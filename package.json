@@ -1,0 +1,5 @@
+{
+  "name": "fwl",
+  "private": true,
+  "workspaces": ["packages/*"]
+}
