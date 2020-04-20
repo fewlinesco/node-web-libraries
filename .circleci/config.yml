@@ -39,6 +39,9 @@ jobs:
             - yarn-packages-v1-{{ .Branch }}-
             - yarn-packages-v1-
       - run:
+          name: yarn-install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
           name: database-tests
           command: yarn --cache-folder ~/.cache/yarn test
           working_directory: packages/database
