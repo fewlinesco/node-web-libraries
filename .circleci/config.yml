@@ -40,7 +40,7 @@ jobs:
             - yarn-packages-v1-
       - run:
           name: database-tests
-          command: yarn test
+          command: yarn --cache-folder ~/.cache/yarn test
           working_directory: packages/database
 
 workflows:
