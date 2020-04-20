@@ -13,7 +13,7 @@ function close(pool: Pool): Promise<void> {
   return pool.end();
 }
 
-type TransactionFunction = (client: PoolClient) => Promise<any>;
+type TransactionFunction = (client: DatabaseQueryRunner) => Promise<any>;
 
 export interface DatabaseQueryRunner {
   query: (query: string, values?: any[]) => Promise<QueryArrayResult<any>>;
@@ -35,6 +35,52 @@ export class TransactionError extends Error {
   }
 }
 
+function queryRunner(
+  pool: Pool,
+  txClient: undefined | PoolClient = undefined,
+): DatabaseQueryRunner {
+  return {
+    close: async (): Promise<void> => {
+      if (txClient) {
+        throw new TransactionError(
+          new Error("Can't close a connection inside a transaction"),
+        );
+      } else {
+        close(pool);
+      }
+    },
+    query: (query, values = []): Promise<QueryArrayResult<any>> => {
+      if (txClient) {
+        return txClient.query(query, values);
+      } else {
+        return pool.query(query, values);
+      }
+    },
+    transaction: async (transactionFunction): Promise<any> => {
+      if (txClient) {
+        throw new TransactionError(
+          new Error("Can't run a transaction inside another transaction"),
+        );
+        return;
+      }
+      const newTxClient: PoolClient = await pool.connect();
+      try {
+        await newTxClient.query("BEGIN");
+        const result = await transactionFunction(
+          queryRunner(pool, newTxClient),
+        );
+        await newTxClient.query("COMMIT");
+        return result;
+      } catch (error) {
+        await newTxClient.query("ROLLBACK");
+        throw new TransactionError(error);
+      } finally {
+        newTxClient.release();
+      }
+    },
+  };
+}
+
 export function connect(options: PGOptions): DatabaseQueryRunner {
   const pool = new Pool({
     user: options.username,
@@ -43,23 +89,5 @@ export function connect(options: PGOptions): DatabaseQueryRunner {
     database: options.database,
     port: options.port,
   });
-  return {
-    close: (): Promise<void> => close(pool),
-    query: (query, values = []): Promise<QueryArrayResult<any>> =>
-      pool.query(query, values),
-    transaction: async (transactionFunction): Promise<any> => {
-      const client = await pool.connect();
-      try {
-        await client.query("BEGIN");
-        const result = await transactionFunction(client);
-        await client.query("COMMIT");
-        return result;
-      } catch (error) {
-        await client.query("ROLLBACK");
-        throw new TransactionError(error);
-      } finally {
-        client.release();
-      }
-    },
-  };
+  return queryRunner(pool);
 }

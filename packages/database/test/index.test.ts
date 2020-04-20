@@ -30,52 +30,97 @@ test("it should connect and get data", async () => {
   expect(rows[0].name).toBe("test");
 });
 
-test("a transaction should be commited if all works", async () => {
-  try {
-    await db.transaction(async (client) => {
-      await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
-        "10f9a111-bf5c-4e73-96ac-5de87d962929",
-        "in-transaction",
-      ]);
-    });
-  } catch (error) {
-    expect(error).not.toBeDefined();
-  }
+describe("transactions", () => {
+  test("a transaction should be commited if all works", async () => {
+    try {
+      await db.transaction(async (client) => {
+        await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
+          "10f9a111-bf5c-4e73-96ac-5de87d962929",
+          "in-transaction",
+        ]);
+      });
+    } catch (error) {
+      expect(error).not.toBeDefined();
+    }
 
-  const { rows } = await db.query("SELECT * FROM fwl WHERE name = $1", [
-    "in-transaction",
-  ]);
-  expect(rows.length).toBe(1);
-  expect(rows[0].name).toBe("in-transaction");
-});
+    const { rows } = await db.query("SELECT * FROM fwl WHERE name = $1", [
+      "in-transaction",
+    ]);
+    expect(rows.length).toBe(1);
+    expect(rows[0].name).toBe("in-transaction");
+  });
 
-test("we should be able to manually rollback a transaction", async () => {
-  try {
-    await db.transaction(async (client) => {
-      await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
-        "10f9a111-bf5c-4e73-96ac-5de87d962929",
-        "in-transaction",
-      ]);
-      await client.query("ROLLBACK");
-    });
-  } catch (error) {
-    expect(error).not.toBeDefined();
-  }
+  test("a transaction should be able to return the result of the last returned query", async () => {
+    expect.assertions(2);
+    try {
+      const { rows } = await db.transaction((client) => {
+        return client.query(
+          "INSERT INTO fwl (id, name) VALUES ($1, $2) RETURNING id, name",
+          ["10f9a111-bf5c-4e73-96ac-5de87d962929", "in-transaction"],
+        );
+      });
+      expect(rows.length).toBe(1);
+      expect(rows[0].name).toBe("in-transaction");
+    } catch (error) {
+      expect(error).not.toBeDefined();
+    }
+  });
 
-  const { rows } = await db.query("SELECT * FROM fwl WHERE name = $1", [
-    "in-transaction",
-  ]);
-  expect(rows.length).toBe(0);
-});
+  test("we should be able to manually rollback a transaction", async () => {
+    try {
+      await db.transaction(async (client) => {
+        await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
+          "10f9a111-bf5c-4e73-96ac-5de87d962929",
+          "in-transaction",
+        ]);
+        await client.query("ROLLBACK");
+        return Promise.reject(Error("rollbacked"));
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(database.TransactionError);
+      expect(error.message).toBe("rollbacked");
+    }
 
-test("it should return a TransactionError if a transaction fails", async () => {
-  try {
-    await db.transaction((client) =>
-      client.query("INSERT INTO fwl (name) VALUES ($1)", ["fail"]),
-    );
-  } catch (error) {
-    expect(error).toBeInstanceOf(database.TransactionError);
-  }
-  const { rows } = await db.query("SELECT * FROM fwl");
-  expect(rows.length).toBe(0);
+    const { rows } = await db.query("SELECT * FROM fwl WHERE name = $1", [
+      "in-transaction",
+    ]);
+    expect(rows.length).toBe(0);
+  });
+
+  test("it should return a TransactionError if a transaction fails", async () => {
+    try {
+      await db.transaction((client) =>
+        client.query("INSERT INTO fwl (name) VALUES ($1)", ["fail"]),
+      );
+    } catch (error) {
+      expect(error).toBeInstanceOf(database.TransactionError);
+    }
+    const { rows } = await db.query("SELECT * FROM fwl");
+    expect(rows.length).toBe(0);
+  });
+
+  test("it should return a TransactionError if we try to get a transaction inside of a transaction", async () => {
+    expect.assertions(2);
+    const noOp = () => Promise.resolve();
+    try {
+      await db.transaction((client) => client.transaction(noOp));
+    } catch (error) {
+      expect(error).toBeInstanceOf(database.TransactionError);
+      expect(error.message).toBe(
+        "Can't run a transaction inside another transaction",
+      );
+    }
+  });
+
+  test("it should return a TransactionError if we try to close the connection inside of a transaction", async () => {
+    expect.assertions(2);
+    try {
+      await db.transaction((client) => client.close());
+    } catch (error) {
+      expect(error).toBeInstanceOf(database.TransactionError);
+      expect(error.message).toBe(
+        "Can't close a connection inside a transaction",
+      );
+    }
+  });
 });
