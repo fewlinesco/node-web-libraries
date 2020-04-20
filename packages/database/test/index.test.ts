@@ -21,6 +21,7 @@ afterAll(async () => {
 });
 
 test("it should connect and get data", async () => {
+  expect.assertions(2);
   await db.query("INSERT INTO fwl (id, name) VALUES($1, $2)", [
     "74fbf638-6241-42bd-b257-b9a3dd24feb6",
     "test",
@@ -32,6 +33,7 @@ test("it should connect and get data", async () => {
 
 describe("transactions", () => {
   test("a transaction should be commited if all works", async () => {
+    expect.assertions(2);
     try {
       await db.transaction(async (client) => {
         await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
@@ -67,6 +69,7 @@ describe("transactions", () => {
   });
 
   test("we should be able to manually rollback a transaction", async () => {
+    expect.assertions(3);
     try {
       await db.transaction(async (client) => {
         await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
@@ -88,6 +91,7 @@ describe("transactions", () => {
   });
 
   test("it should return a TransactionError if a transaction fails", async () => {
+    expect.assertions(2);
     try {
       await db.transaction((client) =>
         client.query("INSERT INTO fwl (name) VALUES ($1)", ["fail"]),
