@@ -45,6 +45,24 @@ jobs:
           name: database-tests
           command: yarn --cache-folder ~/.cache/yarn test
           working_directory: packages/database
+  test-logging:
+    docker:
+      - image: circleci/node:12.16.2
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v1-{{ .Branch }}-
+            - yarn-packages-v1-
+      - run:
+          name: yarn-install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
+          name: logging-tests
+          command: yarn --cache-folder ~/.cache/yarn test
+          working_directory: packages/logging
+
 
 workflows:
   version: 2
