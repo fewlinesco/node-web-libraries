@@ -1,0 +1,16 @@
+version: "2.1"
+
+services:
+  postgres:
+    image: postgres:10.1-alpine
+    environment:
+      POSTGRES_USER: "fwl_db"
+      POSTGRES_PASSWORD: "fwl_db"
+      POSTGRES_DB: "fwl_db"
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: "pg_isready -U postgres"
+      interval: 10s
+      timeout: 5s
+      retries: 5
