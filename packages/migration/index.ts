@@ -3,34 +3,12 @@ import * as fs from "fs";
 import * as path from "path";
 import { getPendingMigrations } from "utils/getPendingMigrations";
 import { handleSchemaMigrations } from "utils/handleSchemaMigrations";
-import { createTimestamp } from "utils/createTimestamp";
 
 export type Query = {
   timestamp: string;
   query: string;
   fileName: string;
 };
-
-export async function createMigrationFile(
-  args: string[],
-  targetDir: string,
-): Promise<void> {
-  if (process.argv.length === 3) {
-    const [arg] = args.slice(2);
-    // const targetDir = path.join(process.cwd(), "/sql/migrations");
-    const fileName = `${createTimestamp(new Date())}-${arg}.sql`;
-
-    fs.open(`${targetDir + "/" + fileName}`, "wx", (err) => {
-      if (err) throw err;
-
-      console.log(`${fileName} has been created in ${targetDir}`);
-    });
-  } else {
-    console.log(
-      "❗Please provide a file name like this:\n'yarn db:create-migration-file <file-name>'",
-    );
-  }
-}
 
 export async function runMigrations(
   databaseQueryRunner: database.DatabaseQueryRunner,
