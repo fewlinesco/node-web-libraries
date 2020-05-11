@@ -1,57 +1,15 @@
 import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
-import { v4 as uuidv4 } from "uuid";
+import { getPendingMigrations } from "utils/getPendingMigrations";
+import { handleSchemaMigrations } from "utils/handleSchemaMigrations";
+import { createTimestamp } from "utils/createTimestamp";
 
-type Query = {
+export type Query = {
   timestamp: string;
   query: string;
   fileName: string;
 };
-
-function handleSchemaMigrations(
-  databaseQueryRunner: database.DatabaseQueryRunner,
-  queries: Query[],
-): Promise<any> {
-  return databaseQueryRunner.transaction(async (client) => {
-    const { timestamp, fileName, query } = queries[0];
-
-    // Create `schema_migrations` table if not exists.
-    await client.query(query);
-
-    const schemaMigrations = await client.query(
-      "SELECT * FROM schema_migrations",
-    );
-
-    if (schemaMigrations.rows.length === 0) {
-      return await client.query(
-        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4) RETURNING *",
-        [uuidv4(), timestamp, fileName, Buffer.from(query).toString("base64")],
-      );
-    } else {
-      return schemaMigrations;
-    }
-  });
-}
-
-function getPendingMigrations(queries: Query[], timestamp: string): Query[] {
-  const index = queries.findIndex((query) =>
-    query.timestamp.includes(timestamp),
-  );
-
-  return queries.slice(index + 1);
-}
-
-// Format Date in to 14 char timestamp (i.e. `2020-05-07T09:59:22.603Z` => `20200507095922`).
-function createTimestamp(date: Date): string | void {
-  const filteredDate = date.toISOString().match(/[\d]/g);
-
-  if (filteredDate) {
-    return filteredDate.join("").slice(0, -3);
-  } else {
-    throw new Error("❗Incorrect date format. Please use `new Date()`");
-  }
-}
 
 export async function createMigrationFile(
   args: string[],
@@ -101,7 +59,7 @@ export async function runMigrations(
         });
     }
 
-    const { rows } = await handleSchemaMigrations(databaseQueryRunner, queries);
+    const { rows } = await handleSchemaMigrations(databaseQueryRunner);
 
     const lastRanMigration = rows[rows.length - 1];
 
