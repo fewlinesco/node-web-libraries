@@ -22,6 +22,12 @@ Provides an interface for a simple logger.
 
 [Logging documentation](./packages/logging/README.md)
 
+## Migration
+
+Provides a migration tool using SQL files.
+
+[Migration documentation](./packages/migration/README.md)
+
 ## Tracing
 
 Provides an interface other OpenTelemetry.
