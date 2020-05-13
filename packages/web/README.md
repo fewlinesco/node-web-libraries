@@ -18,19 +18,26 @@ yarn add @fewlines/fwl-web
 
 The `Router` of this package is an abstraction on top of the basic Express Router, it is charged with sending the response and displaying the errors.
 
-It takes a `tracer` and a `logger` in its constructor and has a similar API as the Express Router after that:
+It takes a `tracer` and a `logger` in its constructor and its API looks a bit like what Express is expecting but we need to pass the types of data the handler will receive.
+
+There are differences between `.get` and the other methods:
+- `.get` will need to type the `params` that it will receive.
+- `.post`, `.pacth`, `.delete` will need to type both the `params` and the `body` they will receive.
+
+`params` is a merge of Query Strings (`?offset=10`) and Named Parameters (e.g. the `id` in `/path/:id`).
+Please beware, Named Parameters will have precedence over Query Strings, meaning that for the path `/user/:id`, the URL `/user/1?id=2` will have a `params.id` equal to `1`.
 
 ```typescript
 const router = new Router(tracer, logger);
 
-router.get("/", handler);
-router.get("/path/:id", anotherHandler);
-router.post("/path", postHandler);
-router.patch("/path", patchHandler);
-router.delete("/path", deleteHandler);
+router.get<{}>("/", handler);
+router.get<{id: string}>("/path/:id", anotherHandler);
+router.post<{}, {name: string, description: string}>("/path", postHandler);
+router.patch<{id: string}, {name:? string, description:? string>("/path/:id", patchHandler);
+router.delete<{id: string}, {}>("/path/:id", deleteHandler);
 ```
 
-Its difference lies in the way the Handler works.
+For more information, please look at the [example](./example/).
 
 ### Handler
 
@@ -45,7 +52,7 @@ Let's see an example:
 
 ```typescript
 // First we define the route wit an URL Parameter
-router.get("/my/:name", myHandler(database));
+router.get<{name: string}>("/my/:name", myHandler(database));
 ```
 
 ```typescript
@@ -54,7 +61,6 @@ import { Tracer } from "@fewlines/fwl-tracing";
 import {
   HandlerPromise,
   HttpStatus,
-  Params,
   RejectFunction,
   ResolveFunction,
 } from "@fewlines/fwl-web";
@@ -92,6 +98,8 @@ export function myHandler(database) {
   };
 }
 ```
+
+For more information, please look at the [example](./example/).
 
 ### Dealing With Errors
 
@@ -156,7 +164,7 @@ import { handler } from "./handlers";
 export function bootstrap( tracer: Tracer, logger: Logger): Application {
   const router = new Router(tracer, logger);
 
-  router.get("/", handler(spartaApiClient));
+  router.get<{}>("/", handler(spartaApiClient));
 
   return createApp(router, [loggingMiddleware(tracer, logger)]);
 }
