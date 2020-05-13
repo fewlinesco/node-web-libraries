@@ -10,11 +10,13 @@ export function handleSchemaMigrations(
         "id" uuid NOT NULL,
         "version" varchar(14) NOT NULL,
         "file_name" varchar(255) NOT NULL,
-        "query" BYTEA NOT NULL,
+        "query" text NOT NULL,
         "created_at" timestamp NOT NULL DEFAULT NOW(),
         "updated_at" timestamp NOT NULL DEFAULT NOW(),
         PRIMARY KEY ("id")
       );`;
+
+    // Remove insert when create the table.
 
     const timestamp = "00000000000000";
 
@@ -29,7 +31,7 @@ export function handleSchemaMigrations(
     if (schemaMigrations.rows.length === 0) {
       return await client.query(
         "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4) RETURNING *",
-        [uuidv4(), timestamp, fileName, Buffer.from(query).toString("base64")],
+        [uuidv4(), timestamp, fileName, query],
       );
     } else {
       return schemaMigrations;
