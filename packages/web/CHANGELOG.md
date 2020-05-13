@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.0 - 2020-05-13
+
+- Removed `Params` from the exported types of Router
+- Separated Query String and Named Parameters from the Body (hence a "GET" handler has a different signature)
+- Routes must now type what they will receive as params (one type for "GET" routes, two types for the others)
+
 ## 1.0.0 - 2020-04-16
 
 - Created the package @fewlines/fwl-web
