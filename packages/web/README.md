@@ -22,7 +22,7 @@ It takes a `tracer` and a `logger` in its constructor and its API looks a bit li
 
 There are differences between `.get` and the other methods:
 - `.get` will need to type the `params` that it will receive.
-- `.post`, `.pacth`, `.delete` will need to type both the `params` and the `body` they will receive.
+- `.post`, `.patch`, `.delete` will need to type both the `params` and the `body` they will receive.
 
 `params` is a merge of Query Strings (`?offset=10`) and Named Parameters (e.g. the `id` in `/path/:id`).
 Please beware, Named Parameters will have precedence over Query Strings, meaning that for the path `/user/:id`, the URL `/user/1?id=2` will have a `params.id` equal to `1`.
