@@ -1,9 +1,6 @@
 import * as database from "@fewlines/fwl-database";
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
-import {
-  getLastMigration,
-  // SchemaMigrationsRow,
-} from "../utils/getLastMigration";
+import { getLastMigration } from "../utils/getLastMigration";
 
 let db: database.DatabaseQueryRunner;
 beforeAll(async () => {
