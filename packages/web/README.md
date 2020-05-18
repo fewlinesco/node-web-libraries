@@ -33,7 +33,7 @@ const router = new Router(tracer, logger);
 router.get<{}>("/", handler);
 router.get<{id: string}>("/path/:id", anotherHandler);
 router.post<{}, {name: string, description: string}>("/path", postHandler);
-router.patch<{id: string}, {name:? string, description:? string>("/path/:id", patchHandler);
+router.patch<{id: string}, {name?: string, description?: string>("/path/:id", patchHandler);
 router.delete<{id: string}, {}>("/path/:id", deleteHandler);
 ```
 
