@@ -72,11 +72,13 @@ export class Router {
     this.router = expressRouter();
   }
 
-  private withBodyResponse<T, U>(handler: HandlerWithBody<T, U>) {
-    return async (request, response): Promise<void> => {
+  private withBodyResponse<T extends object, U>(
+    handler: HandlerWithBody<T, U>,
+  ) {
+    return async (request: Request, response: Response): Promise<void> => {
       const resolve = resolveFactory(response);
       const reject = rejectFactory(response);
-      const params = { ...request.query, ...request.params };
+      const params = { ...request.query, ...request.params } as T;
       try {
         await handler(
           this.tracer,
@@ -96,20 +98,29 @@ export class Router {
     };
   }
 
-  post<T, U>(path: string, handler: HandlerWithBody<T, U>): void {
+  post<T extends object, U>(
+    path: string,
+    handler: HandlerWithBody<T, U>,
+  ): void {
     this.router.post(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  patch<T, U>(path: string, handler: HandlerWithBody<T, U>): void {
+  patch<T extends object, U>(
+    path: string,
+    handler: HandlerWithBody<T, U>,
+  ): void {
     this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  delete<T, U>(path: string, handler: HandlerWithBody<T, U>): void {
+  delete<T extends object, U>(
+    path: string,
+    handler: HandlerWithBody<T, U>,
+  ): void {
     this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
   }
 
   get<T extends object>(path: string, handler: HandlerWithoutBody<T>): void {
-    this.router.get(path, async (request, response) => {
+    this.router.get(path, async (request: Request, response: Response) => {
       const resolve = resolveFactory(response);
       const reject = rejectFactory(response);
       const params = { ...request.query, ...request.params } as T;

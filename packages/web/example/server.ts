@@ -15,7 +15,7 @@ export function start(tracer: Tracer, logger: Logger): Application {
     userHandler.getUserById(),
   );
 
-  router.post<{}, userHandler.CreateUserBody>(
+  router.post<userHandler.CreateUserParams, userHandler.CreateUserBody>(
     "/users",
     userHandler.createUser(),
   );

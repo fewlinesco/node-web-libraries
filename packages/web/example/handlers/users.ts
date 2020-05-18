@@ -39,6 +39,7 @@ export function getUserById() {
   };
 }
 
+export type CreateUserParams = {};
 export interface CreateUserBody {
   name: string;
 }
