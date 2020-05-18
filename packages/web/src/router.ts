@@ -6,10 +6,6 @@ import { Tracer } from "@fewlines/fwl-tracing";
 import { HttpStatus } from "./http-statuses";
 import { UnmanagedError, WebError } from "./errors";
 
-export interface Params {
-  [key: string]: unknown;
-}
-
 enum ResolveOrReject {
   RESOLVE,
   REJECT,
@@ -24,11 +20,20 @@ export type ResolveFunction = (
   returnValue?: unknown,
 ) => HandlerPromise;
 
-type Handler = (
+type HandlerWithoutBody<T extends object> = (
   tracer: Tracer,
   resolve: ResolveFunction,
   reject: RejectFunction,
-  params: Params,
+  params: T,
+  request: Request,
+) => HandlerPromise;
+
+type HandlerWithBody<T, U> = (
+  tracer: Tracer,
+  resolve: ResolveFunction,
+  reject: RejectFunction,
+  params: T,
+  body: U,
   request: Request,
 ) => HandlerPromise;
 
@@ -67,13 +72,22 @@ export class Router {
     this.router = expressRouter();
   }
 
-  private withBodyResponse(handler: Handler) {
-    return async (request, response): Promise<void> => {
+  private withBodyResponse<T extends object, U>(
+    handler: HandlerWithBody<T, U>,
+  ) {
+    return async (request: Request, response: Response): Promise<void> => {
       const resolve = resolveFactory(response);
       const reject = rejectFactory(response);
-      const params = { ...request.query, ...request.params, ...request.body };
+      const params = { ...request.query, ...request.params } as T;
       try {
-        await handler(this.tracer, resolve, reject, params, request);
+        await handler(
+          this.tracer,
+          resolve,
+          reject,
+          params,
+          request.body,
+          request,
+        );
       } catch (exception) {
         if (exception instanceof WebError) {
           reject(exception);
@@ -84,23 +98,32 @@ export class Router {
     };
   }
 
-  post(path: string, handler: Handler): void {
+  post<T extends object, U>(
+    path: string,
+    handler: HandlerWithBody<T, U>,
+  ): void {
     this.router.post(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  patch(path: string, handler: Handler): void {
+  patch<T extends object, U>(
+    path: string,
+    handler: HandlerWithBody<T, U>,
+  ): void {
     this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  delete(path: string, handler: Handler): void {
+  delete<T extends object, U>(
+    path: string,
+    handler: HandlerWithBody<T, U>,
+  ): void {
     this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  get(path: string, handler: Handler): void {
-    this.router.get(path, async (request, response) => {
+  get<T extends object>(path: string, handler: HandlerWithoutBody<T>): void {
+    this.router.get(path, async (request: Request, response: Response) => {
       const resolve = resolveFactory(response);
       const reject = rejectFactory(response);
-      const params = { ...request.query, ...request.params };
+      const params = { ...request.query, ...request.params } as T;
       try {
         await handler(this.tracer, resolve, reject, params, request);
       } catch (exception) {
