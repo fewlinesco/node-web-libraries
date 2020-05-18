@@ -45,7 +45,7 @@ describe("getLastMigration", () => {
 
     const queries: [string, string[]][] = [
       [
-        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4) RETURNING *",
+        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
         [
           "74fbf638-6241-42bd-b257-b9a3dd24feb6",
           "01234567891011",
@@ -54,7 +54,7 @@ describe("getLastMigration", () => {
         ],
       ],
       [
-        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4) RETURNING *",
+        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
         [
           "f4afc55f-1c03-4f08-8750-ab92e106b606",
           "01234567891011",
@@ -63,7 +63,7 @@ describe("getLastMigration", () => {
         ],
       ],
       [
-        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4) RETURNING *",
+        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
         [
           "37e2c486-0009-4b85-839a-1768bbd553ad",
           "01234567891011",
@@ -84,10 +84,8 @@ describe("getLastMigration", () => {
       });
     }
 
-    const { rows } = await getLastMigration(db);
+    const lastMigrationRan = await getLastMigration(db);
 
-    const lastMigration = rows[0];
-
-    expect(lastMigration.file_name).toBe("third migration");
+    expect(lastMigrationRan.file_name).toBe("third migration");
   });
 });

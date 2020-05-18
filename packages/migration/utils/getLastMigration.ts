@@ -1,5 +1,4 @@
 import * as database from "@fewlines/fwl-database";
-import { QueryResult } from "pg";
 
 export type SchemaMigrationsRow = {
   id: string;
@@ -9,10 +8,12 @@ export type SchemaMigrationsRow = {
   created_at: string;
 };
 
-export function getLastMigration(
+export async function getLastMigration(
   databaseQueryRunner: database.DatabaseQueryRunner,
-): Promise<QueryResult<SchemaMigrationsRow>> {
-  return databaseQueryRunner.query(
+): Promise<SchemaMigrationsRow> {
+  const { rows } = await databaseQueryRunner.query(
     "SELECT * FROM schema_migrations ORDER BY created_at DESC LIMIT 1",
   );
+
+  return rows[0];
 }

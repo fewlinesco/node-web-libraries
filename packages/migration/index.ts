@@ -1,9 +1,10 @@
 import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
-// import { getPendingMigrations } from "utils/getPendingMigrations";
+import { getPendingMigrations } from "utils/getPendingMigrations";
 import { createSchemaMigrationsTable } from "utils/createSchemaMigrationsTable";
 import { getLastMigration } from "utils/getLastMigration";
+import { v4 as uuidv4 } from "uuid";
 
 export type Query = {
   timestamp: string;
@@ -40,39 +41,32 @@ export async function runMigrations(
 
     createSchemaMigrationsTable(databaseQueryRunner);
 
-    const lastRanMigration = await getLastMigration(databaseQueryRunner);
+    const lastMigrationRan = await getLastMigration(databaseQueryRunner);
 
-    console.log(lastRanMigration);
+    const pendingMigrations = getPendingMigrations(
+      queries,
+      lastMigrationRan.version,
+    );
 
-    //   const pendingMigrations = getPendingMigrations(
-    //     queries,
-    //     lastRanMigration.version,
-    //   );
+    for await (const { timestamp, fileName, query } of pendingMigrations) {
+      await databaseQueryRunner.transaction(async (client) => {
+        try {
+          console.log(`\nRunning ${query}`);
+          await client.query(query);
 
-    //   for await (const { timestamp, fileName, query } of pendingMigrations) {
-    //     await databaseQueryRunner.transaction(async (client) => {
-    //       try {
-    //         console.log(`\nRunning ${query}`);
-    //         await client.query(query);
+          console.log("Inserting row into schema_migrations table");
+          await client.query(
+            `INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+            [uuidv4(), timestamp, fileName, query],
+          );
 
-    //         console.log("Updating schema_migrations table");
-    //         await client.query(
-    //           `UPDATE schema_migrations SET version = $1, file_name = $2, query = $3 WHERE id = $4`,
-    //           [
-    //             timestamp,
-    //             fileName,
-    //             Buffer.from(query).toString("base64"),
-    //             lastRanMigration.id,
-    //           ],
-    //         );
-
-    //         console.log("Done.");
-    //       } catch (error) {
-    //         client.query("ROLLBACK");
-    //         throw new Error(error);
-    //       }
-    //     });
-    //   }
+          console.log("Done.");
+        } catch (error) {
+          client.query("ROLLBACK");
+          throw new Error(error);
+        }
+      });
+    }
   } catch (error) {
     console.error(error);
   }
