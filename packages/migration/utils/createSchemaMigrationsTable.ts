@@ -1,9 +1,9 @@
 import * as database from "@fewlines/fwl-database";
 
-export function createSchemaMigrationsTable(
+export async function createSchemaMigrationsTable(
   databaseQueryRunner: database.DatabaseQueryRunner,
-): void {
-  databaseQueryRunner.query(`
+): Promise<void> {
+  await databaseQueryRunner.query(`
       CREATE TABLE IF NOT EXISTS "schema_migrations" (
         "id" uuid NOT NULL,
         "version" varchar(14) NOT NULL,

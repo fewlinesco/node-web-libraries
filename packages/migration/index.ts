@@ -1,8 +1,9 @@
 import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
-import { getPendingMigrations } from "utils/getPendingMigrations";
-import { createSchemaMigrationsTable } from "utils/handleSchemaMigrations";
+// import { getPendingMigrations } from "utils/getPendingMigrations";
+import { createSchemaMigrationsTable } from "utils/createSchemaMigrationsTable";
+import { getLastMigration } from "utils/getLastMigration";
 
 export type Query = {
   timestamp: string;
@@ -37,41 +38,44 @@ export async function runMigrations(
         });
     }
 
-    await createSchemaMigrationsTable(databaseQueryRunner);
+    createSchemaMigrationsTable(databaseQueryRunner);
 
-    const lastRanMigration = rows[rows.length - 1];
+    const lastRanMigration = await getLastMigration(databaseQueryRunner);
 
-    const pendingMigrations = getPendingMigrations(
-      queries,
-      lastRanMigration.version,
-    );
+    console.log(lastRanMigration);
 
-    for await (const { timestamp, fileName, query } of pendingMigrations) {
-      await databaseQueryRunner.transaction(async (client) => {
-        try {
-          console.log(`\nRunning ${query}`);
-          await client.query(query);
+    //   const pendingMigrations = getPendingMigrations(
+    //     queries,
+    //     lastRanMigration.version,
+    //   );
 
-          console.log("Updating schema_migrations table");
-          await client.query(
-            `UPDATE schema_migrations SET version = $1, file_name = $2, query = $3 WHERE id = $4`,
-            [
-              timestamp,
-              fileName,
-              Buffer.from(query).toString("base64"),
-              lastRanMigration.id,
-            ],
-          );
+    //   for await (const { timestamp, fileName, query } of pendingMigrations) {
+    //     await databaseQueryRunner.transaction(async (client) => {
+    //       try {
+    //         console.log(`\nRunning ${query}`);
+    //         await client.query(query);
 
-          console.log("Done.");
-        } catch (error) {
-          client.query("ROLLBACK");
-          throw new Error(error);
-        }
-      });
-    }
+    //         console.log("Updating schema_migrations table");
+    //         await client.query(
+    //           `UPDATE schema_migrations SET version = $1, file_name = $2, query = $3 WHERE id = $4`,
+    //           [
+    //             timestamp,
+    //             fileName,
+    //             Buffer.from(query).toString("base64"),
+    //             lastRanMigration.id,
+    //           ],
+    //         );
+
+    //         console.log("Done.");
+    //       } catch (error) {
+    //         client.query("ROLLBACK");
+    //         throw new Error(error);
+    //       }
+    //     });
+    //   }
   } catch (error) {
     console.error(error);
   }
+
   databaseQueryRunner.close();
 }
