@@ -2,7 +2,7 @@ import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
 import { getPendingMigrations } from "utils/getPendingMigrations";
-import { handleSchemaMigrations } from "utils/handleSchemaMigrations";
+import { createSchemaMigrationsTable } from "utils/handleSchemaMigrations";
 
 export type Query = {
   timestamp: string;
@@ -37,7 +37,7 @@ export async function runMigrations(
         });
     }
 
-    const { rows } = await handleSchemaMigrations(databaseQueryRunner);
+    await createSchemaMigrationsTable(databaseQueryRunner);
 
     const lastRanMigration = rows[rows.length - 1];
 
