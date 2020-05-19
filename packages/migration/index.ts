@@ -1,9 +1,9 @@
 import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
-import { getPendingMigrations } from "utils/getPendingMigrations";
 import { createSchemaMigrationsTable } from "utils/createSchemaMigrationsTable";
 import { getLastMigration } from "utils/getLastMigration";
+import { getPendingMigrations } from "utils/getPendingMigrations";
 import { v4 as uuidv4 } from "uuid";
 
 export type Query = {

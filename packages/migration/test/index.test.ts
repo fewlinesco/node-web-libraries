@@ -1,4 +1,5 @@
 import * as database from "@fewlines/fwl-database";
+
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getLastMigration } from "../utils/getLastMigration";
 
