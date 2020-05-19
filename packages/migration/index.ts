@@ -21,13 +21,13 @@ export async function runMigrations(
 
     const filteredMigrationFiles = migrationsFiles
       .filter((file) => path.extname(file).toLowerCase() === ".sql")
-      .sort((a, b) => (a < b ? -1 : 1));
+      .sort();
 
     const queries: Query[] = [];
 
     for await (const fileName of filteredMigrationFiles) {
       await fs.promises
-        .readFile(sqlMigrationsFolder + "/" + fileName, "utf8")
+        .readFile(`${sqlMigrationsFolder}/${fileName}`, "utf8")
         .then((query) => {
           const timestamp = fileName.split("-")[0];
 

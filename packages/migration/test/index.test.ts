@@ -22,7 +22,7 @@ afterAll(async () => {
   await db.close();
 });
 
-test("it should connect and get data", async () => {
+it("should connect and get data", async () => {
   expect.assertions(4);
   const {
     rows,
