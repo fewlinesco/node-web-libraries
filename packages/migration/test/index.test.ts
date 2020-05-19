@@ -1,5 +1,8 @@
 import * as database from "@fewlines/fwl-database";
 
+import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
+import { getLastMigration } from "../utils/getLastMigration";
+
 let db: database.DatabaseQueryRunner;
 beforeAll(async () => {
   db = database.connect({
@@ -9,18 +12,8 @@ beforeAll(async () => {
     database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
     port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
   });
-  await db.query(
-    `
-      CREATE TABLE IF NOT EXISTS "schema_migrations" (
-        "id" uuid NOT NULL,
-        "version" varchar(14) NOT NULL,
-        "file_name" varchar(255) NOT NULL,
-        "query" text NOT NULL,
-        "created_at" timestamp NOT NULL DEFAULT NOW(),
-        "updated_at" timestamp NOT NULL DEFAULT NOW(),
-        PRIMARY KEY ("id")
-      );`,
-  );
+
+  await createSchemaMigrationsTable(db);
 });
 beforeEach(() => db.query("TRUNCATE schema_migrations"));
 
@@ -29,7 +22,7 @@ afterAll(async () => {
   await db.close();
 });
 
-test("it should connect and get data", async () => {
+it("should connect and get data", async () => {
   expect.assertions(4);
   const {
     rows,
@@ -42,4 +35,55 @@ test("it should connect and get data", async () => {
   expect(rows[0].version).toBe("01234567891011");
   expect(rows[0].file_name).toBe("test");
   expect(rows[0].query).toBe("query");
+});
+
+describe("getLastMigration", () => {
+  it("returns the last migration", async () => {
+    expect.assertions(1);
+
+    const queries: [string, string[]][] = [
+      [
+        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
+        [
+          "74fbf638-6241-42bd-b257-b9a3dd24feb6",
+          "01234567891011",
+          "first migration",
+          "query",
+        ],
+      ],
+      [
+        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
+        [
+          "f4afc55f-1c03-4f08-8750-ab92e106b606",
+          "01234567891011",
+          "second migration",
+          "query",
+        ],
+      ],
+      [
+        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
+        [
+          "37e2c486-0009-4b85-839a-1768bbd553ad",
+          "01234567891011",
+          "third migration",
+          "query",
+        ],
+      ],
+    ];
+
+    for await (const [query, arg] of queries) {
+      await db.transaction(async (client) => {
+        try {
+          await client.query(query, arg);
+        } catch (error) {
+          client.query("ROLLBACK");
+          throw new Error(error);
+        }
+      });
+    }
+
+    const lastMigrationRan = await getLastMigration(db);
+
+    expect(lastMigrationRan.file_name).toBe("third migration");
+  });
 });

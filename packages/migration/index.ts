@@ -1,8 +1,10 @@
 import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
+import { createSchemaMigrationsTable } from "utils/createSchemaMigrationsTable";
+import { getLastMigration } from "utils/getLastMigration";
 import { getPendingMigrations } from "utils/getPendingMigrations";
-import { handleSchemaMigrations } from "utils/handleSchemaMigrations";
+import { v4 as uuidv4 } from "uuid";
 
 export type Query = {
   timestamp: string;
@@ -19,13 +21,13 @@ export async function runMigrations(
 
     const filteredMigrationFiles = migrationsFiles
       .filter((file) => path.extname(file).toLowerCase() === ".sql")
-      .sort((a, b) => (a < b ? -1 : 1));
+      .sort();
 
     const queries: Query[] = [];
 
     for await (const fileName of filteredMigrationFiles) {
       await fs.promises
-        .readFile(sqlMigrationsFolder + "/" + fileName, "utf8")
+        .readFile(`${sqlMigrationsFolder}/${fileName}`, "utf8")
         .then((query) => {
           const timestamp = fileName.split("-")[0];
 
@@ -37,13 +39,13 @@ export async function runMigrations(
         });
     }
 
-    const { rows } = await handleSchemaMigrations(databaseQueryRunner);
+    createSchemaMigrationsTable(databaseQueryRunner);
 
-    const lastRanMigration = rows[rows.length - 1];
+    const lastMigrationRan = await getLastMigration(databaseQueryRunner);
 
     const pendingMigrations = getPendingMigrations(
       queries,
-      lastRanMigration.version,
+      lastMigrationRan.version,
     );
 
     for await (const { timestamp, fileName, query } of pendingMigrations) {
@@ -52,15 +54,10 @@ export async function runMigrations(
           console.log(`\nRunning ${query}`);
           await client.query(query);
 
-          console.log("Updating schema_migrations table");
+          console.log("Inserting row into schema_migrations table");
           await client.query(
-            `UPDATE schema_migrations SET version = $1, file_name = $2, query = $3 WHERE id = $4`,
-            [
-              timestamp,
-              fileName,
-              Buffer.from(query).toString("base64"),
-              lastRanMigration.id,
-            ],
+            `INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+            [uuidv4(), timestamp, fileName, query],
           );
 
           console.log("Done.");
@@ -73,5 +70,6 @@ export async function runMigrations(
   } catch (error) {
     console.error(error);
   }
+
   databaseQueryRunner.close();
 }
