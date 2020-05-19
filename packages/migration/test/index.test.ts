@@ -1,5 +1,6 @@
 import * as database from "@fewlines/fwl-database";
 
+import { runMigrations } from "../index";
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getLastMigration } from "../utils/getLastMigration";
 
@@ -85,5 +86,31 @@ describe("getLastMigration", () => {
     const lastMigrationRan = await getLastMigration(db);
 
     expect(lastMigrationRan.file_name).toBe("third migration");
+  });
+});
+
+describe("runMigration", () => {
+  const config = {
+    database: {
+      database: "fwl_migration",
+      host: "localhost",
+      password: "fwl_migration",
+      port: 3001,
+      username: "fwl_migration",
+    },
+    http: {
+      port: 50100,
+    },
+    tracing: {
+      serviceName: "fwl_migration",
+    },
+    migration: {},
+  };
+
+  it("takes a config json as parameter", () => {
+    expect.assertions(1);
+
+    runMigrations(config);
+    // expect(runMigrations(config)).not.toThrow();
   });
 });

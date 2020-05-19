@@ -1,10 +1,11 @@
 import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
-import { createSchemaMigrationsTable } from "utils/createSchemaMigrationsTable";
-import { getLastMigration } from "utils/getLastMigration";
-import { getPendingMigrations } from "utils/getPendingMigrations";
 import { v4 as uuidv4 } from "uuid";
+
+import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
+import { getLastMigration } from "./utils/getLastMigration";
+import { getPendingMigrations } from "./utils/getPendingMigrations";
 
 export type Query = {
   timestamp: string;
@@ -12,10 +13,32 @@ export type Query = {
   fileName: string;
 };
 
-export async function runMigrations(
-  databaseQueryRunner: database.DatabaseQueryRunner,
-  sqlMigrationsFolder: string,
-): Promise<void> {
+export type Config = {
+  database: {
+    database: string;
+    host: string;
+    password: string;
+    port: number;
+    username: string;
+  };
+  http: {
+    port: number;
+  };
+  tracing: {
+    serviceName: string;
+  };
+  migration: {
+    dirPath?: string;
+  };
+};
+
+export async function runMigrations(config: Config): Promise<void> {
+  const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
+    config.database,
+  );
+
+  const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
+
   try {
     const migrationsFiles = await fs.promises.readdir(sqlMigrationsFolder);
 
