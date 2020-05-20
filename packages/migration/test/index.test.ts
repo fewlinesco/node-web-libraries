@@ -1,6 +1,5 @@
 import * as database from "@fewlines/fwl-database";
 
-import { runMigrations } from "../index";
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getLastMigration } from "../utils/getLastMigration";
 
@@ -25,11 +24,12 @@ afterAll(async () => {
 
 it("should connect and get data", async () => {
   expect.assertions(4);
+
   const {
     rows,
   } = await db.query(
     "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4) RETURNING *",
-    ["74fbf638-6241-42bd-b257-b9a3dd24feb6", "01234567891011", "test", "query"],
+    ["c574af57-3e92-437f-9312-3090e113a3a5", "01234567891011", "test", "query"],
   );
 
   expect(rows.length).toBe(1);
@@ -86,31 +86,5 @@ describe("getLastMigration", () => {
     const lastMigrationRan = await getLastMigration(db);
 
     expect(lastMigrationRan.file_name).toBe("third migration");
-  });
-});
-
-describe("runMigration", () => {
-  const config = {
-    database: {
-      database: "fwl_migration",
-      host: "localhost",
-      password: "fwl_migration",
-      port: 3001,
-      username: "fwl_migration",
-    },
-    http: {
-      port: 50100,
-    },
-    tracing: {
-      serviceName: "fwl_migration",
-    },
-    migration: {},
-  };
-
-  it("takes a config json as parameter", () => {
-    expect.assertions(1);
-
-    runMigrations(config);
-    // expect(runMigrations(config)).not.toThrow();
   });
 });
