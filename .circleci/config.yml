@@ -35,7 +35,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum "packages/database/yarn.lock" }}
             - yarn-packages-v1-{{ .Branch }}-
             - yarn-packages-v1-
       - run:
@@ -52,7 +52,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum "packages/logging/yarn.lock" }}
             - yarn-packages-v1-{{ .Branch }}-
             - yarn-packages-v1-
       - run:
@@ -62,7 +62,7 @@ jobs:
           name: logging-tests
           command: yarn --cache-folder ~/.cache/yarn test
           working_directory: packages/logging
-  test-migrate:
+  test-migration:
     docker:
       - image: circleci/node:12.16.2
         environment:
@@ -80,7 +80,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum packages/migration/"yarn.lock" }}
             - yarn-packages-v1-{{ .Branch }}-
             - yarn-packages-v1-
       - run:
@@ -103,6 +103,6 @@ workflows:
       - test-logging:
           requires:
             - setup
-      - test-migrate:
+      - test-migration:
           requires:
             - setup
