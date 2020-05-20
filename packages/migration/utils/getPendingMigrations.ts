@@ -7,6 +7,5 @@ export function getPendingMigrations(
   const index = queries.findIndex((query) =>
     query.timestamp.includes(timestamp),
   );
-
   return queries.slice(index + 1);
 }

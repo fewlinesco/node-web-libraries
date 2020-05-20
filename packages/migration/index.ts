@@ -54,10 +54,9 @@ export async function runMigrations(config: MigrateConfig): Promise<void> {
 
     const lastMigrationRan = await getLastMigration(databaseQueryRunner);
 
-    const pendingMigrations = getPendingMigrations(
-      queries,
-      lastMigrationRan ? lastMigrationRan.version : false,
-    );
+    const pendingMigrations = lastMigrationRan
+      ? getPendingMigrations(queries, lastMigrationRan.version)
+      : queries;
 
     for await (const { timestamp, fileName, query } of pendingMigrations) {
       await databaseQueryRunner.transaction(async (client) => {
