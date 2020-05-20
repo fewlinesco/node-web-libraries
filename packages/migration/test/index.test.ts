@@ -58,6 +58,8 @@ describe("runMigrations", () => {
   };
 
   it("takes a config json as parameter", async (done) => {
+    expect.assertions(1);
+
     await runMigrations(testConfig);
 
     const db = database.connect({
@@ -77,30 +79,32 @@ describe("runMigrations", () => {
     done();
   });
 
-  // it("takes insert each migrations", async () => {
-  //   await runMigrations(testConfig);
+  it("takes insert each migrations", async (done) => {
+    expect.assertions(1);
 
-  //   const db = database.connect({
-  //     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-  //     host: process.env.DATABASE_SQL_HOST || "localhost",
-  //     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-  //     database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-  //     port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-  //   });
+    await runMigrations(testConfig);
 
-  //   const { rows } = await db.query("SELECT * FROM schema_migrations");
-  //   const tableNames = ["users", "profiles", "posts"];
+    const db = database.connect({
+      username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
+      host: process.env.DATABASE_SQL_HOST || "localhost",
+      password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
+      database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
+      port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
+    });
 
-  //   expect(rows.length).toEqual(3);
+    const dbTables = await db.transaction(async (client) => {
+      const schemaMugrationsTable = await client.query("SELECT * FROM users");
+      const usersTable = await client.query("SELECT * FROM users");
+      const profilesTable = await client.query("SELECT * FROM profiles");
+      const postsTable = await client.query("SELECT * FROM posts");
 
-  //   tableNames.forEach((tableName, index) => {
-  //     expect(tableName).toEqual([index])
-  //   });
+      return [schemaMugrationsTable, usersTable, profilesTable, postsTable];
+    });
 
-  //   for (const tableName in tableNames) {
-  //     expect(tableName).toEqual
-  //   }
+    expect(dbTables.length).toEqual(4);
 
-  //   await db.close();
-  // });
+    await db.close();
+
+    done();
+  });
 });
