@@ -2,6 +2,7 @@ import * as database from "@fewlines/fwl-database";
 import * as fs from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { Config as DefaultConfig } from "@fewlines/fwl-config";
 
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { getLastMigration } from "./utils/getLastMigration";
@@ -13,26 +14,13 @@ export type Query = {
   fileName: string;
 };
 
-export type Config = {
-  database: {
-    database: string;
-    host: string;
-    password: string;
-    port: number;
-    username: string;
-  };
-  http: {
-    port: number;
-  };
-  tracing: {
-    serviceName: string;
-  };
+export interface MigrateConfig extends DefaultConfig {
   migration: {
     dirPath?: string;
   };
-};
+}
 
-export async function runMigrations(config: Config): Promise<void> {
+export async function runMigrations(config: MigrateConfig): Promise<void> {
   const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
     config.database,
   );
@@ -62,13 +50,13 @@ export async function runMigrations(config: Config): Promise<void> {
         });
     }
 
-    createSchemaMigrationsTable(databaseQueryRunner);
+    await createSchemaMigrationsTable(databaseQueryRunner);
 
     const lastMigrationRan = await getLastMigration(databaseQueryRunner);
 
     const pendingMigrations = getPendingMigrations(
       queries,
-      lastMigrationRan.version,
+      lastMigrationRan ? lastMigrationRan.version : false,
     );
 
     for await (const { timestamp, fileName, query } of pendingMigrations) {
