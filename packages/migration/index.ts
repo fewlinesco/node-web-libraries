@@ -1,6 +1,6 @@
+import { Config as DefaultConfig } from "@fewlines/fwl-config";
 import * as database from "@fewlines/fwl-database";
 import { v4 as uuidv4 } from "uuid";
-import { Config as DefaultConfig } from "@fewlines/fwl-config";
 
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { getLastMigration } from "./utils/getLastMigration";

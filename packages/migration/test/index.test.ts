@@ -1,4 +1,3 @@
-// import { configDefaults } from "@fewlines/fwl-config";
 import * as database from "@fewlines/fwl-database";
 
 import { runMigrations } from "../index";
@@ -93,12 +92,12 @@ describe("runMigrations", () => {
     });
 
     const dbTables = await db.transaction(async (client) => {
-      const schemaMugrationsTable = await client.query("SELECT * FROM users");
+      const schemaMigrationsTable = await client.query("SELECT * FROM users");
       const usersTable = await client.query("SELECT * FROM users");
       const profilesTable = await client.query("SELECT * FROM profiles");
       const postsTable = await client.query("SELECT * FROM posts");
 
-      return [schemaMugrationsTable, usersTable, profilesTable, postsTable];
+      return [schemaMigrationsTable, usersTable, profilesTable, postsTable];
     });
 
     expect(dbTables.length).toEqual(4);
