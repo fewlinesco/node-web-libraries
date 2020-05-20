@@ -2,6 +2,7 @@ import * as database from "@fewlines/fwl-database";
 
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getLastMigration } from "../utils/getLastMigration";
+import { getQueries } from "../utils/getQueries";
 
 let db: database.DatabaseQueryRunner;
 beforeAll(async () => {
@@ -86,5 +87,30 @@ describe("getLastMigration", () => {
     const lastMigrationRan = await getLastMigration(db);
 
     expect(lastMigrationRan.file_name).toBe("third migration");
+  });
+});
+
+describe("getPendingMigrations", () => {
+  it("gets the pending migrations", () => {
+    expect(1).toEqual(1);
+  });
+});
+
+describe("getQueries", () => {
+  it("gets the queries from the migrations folder", async () => {
+    const queries = await getQueries("./test/migrations");
+
+    expect(queries.length).toEqual(3);
+  });
+
+  it("keeps the migrations timestamp order", async () => {
+    const queries = await getQueries("./test/migrations");
+    const timestamps = ["20200511072746", "20200511073348", "20200511073458"];
+
+    queries.forEach((query, index) => {
+      const { timestamp } = query;
+
+      expect(timestamp).toBe(timestamps[index]);
+    });
   });
 });

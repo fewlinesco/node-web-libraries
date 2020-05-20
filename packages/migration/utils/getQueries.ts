@@ -5,7 +5,9 @@ import { Query } from "../index";
 export async function getQueries(
   sqlMigrationsFolder: string,
 ): Promise<Query[]> {
-  const migrationsFiles = await fs.promises.readdir(sqlMigrationsFolder);
+  const migrationsDirPath = path.join(process.cwd(), sqlMigrationsFolder);
+
+  const migrationsFiles = await fs.promises.readdir(migrationsDirPath);
 
   const filteredMigrationFiles = migrationsFiles
     .filter((file) => path.extname(file).toLowerCase() === ".sql")
@@ -15,7 +17,7 @@ export async function getQueries(
 
   for await (const fileName of filteredMigrationFiles) {
     await fs.promises
-      .readFile(`${sqlMigrationsFolder}/${fileName}`, "utf8")
+      .readFile(`${migrationsDirPath}/${fileName}`, "utf8")
       .then((query) => {
         const timestamp = fileName.split("-")[0];
 
