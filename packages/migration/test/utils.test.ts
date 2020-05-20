@@ -3,9 +3,10 @@ import * as database from "@fewlines/fwl-database";
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getLastMigration } from "../utils/getLastMigration";
 import { getQueries } from "../utils/getQueries";
+import { getPendingMigrations } from "../utils/getPendingMigrations";
 
 let db: database.DatabaseQueryRunner;
-beforeAll(async () => {
+beforeAll(async (done) => {
   db = database.connect({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
@@ -15,15 +16,19 @@ beforeAll(async () => {
   });
 
   await createSchemaMigrationsTable(db);
+
+  done();
 });
 beforeEach(() => db.query("TRUNCATE schema_migrations"));
 
-afterAll(async () => {
+afterAll(async (done) => {
   await db.query("DROP TABLE schema_migrations");
   await db.close();
+
+  done();
 });
 
-it("should connect and get data", async () => {
+it("should connect and get data", async (done) => {
   expect.assertions(4);
 
   const {
@@ -37,10 +42,12 @@ it("should connect and get data", async () => {
   expect(rows[0].version).toBe("01234567891011");
   expect(rows[0].file_name).toBe("test");
   expect(rows[0].query).toBe("query");
+
+  done();
 });
 
 describe("getLastMigration", () => {
-  it("returns the last migration", async () => {
+  it("returns the last migration", async (done) => {
     expect.assertions(1);
 
     const queries: [string, string[]][] = [
@@ -87,23 +94,25 @@ describe("getLastMigration", () => {
     const lastMigrationRan = await getLastMigration(db);
 
     expect(lastMigrationRan.file_name).toBe("third migration");
-  });
-});
 
-describe("getPendingMigrations", () => {
-  it("gets the pending migrations", () => {
-    expect(1).toEqual(1);
+    done();
   });
 });
 
 describe("getQueries", () => {
-  it("gets the queries from the migrations folder", async () => {
+  it("gets the queries from the migrations folder", async (done) => {
+    expect.assertions(1);
+
     const queries = await getQueries("./test/migrations");
 
     expect(queries.length).toEqual(3);
+
+    done();
   });
 
-  it("keeps the migrations timestamp order", async () => {
+  it("keeps the migrations timestamp order", async (done) => {
+    expect.assertions(3);
+
     const queries = await getQueries("./test/migrations");
     const timestamps = ["20200511072746", "20200511073348", "20200511073458"];
 
@@ -112,5 +121,41 @@ describe("getQueries", () => {
 
       expect(timestamp).toBe(timestamps[index]);
     });
+
+    done();
+  });
+});
+
+describe("getPendingMigrations", () => {
+  it("gets the pending migrations and keep the order", async (done) => {
+    expect.assertions(3);
+
+    const [query, arg]: [string, string[]] = [
+      "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
+      [
+        "03523136-6f2f-40da-b441-ac9f6f994019",
+        "20200511072746",
+        "20200511072746-create-users",
+        "query",
+      ],
+    ];
+
+    db.query(query, arg);
+
+    const queries = await getQueries("./test/migrations");
+
+    const lastMigrationRan = await getLastMigration(db);
+
+    const pendingMigrations = lastMigrationRan
+      ? getPendingMigrations(queries, lastMigrationRan.version)
+      : queries;
+
+    expect(pendingMigrations.length).toEqual(2);
+
+    pendingMigrations.forEach((pendingMigration, index) => {
+      expect(pendingMigration.timestamp).toEqual(queries[index + 1].timestamp);
+    });
+
+    done();
   });
 });
