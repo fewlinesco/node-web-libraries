@@ -6,34 +6,46 @@ describe("runCLI", () => {
 
     process.argv = ["", ""];
 
-    expect(await runCLI()).toThrowError(ERRORS.default.list);
+    try {
+      await runCLI();
+    } catch (error) {
+      expect(error.message).toBe(ERRORS.default.list);
+    }
 
     done();
   });
 
   describe("--migrate", () => {
-    process.argv = ["", "", "--migrate", "path/migration/dir"];
+    const migrateArgs = ["", "", "--migrate", "path/migration/dir"];
 
     it("handles too many arguments", async (done) => {
       expect.assertions(1);
 
-      process.argv = [...process.argv, "foo"];
+      process.argv = [...migrateArgs, "foo"];
 
-      expect(await runCLI()).toThrowError(ERRORS.migrate.tooManyArgs);
+      try {
+        await runCLI();
+      } catch (error) {
+        expect(error.message).toBe(ERRORS.migrate.tooManyArgs);
+      }
 
       done();
     });
   });
 
   describe("--create", () => {
-    process.argv = ["", "", "--create", "foo"];
+    const createArgs = ["", "", "--create", "foo"];
 
     it("handles too many arguments", async (done) => {
       expect.assertions(1);
 
-      process.argv = [...process.argv, "bar"];
+      process.argv = [...createArgs, "bar"];
 
-      expect(await runCLI()).toThrowError(ERRORS.create.tooManyArgs);
+      try {
+        await runCLI();
+      } catch (error) {
+        expect(error.message).toBe(ERRORS.create.tooManyArgs);
+      }
 
       done();
     });
