@@ -1,0 +1,18 @@
+{
+  "database": {
+    "database": "fwl_db",
+    "password": "fwl_db",
+    "username": "fwl_db",
+    "host": "localhost",
+    "port": 5432
+  },
+  "http": {
+    "port": 50100
+  },
+  "tracing": {
+    "serviceName": ""
+  },
+  "migration": {
+    "dirPath": "./test/migrations"
+  }
+}

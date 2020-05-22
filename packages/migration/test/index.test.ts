@@ -1,6 +1,7 @@
 import * as database from "@fewlines/fwl-database";
 
 import { runMigrations } from "../index";
+import { getConfig } from "../utils/getConfig";
 
 let db: database.DatabaseQueryRunner;
 beforeAll(async () => {
@@ -37,29 +38,12 @@ afterAll(async () => {
 });
 
 describe("runMigrations", () => {
-  const testConfig = {
-    database: {
-      database: "fwl_db",
-      password: "fwl_db",
-      username: "fwl_db",
-      host: "localhost",
-      port: 5432,
-    },
-    http: {
-      port: 50100,
-    },
-    tracing: {
-      serviceName: "",
-    },
-    migration: {
-      dirPath: "./test/migrations",
-    },
-  };
-
   it("takes a config json as parameter", async (done) => {
     expect.assertions(1);
 
-    await runMigrations(testConfig);
+    const config = await getConfig("./test/config.json");
+
+    await runMigrations(config);
 
     const db = database.connect({
       username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
@@ -81,7 +65,9 @@ describe("runMigrations", () => {
   it("takes insert each migrations", async (done) => {
     expect.assertions(1);
 
-    await runMigrations(testConfig);
+    const config = await getConfig("./test/config.json");
+
+    await runMigrations(config);
 
     const db = database.connect({
       username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
