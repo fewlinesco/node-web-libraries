@@ -53,9 +53,13 @@ describe("runCLI", () => {
 
       const expectedFile = `${createTimestamp(new Date())}-foo.sql`;
 
-      expect(createdMigrationFile[0]).toBe(expectedFile);
+      expect(createdMigrationFile[createdMigrationFile.length - 1]).toBe(
+        expectedFile,
+      );
 
-      await fs.promises.rmdir(migrationsDirPath, (smth) => console.log(smth));
+      await fs.promises.unlink(`${migrationsDirPath}/${expectedFile}`);
+
+      await fs.promises.rmdir(migrationsDirPath);
 
       done();
     });
