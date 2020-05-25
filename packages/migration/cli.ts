@@ -41,5 +41,3 @@ export async function runCLI(): Promise<void> {
     throw new Error(ERRORS.default.list);
   }
 }
-
-runCLI();

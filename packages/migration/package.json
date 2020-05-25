@@ -44,11 +44,9 @@
     "prepare": "yarn build",
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
-    "test": "jest --runInBand",
-    "test:cli": "ts-node ./cli.ts"
+    "test": "jest --runInBand"
   },
   "bin": {
-
     "migration": "./cli.ts"
   },
   "types": "dist/index.d.ts",
