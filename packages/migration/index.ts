@@ -64,7 +64,6 @@ export async function runMigrations(config: MigrateConfig): Promise<void> {
 }
 
 export async function createMigrationFile(name: string): Promise<void> {
-  const config = getConfig();
   const targetDir = path.join(process.cwd(), "./migrations");
   const fileName = `${createTimestamp(new Date())}-${name}.sql`;
 

@@ -1,4 +1,9 @@
+import * as fs from "fs";
+import * as path from "path";
+
 import { runCLI, ERRORS } from "../cli";
+import { createMigrationFile } from "../index";
+import { createTimestamp } from "../utils/createTimestamp";
 
 describe("runCLI", () => {
   it("handles no arguments", async (done) => {
@@ -35,6 +40,25 @@ describe("runCLI", () => {
 
   describe("--create", () => {
     const createArgs = ["", "", "--create", "foo"];
+
+    it("create a timestamped migration file", async (done) => {
+      expect.assertions(1);
+
+      process.argv = [...createArgs, "foo"];
+      await createMigrationFile("foo");
+
+      const migrationsDirPath = path.join(process.cwd(), "migrations");
+
+      const createdMigrationFile = await fs.promises.readdir(migrationsDirPath);
+
+      const expectedFile = `${createTimestamp(new Date())}-foo.sql`;
+
+      expect(createdMigrationFile[0]).toBe(expectedFile);
+
+      await fs.promises.rmdir(migrationsDirPath, (smth) => console.log(smth));
+
+      done();
+    });
 
     it("handles too many arguments", async (done) => {
       expect.assertions(1);
