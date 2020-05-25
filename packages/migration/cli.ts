@@ -32,7 +32,7 @@ export async function runCLI(): Promise<void> {
       }
     } else if (args[0] === "--create") {
       if (args.length < 3) {
-        // Will add this part with the createMigrationFile PR.
+        throw new Error("Not yet implemented");
       } else {
         throw new Error(ERRORS.create.tooManyArgs);
       }
