@@ -1,6 +1,7 @@
 import * as database from "@fewlines/fwl-database";
 
 import { runMigrations } from "../index";
+import { getQueries } from "../utils/getQueries";
 
 let db: database.DatabaseQueryRunner;
 beforeAll(async () => {
@@ -57,47 +58,52 @@ describe("runMigrations", () => {
   };
 
   it("takes a config json as parameter", async (done) => {
-    expect.assertions(1);
+    expect.assertions(4);
 
     await runMigrations(testConfig);
 
-    const db = database.connect({
-      username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-      host: process.env.DATABASE_SQL_HOST || "localhost",
-      password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-      database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-      port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-    });
+    const db = database.connect(testConfig.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
     expect(rows.length).toEqual(3);
+
+    const queries = await getQueries("./test/migrations");
+
+    rows.forEach(({ version }, index) => {
+      expect(version).toEqual(queries[index].timestamp);
+    });
 
     await db.close();
 
     done();
   });
 
-  it("takes insert each migrations", async (done) => {
-    expect.assertions(1);
+  it("does each migrations", async (done) => {
+    expect.assertions(5);
 
     await runMigrations(testConfig);
 
-    const db = database.connect({
-      username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-      host: process.env.DATABASE_SQL_HOST || "localhost",
-      password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-      database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-      port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-    });
+    const db = database.connect(testConfig.database);
 
     const dbTables = await db.transaction(async (client) => {
-      const schemaMigrationsTable = await client.query("SELECT * FROM users");
-      const usersTable = await client.query("SELECT * FROM users");
-      const profilesTable = await client.query("SELECT * FROM profiles");
-      const postsTable = await client.query("SELECT * FROM posts");
+      try {
+        const schemaMigrationsTable = await client.query(
+          "SELECT * FROM schema_migrations",
+        );
+        const usersTable = await client.query("SELECT * FROM users");
+        const profilesTable = await client.query("SELECT * FROM profiles");
+        const postsTable = await client.query("SELECT * FROM posts");
 
-      return [schemaMigrationsTable, usersTable, profilesTable, postsTable];
+        expect(schemaMigrationsTable.rows.length).toBe(3);
+        expect(usersTable.rows.length).toBe(0);
+        expect(profilesTable.rows.length).toBe(0);
+        expect(postsTable.rows.length).toBe(0);
+
+        return [schemaMigrationsTable, usersTable, profilesTable, postsTable];
+      } catch (error) {
+        expect(error).not.toBeDefined();
+      }
     });
 
     expect(dbTables.length).toEqual(4);
