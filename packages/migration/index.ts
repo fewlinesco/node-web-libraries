@@ -1,8 +1,12 @@
 import { Config as DefaultConfig } from "@fewlines/fwl-config";
 import * as database from "@fewlines/fwl-database";
+import * as fs from "fs";
+import * as path from "path";
+import { getConfig } from "utils/getConfig";
 import { v4 as uuidv4 } from "uuid";
 
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
+import { createTimestamp } from "./utils/createTimestamp";
 import { getLastMigration } from "./utils/getLastMigration";
 import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
@@ -57,4 +61,22 @@ export async function runMigrations(config: MigrateConfig): Promise<void> {
   }
 
   databaseQueryRunner.close();
+}
+
+export async function createMigrationFile(name: string): Promise<void> {
+  const config = getConfig();
+  const targetDir = path.join(process.cwd(), "./migrations");
+  const fileName = `${createTimestamp(new Date())}-${name}.sql`;
+
+  if (!fs.existsSync(targetDir)) {
+    fs.promises.mkdir(targetDir);
+
+    console.log(`${targetDir} has been created`);
+  }
+
+  fs.open(`${targetDir + "/" + fileName}`, "wx", (error) => {
+    if (error) throw error;
+
+    console.log(`${fileName} has been created in ${targetDir}`);
+  });
 }

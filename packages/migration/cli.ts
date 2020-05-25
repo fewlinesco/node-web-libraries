@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { runMigrations } from "./index";
+import { runMigrations, createMigrationFile } from "./index";
 import { getConfig } from "./utils/getConfig";
 
 type MigrationErrors = { [key: string]: { [key: string]: string } };
@@ -32,7 +32,7 @@ export async function runCLI(): Promise<void> {
       }
     } else if (args[0] === "--create") {
       if (args.length < 3) {
-        // Will add this part with the createMigrationFile PR.
+        createMigrationFile(args[1]);
       } else {
         throw new Error(ERRORS.create.tooManyArgs);
       }
