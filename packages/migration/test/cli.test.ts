@@ -5,6 +5,17 @@ import { runCLI, ERRORS } from "../cli";
 import { createMigrationFile } from "../index";
 import { createTimestamp } from "../utils/createTimestamp";
 
+jest.mock("../utils/getConfig", () => {
+  const cleanConfigPath = path.join(process.cwd(), "./test/config.json");
+
+  return {
+    getConfig: async () =>
+      await fs.promises
+        .readFile(path.join(cleanConfigPath), "utf-8")
+        .then(JSON.parse),
+  };
+});
+
 describe("runCLI", () => {
   it("handles no arguments", async (done) => {
     expect.assertions(1);
@@ -47,7 +58,7 @@ describe("runCLI", () => {
       process.argv = [...createArgs, "foo"];
       await createMigrationFile("foo");
 
-      const migrationsDirPath = path.join(process.cwd(), "migrations");
+      const migrationsDirPath = path.join(process.cwd(), "/test/migrations");
 
       const createdMigrationFile = await fs.promises.readdir(migrationsDirPath);
 
@@ -58,8 +69,6 @@ describe("runCLI", () => {
       );
 
       await fs.promises.unlink(`${migrationsDirPath}/${expectedFile}`);
-
-      await fs.promises.rmdir(migrationsDirPath);
 
       done();
     });

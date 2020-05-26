@@ -66,11 +66,17 @@ export async function runMigrations(config?: MigrateConfig): Promise<void> {
 }
 
 export async function createMigrationFile(name: string): Promise<void> {
-  const targetDir = path.join(process.cwd(), "./migrations");
+  const config = await getConfig();
+
+  const targetDir = path.join(
+    process.cwd(),
+    config ? config.migration.dirPath : "./migrations",
+  );
+
   const fileName = `${createTimestamp(new Date())}-${name}.sql`;
 
   if (!fs.existsSync(targetDir)) {
-    fs.promises.mkdir(targetDir);
+    await fs.promises.mkdir(targetDir);
 
     console.log(`${targetDir} has been created`);
   }
