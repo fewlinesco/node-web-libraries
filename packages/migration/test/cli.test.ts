@@ -52,7 +52,7 @@ describe("runCLI", () => {
   describe("--create", () => {
     const createArgs = ["", "", "--create", "foo"];
 
-    it("create a timestamped migration file", async (done) => {
+    it("creates a timestamped migration file", async (done) => {
       expect.assertions(1);
 
       process.argv = [...createArgs, "foo"];

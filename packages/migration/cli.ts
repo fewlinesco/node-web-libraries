@@ -14,7 +14,7 @@ export const ERRORS: MigrationErrors = {
       "Too many arguments arguments. To create a timestamped migration file, please run 'migration --create name_of_the_file'",
   },
   default: {
-    list: `Please provide one of the following flags:\n\n  - "--migrate path/to/config.json": run the migration process.\n  - "--create name_of_the_file": create a timestamped migration file in the path set up in config.json.`,
+    list: `Please provide one of the following flags:\n\n  - "migration --migrate path/to/config.json": run the migration process.\n  - "migration --create name_of_the_file": create a timestamped migration file in the path set up in config.json.`,
   },
 };
 

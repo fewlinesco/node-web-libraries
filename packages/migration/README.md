@@ -47,8 +47,8 @@ To run `migration`, you need to create a `config.json` with the following data s
 
 To use `migration` as a CLI, simply run one of those command, depending on your needs:
 
-- "--migrate path/to/config.json": run the migration process.
-- "--create name_of_the_file": create a timestamped migration file in the path set up in `config.json`.
+- "migration --migrate path/to/config.json": run the migration process.
+- "migration --create name_of_the_file": create a timestamped migration file in the path set up in `config.json`.
 
 ### Package
 
@@ -56,7 +56,7 @@ If you need more customization and control over the migration process, you can i
 
 #### runMigrations
 
-You will have to give the `config.json` as argument if you created it somewhere else than the root folder, like so:
+You will have to give a config as argument if you created it somewhere else than the root folder, like so:
 
 ```ts
 import * as migration from "@fewlines/fwl-migration";
