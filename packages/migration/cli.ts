@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { runMigrations } from "./index";
+import { runMigrations, createMigrationFile } from "./index";
 import { getConfig } from "./utils/getConfig";
 
 type MigrationErrors = { [key: string]: { [key: string]: string } };
@@ -14,7 +14,7 @@ export const ERRORS: MigrationErrors = {
       "Too many arguments arguments. To create a timestamped migration file, please run 'migration --create name_of_the_file'",
   },
   default: {
-    list: `Please provide one of the following flags:\n\n  - "--migrate path/to/config.json": run the migration process.\n  - "--create name_of_the_file": create a timestamped migration file.`,
+    list: `Please provide one of the following flags:\n\n  - "migration --migrate path/to/config.json": run the migration process.\n  - "migration --create name_of_the_file": create a timestamped migration file in the path set up in config.json.`,
   },
 };
 
@@ -32,7 +32,7 @@ export async function runCLI(): Promise<void> {
       }
     } else if (args[0] === "--create") {
       if (args.length === 2) {
-        throw new Error("Not yet implemented");
+        createMigrationFile(args[1]);
       } else {
         throw new Error(ERRORS.create.tooManyArgs);
       }
