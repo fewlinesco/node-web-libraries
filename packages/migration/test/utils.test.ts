@@ -141,7 +141,7 @@ describe("getPendingMigrations", () => {
       ],
     ];
 
-    db.query(query, arg);
+    await db.query(query, arg);
 
     const queries = await getQueries("./test/migrations");
 
