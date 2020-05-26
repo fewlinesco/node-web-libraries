@@ -16,7 +16,7 @@ yarn add @fewlines/fwl-migration
 
 `migration` is a database migrations written in TypeScript which can be used as a **CLI** of imported as a **package**.
 
-It will look into the migrations folder and execute each SQL queries, in the correct order. If one of the transaction fails, `migration` will keep track of the last successful query, so you can safely rerun the migration process.
+It will look into the migrations folder and execute each SQL queries, in the correct order. If one of the transaction fails, `migration` will keep track of the last successful query through a `migration_schemas` table, so you can safely rerun the migration process.
 
 ### `config.json`
 
@@ -56,4 +56,24 @@ If you need more customization and control over the migration process, you can i
 
 #### runMigrations
 
+You will have to give the `config.json` as argument if you created it somewhere else than the root folder, like so:
+
+```ts
+import * as migration from "@fewlines/fwl-migration";
+
+import config from "path/to/config";
+
+migration.runMigrations(config);
+```
+
 #### createMigrationFile
+
+The `createMigrationFile` takes the name of the file as an argument:
+
+```ts
+import * as migration from "@fewlines/fwl-migration";
+
+migration.createMigrationFile("name_of_the_file");
+```
+
+You can also use it through a custom npm script, and use the corresponding `process.argv` value as arguments.
