@@ -1,6 +1,7 @@
 import * as database from "@fewlines/fwl-database";
 
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
+import { getConfig } from "../utils/getConfig";
 import { getLastMigration } from "../utils/getLastMigration";
 import { getPendingMigrations } from "../utils/getPendingMigrations";
 import { getQueries } from "../utils/getQueries";
@@ -140,7 +141,7 @@ describe("getPendingMigrations", () => {
       ],
     ];
 
-    db.query(query, arg);
+    await db.query(query, arg);
 
     const queries = await getQueries("./test/migrations");
 
@@ -155,6 +156,31 @@ describe("getPendingMigrations", () => {
     pendingMigrations.forEach((pendingMigration, index) => {
       expect(pendingMigration.timestamp).toEqual(queries[index + 1].timestamp);
     });
+
+    done();
+  });
+});
+
+describe("getConfig", () => {
+  it("gets the config from the path", async (done) => {
+    expect.assertions(1);
+
+    const config = await getConfig("./test/config.json");
+
+    const testConfig = {
+      database: {
+        database: "fwl_db",
+        password: "fwl_db",
+        username: "fwl_db",
+        host: "localhost",
+        port: 5432,
+      },
+      http: { port: 50100 },
+      tracing: { serviceName: "" },
+      migration: { dirPath: "./test/migrations" },
+    };
+
+    expect(config).toEqual(testConfig);
 
     done();
   });

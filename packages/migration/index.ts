@@ -3,6 +3,7 @@ import * as database from "@fewlines/fwl-database";
 import { v4 as uuidv4 } from "uuid";
 
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
+import { getConfig } from "./utils/getConfig";
 import { getLastMigration } from "./utils/getLastMigration";
 import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
@@ -19,12 +20,14 @@ export interface MigrateConfig extends DefaultConfig {
   };
 }
 
-export async function runMigrations(config: MigrateConfig): Promise<void> {
+export async function runMigrations(config?: MigrateConfig): Promise<void> {
+  const checkedConfig = config ? config : await getConfig();
+
   const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
-    config.database,
+    checkedConfig.database,
   );
 
-  const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
+  const sqlMigrationsFolder = checkedConfig.migration.dirPath || "./migrations";
 
   try {
     const queries = await getQueries(sqlMigrationsFolder);
