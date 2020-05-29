@@ -47,8 +47,8 @@
     "test": "jest --runInBand"
   },
   "bin": {
-    "migration": "dist/cli.js"
+    "migration": "dist/runCli.js"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
