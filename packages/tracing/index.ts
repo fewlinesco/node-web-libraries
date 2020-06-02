@@ -65,10 +65,7 @@ export function getTracer(): Tracer {
     },
     span: <T>(name: string, callback: SpanCallback<T>): Promise<T> => {
       const span = provider.getTracer("default").startSpan(name);
-      return callback(span).then((result) => {
-        span.end();
-        return result;
-      });
+      return callback(span).finally(() => span.end());
     },
   };
 }
