@@ -13,7 +13,8 @@ jest.mock("../utils/getConfig", () => {
     getConfig: async () =>
       await fs.promises
         .readFile(path.join(cleanConfigPath), "utf-8")
-        .then(JSON.parse),
+        .then(JSON.parse)
+        .catch((error) => console.log(error)),
   };
 });
 
@@ -144,6 +145,57 @@ describe("runMigrations", () => {
     expect(dbTables.length).toEqual(4);
 
     await db.close();
+
+    done();
+  });
+
+  it("runs unrun migrations, prior to the last one ran", async (done) => {
+    expect.assertions(3);
+
+    const config = await getConfig("./test/config.json");
+
+    await runMigrations();
+
+    const db = database.connect(config.database);
+
+    const { rows } = await db.query("SELECT * FROM schema_migrations");
+
+    expect(rows.length).toEqual(3);
+
+    const targetDir = path.join(
+      process.cwd(),
+      config ? config.migration.dirPath : "./migrations",
+    );
+
+    const fileName = "20200511073350-rogue_migrations.sql";
+
+    const queryContent = `CREATE TABLE "rogues" ("id" uuid NOT NULL, "created_at" timestamp NOT NULL DEFAULT NOW(), "updated_at" timestamp NOT NULL DEFAULT NOW(), PRIMARY KEY ("id"));`;
+
+    if (!fs.existsSync(targetDir)) {
+      await fs.promises.mkdir(targetDir).catch((error) => console.log(error));
+    }
+
+    await fs.promises
+      .appendFile(`${targetDir + "/" + fileName}`, `${queryContent}`)
+      .catch((error) => console.log(error));
+
+    const updatedMigrationsFolder = await getQueries(config.migration.dirPath);
+
+    expect(updatedMigrationsFolder.length).toEqual(4);
+
+    await runMigrations();
+
+    await fs.promises
+      .unlink(`${config.migration.dirPath}/${fileName}`)
+      .catch((error) => console.log(error));
+
+    const { rows: updatedRows } = await db.query(
+      "SELECT * FROM schema_migrations",
+    );
+
+    await db.close();
+
+    expect(updatedRows.length).toEqual(4);
 
     done();
   });
