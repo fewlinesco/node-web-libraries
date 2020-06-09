@@ -7,8 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { createTimestamp } from "./utils/createTimestamp";
 import { getConfig } from "./utils/getConfig";
-// import { getLastMigration } from "./utils/getLastMigration";
-// import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
 import { getUnranMigrations } from "./utils/getUnranMigrations";
 
@@ -43,12 +41,6 @@ export async function runMigrations(config?: MigrateConfig): Promise<void> {
     );
 
     const unranMigrations = rows ? getUnranMigrations(rows, queries) : queries;
-
-    // const lastMigrationRan = await getLastMigration(databaseQueryRunner);
-
-    // const pendingMigrations = lastMigrationRan
-    //   ? getPendingMigrations(queries, lastMigrationRan.version)
-    //   : queries;
 
     for await (const { timestamp, fileName, query } of unranMigrations) {
       await databaseQueryRunner.transaction(async (client) => {
