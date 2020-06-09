@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { createTimestamp } from "./utils/createTimestamp";
 import { getConfig } from "./utils/getConfig";
-import { getLastMigration } from "./utils/getLastMigration";
-import { getPendingMigrations } from "./utils/getPendingMigrations";
+// import { getLastMigration } from "./utils/getLastMigration";
+// import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
 
 export type Query = {
@@ -21,6 +21,29 @@ export interface MigrateConfig extends DefaultConfig {
   migration: {
     dirPath?: string;
   };
+}
+
+export type SchemaMigrationsRow = {
+  id: string;
+  version: string;
+  file_name: string;
+  query: string;
+  created_at: string;
+};
+
+function getUnranMigrations(
+  rows: SchemaMigrationsRow[],
+  queries: Query[],
+): Query[] {
+  const ranMigrationsVersions = rows.map((row) => row.version);
+
+  return queries
+    .map((query) => {
+      if (!ranMigrationsVersions.includes(query.timestamp)) {
+        return query;
+      }
+    })
+    .filter((query) => query !== undefined);
 }
 
 export async function runMigrations(config?: MigrateConfig): Promise<void> {
@@ -37,13 +60,21 @@ export async function runMigrations(config?: MigrateConfig): Promise<void> {
 
     await createSchemaMigrationsTable(databaseQueryRunner);
 
-    const lastMigrationRan = await getLastMigration(databaseQueryRunner);
+    const { rows } = await databaseQueryRunner.query(
+      "SELECT * FROM schema_migrations ORDER BY created_at DESC",
+    );
 
-    const pendingMigrations = lastMigrationRan
-      ? getPendingMigrations(queries, lastMigrationRan.version)
-      : queries;
+    const unranMigrations = rows ? getUnranMigrations(rows, queries) : queries;
 
-    for await (const { timestamp, fileName, query } of pendingMigrations) {
+    console.log(unranMigrations);
+
+    // const lastMigrationRan = await getLastMigration(databaseQueryRunner);
+
+    // const pendingMigrations = lastMigrationRan
+    //   ? getPendingMigrations(queries, lastMigrationRan.version)
+    //   : queries;
+
+    for await (const { timestamp, fileName, query } of unranMigrations) {
       await databaseQueryRunner.transaction(async (client) => {
         try {
           await client.query(query);
