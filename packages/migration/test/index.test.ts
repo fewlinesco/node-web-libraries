@@ -31,6 +31,7 @@ beforeAll(async () => {
   await db.query("DROP TABLE IF EXISTS schema_migrations");
   await db.query("DROP TABLE IF EXISTS profiles");
   await db.query("DROP TABLE IF EXISTS posts");
+  await db.query("DROP TABLE IF EXISTS rogues");
   await db.query("DROP TABLE IF EXISTS users");
 
   await db.close();
@@ -47,6 +48,7 @@ afterAll(async () => {
   await db.query("DROP TABLE IF EXISTS schema_migrations");
   await db.query("DROP TABLE IF EXISTS profiles");
   await db.query("DROP TABLE IF EXISTS posts");
+  await db.query("DROP TABLE IF EXISTS rogues");
   await db.query("DROP TABLE IF EXISTS users");
 
   await db.close();
