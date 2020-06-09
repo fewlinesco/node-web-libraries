@@ -22,6 +22,14 @@ export interface MigrateConfig extends DefaultConfig {
   };
 }
 
+export type SchemaMigrationsRow = {
+  id: string;
+  version: string;
+  file_name: string;
+  query: string;
+  created_at: string;
+};
+
 export async function runMigrations(config?: MigrateConfig): Promise<void> {
   const checkedConfig = config ? config : await getConfig();
 

@@ -1,12 +1,4 @@
-import { Query } from "index";
-
-export type SchemaMigrationsRow = {
-  id: string;
-  version: string;
-  file_name: string;
-  query: string;
-  created_at: string;
-};
+import { Query, SchemaMigrationsRow } from "index";
 
 export function getUnranMigrations(
   rows: SchemaMigrationsRow[],
