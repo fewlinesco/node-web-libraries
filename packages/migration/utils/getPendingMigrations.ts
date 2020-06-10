@@ -1,6 +1,6 @@
 import { Query, SchemaMigrationsRow } from "index";
 
-export function getUnranMigrations(
+export function getPendingMigrations(
   rows: SchemaMigrationsRow[],
   queries: Query[],
 ): Query[] {

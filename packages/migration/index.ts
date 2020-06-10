@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { createTimestamp } from "./utils/createTimestamp";
 import { getConfig } from "./utils/getConfig";
+import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
-import { getUnranMigrations } from "./utils/getUnranMigrations";
 
 export type Query = {
   timestamp: string;
@@ -48,9 +48,11 @@ export async function runMigrations(config?: MigrateConfig): Promise<void> {
       "SELECT * FROM schema_migrations ORDER BY created_at DESC",
     );
 
-    const unranMigrations = rows ? getUnranMigrations(rows, queries) : queries;
+    const pendingMigration = rows
+      ? getPendingMigrations(rows, queries)
+      : queries;
 
-    for await (const { timestamp, fileName, query } of unranMigrations) {
+    for await (const { timestamp, fileName, query } of pendingMigration) {
       await databaseQueryRunner.transaction(async (client) => {
         try {
           await client.query(query);

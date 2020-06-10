@@ -2,11 +2,9 @@
 
 ## 0.1.3 - 2020-06-09
 
-- Fixed a bug related to unrun migration from merged git branches timeline.
+- Fixed a bug related to unran migration from merged git branches timeline.
 
-- Added `getUnranMigrations` function + tests.
-
-- Removed `getPendingMigrations` function + tests from codebase.
+- Modified `getPendingMigrations` function + tests to get all unran migrations, regardless of last ran one.
 
 - Removed `getLastMigration` function + tests from codebase.
 
