@@ -2,8 +2,6 @@ import * as database from "@fewlines/fwl-database";
 
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getConfig } from "../utils/getConfig";
-import { getLastMigration } from "../utils/getLastMigration";
-import { getPendingMigrations } from "../utils/getPendingMigrations";
 import { getQueries } from "../utils/getQueries";
 
 let db: database.DatabaseQueryRunner;
@@ -47,59 +45,6 @@ it("should connect and get data", async (done) => {
   done();
 });
 
-describe("getLastMigration", () => {
-  it("returns the last migration", async (done) => {
-    expect.assertions(1);
-
-    const queries: [string, string[]][] = [
-      [
-        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
-        [
-          "74fbf638-6241-42bd-b257-b9a3dd24feb6",
-          "01234567891011",
-          "first migration",
-          "query",
-        ],
-      ],
-      [
-        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
-        [
-          "f4afc55f-1c03-4f08-8750-ab92e106b606",
-          "01234567891011",
-          "second migration",
-          "query",
-        ],
-      ],
-      [
-        "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
-        [
-          "37e2c486-0009-4b85-839a-1768bbd553ad",
-          "01234567891011",
-          "third migration",
-          "query",
-        ],
-      ],
-    ];
-
-    for await (const [query, arg] of queries) {
-      await db.transaction(async (client) => {
-        try {
-          await client.query(query, arg);
-        } catch (error) {
-          client.query("ROLLBACK");
-          throw new Error(error);
-        }
-      });
-    }
-
-    const lastMigrationRan = await getLastMigration(db);
-
-    expect(lastMigrationRan.file_name).toBe("third migration");
-
-    done();
-  });
-});
-
 describe("getQueries", () => {
   it("gets the queries from the migrations folder", async (done) => {
     expect.assertions(1);
@@ -121,40 +66,6 @@ describe("getQueries", () => {
       const { timestamp } = query;
 
       expect(timestamp).toBe(timestamps[index]);
-    });
-
-    done();
-  });
-});
-
-describe("getPendingMigrations", () => {
-  it("gets the pending migrations and keep the order", async (done) => {
-    expect.assertions(3);
-
-    const [query, arg]: [string, string[]] = [
-      "INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)",
-      [
-        "03523136-6f2f-40da-b441-ac9f6f994019",
-        "20200511072746",
-        "20200511072746-create-users",
-        "query",
-      ],
-    ];
-
-    await db.query(query, arg);
-
-    const queries = await getQueries("./test/migrations");
-
-    const lastMigrationRan = await getLastMigration(db);
-
-    const pendingMigrations = lastMigrationRan
-      ? getPendingMigrations(queries, lastMigrationRan.version)
-      : queries;
-
-    expect(pendingMigrations.length).toEqual(2);
-
-    pendingMigrations.forEach((pendingMigration, index) => {
-      expect(pendingMigration.timestamp).toEqual(queries[index + 1].timestamp);
     });
 
     done();

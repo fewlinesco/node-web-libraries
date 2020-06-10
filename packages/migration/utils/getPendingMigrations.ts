@@ -1,12 +1,16 @@
-import { Query } from "index";
+import { Query, SchemaMigrationsRow } from "index";
 
 export function getPendingMigrations(
+  rows: SchemaMigrationsRow[],
   queries: Query[],
-  timestamp: string,
 ): Query[] {
-  const index = queries.findIndex((query) =>
-    query.timestamp.includes(timestamp),
-  );
+  const ranMigrationsVersions = rows.map((row) => row.version);
 
-  return queries.slice(index + 1);
+  return queries
+    .map((query) => {
+      if (!ranMigrationsVersions.includes(query.timestamp)) {
+        return query;
+      }
+    })
+    .filter((query) => query !== undefined);
 }

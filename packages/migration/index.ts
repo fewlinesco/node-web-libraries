@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { createTimestamp } from "./utils/createTimestamp";
 import { getConfig } from "./utils/getConfig";
-import { getLastMigration } from "./utils/getLastMigration";
 import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
 
@@ -23,6 +22,14 @@ export interface MigrateConfig extends DefaultConfig {
   };
 }
 
+export type SchemaMigrationsRow = {
+  id: string;
+  version: string;
+  file_name: string;
+  query: string;
+  created_at: string;
+};
+
 export async function runMigrations(config?: MigrateConfig): Promise<void> {
   const checkedConfig = config ? config : await getConfig();
 
@@ -37,10 +44,12 @@ export async function runMigrations(config?: MigrateConfig): Promise<void> {
 
     await createSchemaMigrationsTable(databaseQueryRunner);
 
-    const lastMigrationRan = await getLastMigration(databaseQueryRunner);
+    const { rows } = await databaseQueryRunner.query(
+      "SELECT * FROM schema_migrations ORDER BY created_at DESC",
+    );
 
-    const pendingMigrations = lastMigrationRan
-      ? getPendingMigrations(queries, lastMigrationRan.version)
+    const pendingMigrations = rows
+      ? getPendingMigrations(rows, queries)
       : queries;
 
     for await (const { timestamp, fileName, query } of pendingMigrations) {
