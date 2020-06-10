@@ -173,10 +173,6 @@ describe("runMigrations", () => {
 
     const queryContent = `CREATE TABLE "rogues" ("id" uuid NOT NULL, "created_at" timestamp NOT NULL DEFAULT NOW(), "updated_at" timestamp NOT NULL DEFAULT NOW(), PRIMARY KEY ("id"));`;
 
-    if (!fs.existsSync(targetDir)) {
-      await fs.promises.mkdir(targetDir).catch((error) => console.log(error));
-    }
-
     await fs.promises
       .appendFile(`${targetDir + "/" + fileName}`, `${queryContent}`)
       .catch((error) => console.log(error));

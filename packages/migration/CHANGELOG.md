@@ -4,7 +4,7 @@
 
 - Fixed a bug related to unrun migration from merged git branches timeline.
 
-- Added `getUnranMigration` function + tests.
+- Added `getUnranMigrations` function + tests.
 
 - Removed `getPendingMigrations` function + tests from codebase.
 
