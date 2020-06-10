@@ -48,11 +48,11 @@ export async function runMigrations(config?: MigrateConfig): Promise<void> {
       "SELECT * FROM schema_migrations ORDER BY created_at DESC",
     );
 
-    const pendingMigration = rows
+    const pendingMigrations = rows
       ? getPendingMigrations(rows, queries)
       : queries;
 
-    for await (const { timestamp, fileName, query } of pendingMigration) {
+    for await (const { timestamp, fileName, query } of pendingMigrations) {
       await databaseQueryRunner.transaction(async (client) => {
         try {
           await client.query(query);
