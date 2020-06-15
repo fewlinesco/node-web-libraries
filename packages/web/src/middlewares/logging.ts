@@ -14,6 +14,7 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger): Middleware {
       const response = this as Response;
       response.removeListener("finish", onFinish);
       const end = process.hrtime.bigint();
+
       logger.log("", {
         path: response.req.path,
         remoteaddr:
@@ -22,6 +23,7 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger): Middleware {
         method: response.req.method,
         statusCode: response.statusCode,
         duration: (end - startTime) / BigInt(1000),
+        traceid: span.context().traceId,
       });
       span.end();
     };
