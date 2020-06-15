@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.4 - 2020-06-15
+
+- Fix the CLI call
+
 ## 0.1.3 - 2020-06-09
 
 - Fixed a bug related to unran migration from merged git branches timeline.
