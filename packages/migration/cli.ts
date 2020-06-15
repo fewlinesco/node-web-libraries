@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { runMigrations, createMigrationFile } from "./index";
 import { getConfig } from "./utils/getConfig";
 
