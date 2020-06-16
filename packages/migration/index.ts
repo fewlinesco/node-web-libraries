@@ -74,7 +74,7 @@ export async function runMigrations(config?: MigrateConfig): Promise<void> {
   databaseQueryRunner.close();
 }
 
-export async function createMigrationFile(name: string): Promise<void> {
+export async function createMigrationFile(name: string): Promise<string> {
   const config = await getConfig();
 
   const targetDir = path.join(
@@ -95,4 +95,6 @@ export async function createMigrationFile(name: string): Promise<void> {
 
     console.log(`${fileName} has been created in ${targetDir}`);
   });
+
+  return fileName;
 }
