@@ -1,12 +1,8 @@
 # CHANGELOG
 
-## 0.1.5 - 2020-06-16
-
-- Fixed `createMigrationFile` test by returning the newly created file.
-
 ## 0.1.4 - 2020-06-15
 
-- Fix the CLI call.
+- Fixed the CLI call.
 
 ## 0.1.3 - 2020-06-09
 
