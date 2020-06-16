@@ -3,7 +3,6 @@ import * as path from "path";
 
 import { runCLI, ERRORS } from "../cli";
 import { createMigrationFile } from "../index";
-import { createTimestamp } from "../utils/createTimestamp";
 
 jest.mock("../utils/getConfig", () => {
   const cleanConfigPath = path.join(process.cwd(), "./test/config.json");
@@ -56,19 +55,17 @@ describe("runCLI", () => {
       expect.assertions(1);
 
       process.argv = [...createArgs, "foo"];
-      await createMigrationFile("foo");
+      const createdMigrationFile = await createMigrationFile("foo");
 
       const migrationsDirPath = path.join(process.cwd(), "/test/migrations");
 
-      const createdMigrationFile = await fs.promises.readdir(migrationsDirPath);
+      const migrationFiles = await fs.promises.readdir(migrationsDirPath);
 
-      const expectedFile = `${createTimestamp(new Date())}-foo.sql`;
-
-      expect(createdMigrationFile[createdMigrationFile.length - 1]).toBe(
-        expectedFile,
+      expect(createdMigrationFile).toBe(
+        migrationFiles[migrationFiles.length - 1],
       );
 
-      await fs.promises.unlink(`${migrationsDirPath}/${expectedFile}`);
+      await fs.promises.unlink(`${migrationsDirPath}/${createdMigrationFile}`);
 
       done();
     });
