@@ -1,5 +1,5 @@
 # CHANGELOG
 
-## 1.0.0 - 2020-04-16
+## 0.1.0 - 2020-05-19
 
-- Created the package @fewlines/fwl-tracing
+- Created the package @fwl/tracing
