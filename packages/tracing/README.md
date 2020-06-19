@@ -8,7 +8,7 @@ It provides a simple way to do tracing with [OpenTelemetry](https://opentelemetr
 ## Installation
 
 ```shell
-yarn add @fewlines/fwl-tracing
+yarn add @fwl/tracing
 ```
 
 ## Getting Started
@@ -19,7 +19,7 @@ So for instance, have a `tracing.ts` file with that content:
 
 ```typescript
 // src/tracing.ts
-import { startTracer } from "@fewlines/fwl-tracing";
+import { startTracer } from "@fwl/tracing";
 
 startTracer({ serviceName: "serviceName" });
 ```
@@ -29,7 +29,7 @@ And start your server with `ts-node -r src/tracing.ts src/index.ts`.
 Once you're done, your `index.ts` could get the Tracer with:
 
 ```typescript
-import { getTracer } from "@fewlines/fwl-tracing";
+import { getTracer } from "@fwl/tracing";
 
 const tracer = getTracer();
 ```
@@ -39,7 +39,7 @@ const tracer = getTracer();
 Once you have a tracer (of type `Tracer`), you will have a `span` method:
 
 ```typescript
-import { Span, Tracer } from "@fewlines/fwl-tracing";
+import { Span, Tracer } from "@fwl/tracing";
 
 // ...
 function(tracer: Tracer) {
@@ -59,8 +59,8 @@ Here is an example of a logging middleware:
 
 ```typescript
 import { NextFunction, Request, Response } from "express";
-import { Logger } from "@fewlines/fwl-logging";
-import { Tracer, Span } from "@fewlines/fwl-tracing";
+import { Logger } from "@fwl/logging";
+import { Tracer, Span } from "@fwl/tracing";
 
 export function loggingMiddleware(tracer: Tracer, logger: Logger) {
   function onCloseOrFinish(span: Span, startTime: bigint): () => void {
