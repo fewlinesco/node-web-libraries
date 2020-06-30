@@ -116,7 +116,7 @@ export class Router {
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
-    this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
+    this.router.delete(path, jsonParser(), this.withBodyResponse(handler));
   }
 
   get<T extends object>(path: string, handler: HandlerWithoutBody<T>): void {
