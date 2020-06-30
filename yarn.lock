@@ -275,6 +275,22 @@
   resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-2.0.0.tgz#695ea1e907a1b34381fe82212f542c734b0dc442"
   integrity sha512-Bg/J/wpRsbYlSAeeAf53RJQVZ/C9FmbZmox32/4pGbQ3oheI+L/kpBgJeJfsaDWVqD5QSrrzgksTBJCKJpjxTQ==
 
+"@fewlines/fwl-tracing@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@fewlines/fwl-tracing/-/fwl-tracing-1.0.0.tgz#0c11adc42b05c148b885eacbd175d48c88edac3c"
+  integrity sha512-1nHP/2sZRUiSzE79L2Og36qZHRAHZzvodaHYQSWBHC/RVAuhjmVi5jl5KYEhZq5wuOxbb7+X+oUYg5xHesTVOw==
+  dependencies:
+    "@opentelemetry/core" "^0.5.2"
+    "@opentelemetry/exporter-zipkin" "^0.5.2"
+    "@opentelemetry/node" "^0.5.2"
+    "@opentelemetry/plugin-dns" "^0.5.2"
+    "@opentelemetry/plugin-express" "^0.5.2"
+    "@opentelemetry/plugin-http" "^0.5.2"
+    "@opentelemetry/plugin-https" "^0.5.2"
+    "@opentelemetry/plugin-pg" "^0.6.0"
+    "@opentelemetry/plugin-pg-pool" "^0.6.0"
+    "@opentelemetry/tracing" "^0.5.2"
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.0.0.tgz#10602de5570baea82f8afbfa2630b24e7a8cfe5b"
