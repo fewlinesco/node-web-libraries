@@ -129,6 +129,10 @@ export class InMemoryTracer {
 
     return callback(span).then(
       (result) => {
+        if (result instanceof InMemorySpan) {
+          result.end();
+        }
+
         span.end();
         return result;
       },
