@@ -1,2 +1,2 @@
-export * as tracer from "./tracer";
-export * as inMemoryTracer from "./inMemoryTracer";
+export * from "./tracer";
+export * from "./inMemoryTracer";
