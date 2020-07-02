@@ -114,44 +114,10 @@ describe("InMemorySpan", () => {
 
         expect(span.name).toStrictEqual("test-span");
 
-        // span.updateName("new-name")
-        expect(1).toStrictEqual(1);
+        span.updateName("new-name");
+
+        expect(span.name).toStrictEqual("new-name");
       });
-    });
-  });
-
-  test("test", async () => {
-    const spanNames = [
-      "first-span",
-      "second-span",
-      "third-span",
-      "second-span",
-    ];
-    console.log("first");
-
-    for await (const spanName of spanNames) {
-      await tracer.span(spanName, async () => {
-        return;
-      });
-    }
-
-    // spanNames.forEach(
-    //   async (spanName, index) =>
-    //     await tracer.span(spanName, async (span) => {
-    //       return;
-    //     }),
-    // );
-
-    console.log("last");
-
-    console.log(tracer.spans);
-
-    const spans = tracer.searchSpanByName("second-span");
-
-    expect(spans.length).toEqual(2);
-
-    spans.forEach((span) => {
-      expect(span.name).toBe("second-span");
     });
   });
 });

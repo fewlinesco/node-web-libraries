@@ -1,24 +1,24 @@
 import * as types from "@opentelemetry/api";
 
-interface Span {
+interface Span extends types.Span {
   id: number;
   name: string;
   attributes: types.Attributes;
-  parent: undefined | number;
+  parent?: InMemorySpan;
 }
 
-class InMemorySpan {
+class InMemorySpan implements Span {
   private tracer: InMemoryTracer;
   public id: number;
   public name: string;
-  public parent: InMemorySpan | undefined;
+  public parent?: InMemorySpan;
   public attributes: types.Attributes;
 
   constructor(
     id: number,
     name: string,
     tracer: InMemoryTracer,
-    parent: InMemorySpan | undefined,
+    parent?: InMemorySpan,
   ) {
     this.id = id;
     this.tracer = tracer;
@@ -77,8 +77,8 @@ class InMemorySpan {
 type SpanCallback<T> = (span: InMemorySpan) => Promise<T>;
 
 export class InMemoryTracer {
-  public spans: Span[];
-  private currentSpan: InMemorySpan | undefined;
+  public spans: InMemorySpan[];
+  private currentSpan?: InMemorySpan;
   private currentSpanId = 0;
 
   constructor() {
@@ -125,19 +125,23 @@ export class InMemoryTracer {
   }
 
   _saveSpan(span: InMemorySpan): void {
-    this.spans.unshift({
-      id: span.id,
-      name: span.name,
-      attributes: span.attributes,
-      parent: span.parent ? span.parent.id : undefined,
-    });
+    const currentInMemorySpan = new InMemorySpan(
+      span.id,
+      span.name,
+      this,
+      span?.parent,
+    );
+
+    currentInMemorySpan.setAttributes(span.attributes);
+
+    this.spans.unshift(currentInMemorySpan);
 
     if (span.parent) {
       this.currentSpan = span.parent;
     }
   }
 
-  searchSpanByName(name: string): Span[] {
+  searchSpanByName(name: string): InMemorySpan[] {
     return this.spans.filter((span) => span.name === name);
   }
 }
