@@ -68,14 +68,16 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger) {
       const response = this as Response;
       response.removeListener("finish", onCloseOrFinish);
       const end = process.hrtime.bigint();
-      logger.log(`${response.req.path}: ${response.statusCode} in ${end - startTime}`);
+      logger.log(
+        `${response.req.path}: ${response.statusCode} in ${end - startTime}`
+      );
       span.end();
     };
   }
   return function (
     _request: Request,
     response: Response,
-    next: NextFunction,
+    next: NextFunction
   ): void {
     const startTime = process.hrtime.bigint();
     const span = tracer.createSpan("logging middleware");
@@ -87,3 +89,7 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger) {
 
 Keep in mind that this method is only required because we need to call `next()` and we want to start the span across the whole request.
 The recommended method is to use `tracer.span`.
+
+## Tracing during tests
+
+If you need to use the tracer in testing environment, we provide a `InMemoryTracer` class that act as a regular tracer, expect it won't bring noise to your production traces. The usage is the same, you just need to initialize `InMemoryTracer` instead of using `startTracer()`.
