@@ -10,7 +10,7 @@ describe("InMemoryTracer:", () => {
   });
 
   describe("span function:", () => {
-    test("it should create `InMemorySpan`", () => {
+    test("it should create `InMemorySpan`", async (done) => {
       expect.assertions(8);
 
       spanNames.forEach((spanName, index) =>
@@ -19,15 +19,15 @@ describe("InMemoryTracer:", () => {
           expect(result.name).toBe(spanName);
         }),
       );
+
+      done();
     });
 
     test("it should store spans", async (done) => {
       expect.assertions(1);
 
       for await (const spanName of spanNames) {
-        await tracer.span(spanName, async () => {
-          return;
-        });
+        await tracer.span(spanName, async (span) => span);
       }
 
       expect(tracer.spans.length).toEqual(4);
@@ -41,9 +41,7 @@ describe("InMemoryTracer:", () => {
       expect.assertions(3);
 
       for await (const spanName of spanNames) {
-        await tracer.span(spanName, async () => {
-          return;
-        });
+        await tracer.span(spanName, async (span) => span);
       }
 
       const spans = tracer.searchSpanByName("second-span");
@@ -67,25 +65,26 @@ describe("InMemorySpan:", () => {
   });
 
   describe("setAttribute function:", () => {
-    test("it should add a single attribute to the span", () => {
+    test("it should add a single attribute to the span", async (done) => {
       expect.assertions(1);
 
-      tracer.span("test-span", async (span) => {
+      await tracer.span("test-span", async (span) => {
         span.setAttribute("test-attribute", "testValue");
 
-        // Fix
-        span.end();
+        return span;
       });
 
       const spanAttributes = tracer.searchSpanByName("test-span")[0].attributes;
       const expectedAttributes = { "test-attribute": "testValue" };
 
       expect(spanAttributes).toStrictEqual(expectedAttributes);
+
+      done();
     });
   });
 
   describe("setAttributes function:", () => {
-    test("it should add a hash of attributes to the span", () => {
+    test("it should add a hash of attributes to the span", async (done) => {
       expect.assertions(1);
 
       const attributeHash = {
@@ -94,54 +93,61 @@ describe("InMemorySpan:", () => {
         "test-attribute-3": "testValue3",
       };
 
-      tracer.span("test-span", async (span) => {
+      await tracer.span("test-span", async (span) => {
         span.setAttributes(attributeHash);
 
-        // Fix
-        span.end();
+        return span;
       });
 
       const spanAttributes = tracer.searchSpanByName("test-span")[0].attributes;
 
       expect(spanAttributes).toStrictEqual(attributeHash);
+
+      done();
     });
   });
 
   describe("addEvent function:", () => {
-    test("it should return the current in memory span", () => {
+    test("it should return the current in memory span", async (done) => {
       expect.assertions(1);
 
       tracer.span("test-span", async (span) => {
         expect(span.addEvent()).toBe(span);
       });
+
+      done();
     });
   });
 
   describe("setStatus function:", () => {
-    test("it should return the current in memory span", () => {
+    test("it should return the current in memory span", async (done) => {
       expect.assertions(1);
 
       tracer.span("test-span", async (span) => {
         expect(span.addEvent()).toBe(span);
       });
+
+      done();
     });
   });
 
   describe("isRecording function:", () => {
-    test("it should return true", () => {
+    test("it should return true", async (done) => {
       expect.assertions(1);
 
-      tracer.span("test-span", async (span) => {
+      await tracer.span("test-span", async (span) => {
         expect(span.isRecording()).toBe(true);
       });
+
+      done();
     });
   });
 
   describe("updateName function:", () => {
-    test("it should the name of the span", () => {
+    test("it should the name of the span", async (done) => {
       expect.assertions(2);
 
-      tracer.span("test-span", async (span) => span.end());
+      await tracer.span("test-span", async (span) => span);
 
       const span = tracer.searchSpanByName("test-span")[0];
 
@@ -150,6 +156,8 @@ describe("InMemorySpan:", () => {
       span.updateName("new-name");
 
       expect(span.name).toStrictEqual("new-name");
+
+      done();
     });
   });
 });
