@@ -21,28 +21,30 @@ describe("InMemoryTracer", () => {
       );
     });
 
-    test("it should store spans", () => {
+    test("it should store spans", async (done) => {
       expect.assertions(1);
 
-      spanNames.forEach((spanName) =>
-        tracer.span(spanName, async (span) => {
-          return span.end();
-        }),
-      );
+      for await (const spanName of spanNames) {
+        await tracer.span(spanName, async () => {
+          return;
+        });
+      }
 
       expect(tracer.spans.length).toEqual(4);
+
+      done();
     });
   });
 
   describe("searchSpanByName function", () => {
-    test("it should return all the span named as the argument", () => {
+    test("it should return all the span named as the argument", async (done) => {
       expect.assertions(3);
 
-      spanNames.forEach((spanName) =>
-        tracer.span(spanName, async (span) => {
-          return span.end();
-        }),
-      );
+      for await (const spanName of spanNames) {
+        await tracer.span(spanName, async () => {
+          return;
+        });
+      }
 
       const spans = tracer.searchSpanByName("second-span");
 
@@ -51,6 +53,8 @@ describe("InMemoryTracer", () => {
       spans.forEach((span) => {
         expect(span.name).toBe("second-span");
       });
+
+      done();
     });
   });
 });
@@ -116,19 +120,31 @@ describe("InMemorySpan", () => {
     });
   });
 
-  test("test", () => {
+  test("test", async () => {
     const spanNames = [
       "first-span",
       "second-span",
       "third-span",
       "second-span",
     ];
+    console.log("first");
 
-    spanNames.forEach((spanName) =>
-      tracer.span(spanName, async (span) => {
-        return span;
-      }),
-    );
+    for await (const spanName of spanNames) {
+      await tracer.span(spanName, async () => {
+        return;
+      });
+    }
+
+    // spanNames.forEach(
+    //   async (spanName, index) =>
+    //     await tracer.span(spanName, async (span) => {
+    //       return;
+    //     }),
+    // );
+
+    console.log("last");
+
+    console.log(tracer.spans);
 
     const spans = tracer.searchSpanByName("second-span");
 
