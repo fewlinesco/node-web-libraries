@@ -1,6 +1,6 @@
 {
   "author": "Fewlines",
-  "description": "Traacing part of Fewlines Web Libraries",
+  "description": "Tracing part of Fewlines Web Libraries",
   "dependencies": {
     "@opentelemetry/core": "^0.5.2",
     "@opentelemetry/exporter-zipkin": "^0.5.2",
