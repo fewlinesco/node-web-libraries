@@ -1,25 +1,10 @@
-interface Attributes {
-  [key: string]: unknown;
-}
+import * as types from "@opentelemetry/api";
 
 interface Span {
   id: number;
   name: string;
-  attributes: Attributes;
+  attributes: types.Attributes;
   parent: undefined | number;
-}
-
-interface SpanContext {
-  isRemote: undefined | true | false;
-  spanId: string;
-  traceFlags: number;
-  traceId: string;
-  traceState: {
-    get: () => undefined;
-    set: () => void;
-    serialize: () => string;
-    unset: () => void;
-  };
 }
 
 class InMemorySpan {
@@ -27,7 +12,7 @@ class InMemorySpan {
   public id: number;
   public name: string;
   public parent: InMemorySpan | undefined;
-  public attributes: Attributes;
+  public attributes: types.Attributes;
 
   constructor(
     id: number,
@@ -46,7 +31,7 @@ class InMemorySpan {
     this.tracer._saveSpan(this);
   }
 
-  context(): SpanContext {
+  context(): types.SpanContext {
     return {
       isRemote: undefined,
       spanId: this.id.toString(),
@@ -66,7 +51,7 @@ class InMemorySpan {
     return this;
   }
 
-  setAttributes(attributes: Attributes): this {
+  setAttributes(attributes: types.Attributes): this {
     this.attributes = { ...this.attributes, ...attributes };
     return this;
   }
