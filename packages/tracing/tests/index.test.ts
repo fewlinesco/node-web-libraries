@@ -1,6 +1,6 @@
 import { InMemoryTracer } from "../inMemoryTracer";
 
-describe("InMemoryTracer", () => {
+describe("InMemoryTracer:", () => {
   let tracer: InMemoryTracer;
 
   const spanNames = ["first-span", "second-span", "third-span", "second-span"];
@@ -9,7 +9,7 @@ describe("InMemoryTracer", () => {
     tracer = new InMemoryTracer();
   });
 
-  describe("span function", () => {
+  describe("span function:", () => {
     test("it should create `InMemorySpan`", () => {
       expect.assertions(8);
 
@@ -36,7 +36,7 @@ describe("InMemoryTracer", () => {
     });
   });
 
-  describe("searchSpanByName function", () => {
+  describe("searchSpanByName function:", () => {
     test("it should return all the span named as the argument", async (done) => {
       expect.assertions(3);
 
@@ -59,20 +59,21 @@ describe("InMemoryTracer", () => {
   });
 });
 
-describe("InMemorySpan", () => {
+describe("InMemorySpan:", () => {
   let tracer: InMemoryTracer;
 
   beforeEach(() => {
     tracer = new InMemoryTracer();
   });
 
-  describe("setAttribute function", () => {
+  describe("setAttribute function:", () => {
     test("it should add a single attribute to the span", () => {
       expect.assertions(1);
 
       tracer.span("test-span", async (span) => {
         span.setAttribute("test-attribute", "testValue");
 
+        // Fix
         span.end();
       });
 
@@ -83,7 +84,7 @@ describe("InMemorySpan", () => {
     });
   });
 
-  describe("setAttributes function", () => {
+  describe("setAttributes function:", () => {
     test("it should add a hash of attributes to the span", () => {
       expect.assertions(1);
 
@@ -96,6 +97,7 @@ describe("InMemorySpan", () => {
       tracer.span("test-span", async (span) => {
         span.setAttributes(attributeHash);
 
+        // Fix
         span.end();
       });
 
@@ -103,21 +105,51 @@ describe("InMemorySpan", () => {
 
       expect(spanAttributes).toStrictEqual(attributeHash);
     });
+  });
 
-    describe("updateName function", () => {
-      test("it should the name of the span", () => {
-        expect.assertions(2);
+  describe("addEvent function:", () => {
+    test("it should return the current in memory span", () => {
+      expect.assertions(1);
 
-        tracer.span("test-span", async (span) => span.end());
-
-        const span = tracer.searchSpanByName("test-span")[0];
-
-        expect(span.name).toStrictEqual("test-span");
-
-        span.updateName("new-name");
-
-        expect(span.name).toStrictEqual("new-name");
+      tracer.span("test-span", async (span) => {
+        expect(span.addEvent()).toBe(span);
       });
+    });
+  });
+
+  describe("setStatus function:", () => {
+    test("it should return the current in memory span", () => {
+      expect.assertions(1);
+
+      tracer.span("test-span", async (span) => {
+        expect(span.addEvent()).toBe(span);
+      });
+    });
+  });
+
+  describe("isRecording function:", () => {
+    test("it should return true", () => {
+      expect.assertions(1);
+
+      tracer.span("test-span", async (span) => {
+        expect(span.isRecording()).toBe(true);
+      });
+    });
+  });
+
+  describe("updateName function:", () => {
+    test("it should the name of the span", () => {
+      expect.assertions(2);
+
+      tracer.span("test-span", async (span) => span.end());
+
+      const span = tracer.searchSpanByName("test-span")[0];
+
+      expect(span.name).toStrictEqual("test-span");
+
+      span.updateName("new-name");
+
+      expect(span.name).toStrictEqual("new-name");
     });
   });
 });
