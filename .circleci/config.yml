@@ -156,6 +156,9 @@ workflows:
   build-and-test:
     jobs:
       - setup
+      - test-config:
+          requires:
+            - setup
       - test-database:
           requires:
             - setup
@@ -163,5 +166,11 @@ workflows:
           requires:
             - setup
       - test-migration:
+          requires:
+            - setup
+      - test-tracing:
+          requires:
+            - setup
+      - test-web:
           requires:
             - setup
