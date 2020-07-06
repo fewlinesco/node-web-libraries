@@ -62,6 +62,10 @@ jobs:
           name: logging-tests
           command: yarn --cache-folder ~/.cache/yarn test
           working_directory: packages/logging
+      - run:
+          name: logging-lint
+          command: yarn --cache-folder ~/.cache/yarn lint
+          working_directory: packages/logging
   test-migration:
     docker:
       - image: circleci/node:12.16.2
