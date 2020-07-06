@@ -92,40 +92,26 @@ The recommended method is to use `tracer.span`.
 
 ## Tracing during tests
 
-If you need to use the tracer in a testing environment, we provide a `InMemoryTracer` class that act as a regular tracer, expect you won't have to launch `jaeger` to run your tests.`InMemoryTracer` also provides you with a way of testing your spans with the use of the `searchSpanByName`. The usage is the same, you just need to initialize `InMemoryTracer` instead of using `startTracer()`.
+If you need to use the tracer in a testing environment, we provide a `InMemoryTracer` class that act as a regular tracer, except you won't have to launch `jaeger` to run your tests.`InMemoryTracer` also provides you with a way of testing your spans with the use of the `searchSpanByName`. The usage is the same, you just need to initialize `InMemoryTracer` instead of using `startTracer()`.
 
 Here is an example of use in a test file using `jest`:
 
 ```ts
-import { InMemoryTracer } from "../inMemoryTracer";
+import { InMemoryTracer } from "@fwl/tracing";
 
-describe("InMemoryTracer:", () => {
-  let tracer: InMemoryTracer;
+let tracer: InMemoryTracer;
 
-  const spanNames = ["first-span", "second-span", "third-span", "second-span"];
+beforeEach(() => {
+  tracer = new InMemoryTracer();
+});
 
-  beforeEach(() => {
-    tracer = new InMemoryTracer();
-  });
+test("verify span attributes", () => {
+  expect.assertions(1);
 
-  describe("searchSpanByName function:", () => {
-    test("it should return all the span named as the argument", async (done) => {
-      expect.assertions(3);
+  // Call the code that is using a tracer.
 
-      for await (const spanName of spanNames) {
-        await tracer.span(spanName, async (span) => span);
-      }
+  const [span] = tracer.searchSpanByName("test-span");
 
-      const spans = tracer.searchSpanByName("second-span");
-
-      expect(spans.length).toEqual(2);
-
-      spans.forEach((span) => {
-        expect(span.name).toBe("second-span");
-      });
-
-      done();
-    });
-  });
+  expect(span.attributes[0].attributeName).toBe("attribute value");
 });
 ```
