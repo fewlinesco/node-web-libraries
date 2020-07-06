@@ -146,10 +146,6 @@ jobs:
           name: yarn-install
           command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - run:
-          name: web-tests
-          command: yarn --cache-folder ~/.cache/yarn test
-          working_directory: packages/web
-      - run:
           name: web-lint
           command: yarn --cache-folder ~/.cache/yarn lint
           working_directory: packages/web
