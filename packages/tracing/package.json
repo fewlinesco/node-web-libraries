@@ -51,7 +51,7 @@
     "build": "tsc",
     "clean": "rm -rf dist",
     "prelint": "prettier --trailing-comma all --write './**/*.md'",
-    "lint": "eslint --ext ts --ignore-pattern dist . ",
+    "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
     "prepare": "yarn build",
     "prepublishOnly": "yarn lint",
