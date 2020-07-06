@@ -68,14 +68,16 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger) {
       const response = this as Response;
       response.removeListener("finish", onCloseOrFinish);
       const end = process.hrtime.bigint();
-      logger.log(`${response.req.path}: ${response.statusCode} in ${end - startTime}`);
+      logger.log(
+        `${response.req.path}: ${response.statusCode} in ${end - startTime}`
+      );
       span.end();
     };
   }
   return function (
     _request: Request,
     response: Response,
-    next: NextFunction,
+    next: NextFunction
   ): void {
     const startTime = process.hrtime.bigint();
     const span = tracer.createSpan("logging middleware");
@@ -87,3 +89,29 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger) {
 
 Keep in mind that this method is only required because we need to call `next()` and we want to start the span across the whole request.
 The recommended method is to use `tracer.span`.
+
+## Tracing during tests
+
+If you need to use the tracer in a testing environment, we provide a `InMemoryTracer` class that act as a regular tracer, except you won't have to launch `jaeger` to run your tests.`InMemoryTracer` also provides you with a way of testing your spans with the use of the `searchSpanByName`. The usage is the same, you just need to initialize `InMemoryTracer` instead of using `startTracer()`.
+
+Here is an example of use in a test file using `jest`:
+
+```ts
+import { InMemoryTracer } from "@fwl/tracing";
+
+let tracer: InMemoryTracer;
+
+beforeEach(() => {
+  tracer = new InMemoryTracer();
+});
+
+test("verify span attributes", () => {
+  expect.assertions(1);
+
+  // Call the code that is using a tracer.
+
+  const [span] = tracer.searchSpanByName("test-span");
+
+  expect(span.attributes[0].attributeName).toBe("attribute value");
+});
+```
