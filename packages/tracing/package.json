@@ -50,7 +50,8 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "lint": "eslint --ext ts --ignore-pattern dist .",
+    "prelint": "prettier --trailing-comma all --write './**/*.md'",
+    "lint": "eslint --ext ts --ignore-pattern dist . ",
     "prebuild": "yarn clean",
     "prepare": "yarn build",
     "prepublishOnly": "yarn lint",
