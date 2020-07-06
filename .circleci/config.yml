@@ -132,6 +132,27 @@ jobs:
           name: tracing-lint
           command: yarn --cache-folder ~/.cache/yarn lint
           working_directory: packages/tracing
+  test-web:
+    docker:
+      - image: circleci/node:12.16.2
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum "packages/web/yarn.lock" }}
+            - yarn-packages-v1-{{ .Branch }}-
+            - yarn-packages-v1-
+      - run:
+          name: yarn-install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
+          name: web-tests
+          command: yarn --cache-folder ~/.cache/yarn test
+          working_directory: packages/web
+      - run:
+          name: web-lint
+          command: yarn --cache-folder ~/.cache/yarn lint
+          working_directory: packages/web
 
 
 workflows:
