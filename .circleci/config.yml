@@ -17,6 +17,23 @@ jobs:
           paths:
             - ~/.cache/yarn
           key: yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+  test-config:
+    docker:
+      - image: circleci/node:12.16.2
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum "packages/config/yarn.lock" }}
+            - yarn-packages-v1-{{ .Branch }}-
+            - yarn-packages-v1-
+      - run:
+          name: yarn-install
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+      - run:
+          name: config-lint
+          command: yarn --cache-folder ~/.cache/yarn lint
+          working_directory: packages/config
   test-database:
     docker:
       - image: circleci/node:12.16.2
