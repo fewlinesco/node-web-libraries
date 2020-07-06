@@ -37,10 +37,10 @@ KVLogger.log("this is a log");
 JSONLogger.log("this is a log");
 // {"message":"this is a log","service":"service-name"}
 
-KVLogger.log("this is a log", {additionalData: "value"});
+KVLogger.log("this is a log", { additionalData: "value" });
 // service=service-name additonalData=value message="this is a log"
 
-JSONLogger.log("this is a log", {additionalData: "value"});
+JSONLogger.log("this is a log", { additionalData: "value" });
 // {"additionalData":"value","message":"this is a log","service":"service-name"}
 ```
 
