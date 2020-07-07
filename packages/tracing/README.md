@@ -69,7 +69,7 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger) {
       response.removeListener("finish", onCloseOrFinish);
       const end = process.hrtime.bigint();
       logger.log(
-        `${response.req.path}: ${response.statusCode} in ${end - startTime}`
+        `${response.req.path}: ${response.statusCode} in ${end - startTime}`,
       );
       span.end();
     };
@@ -77,7 +77,7 @@ export function loggingMiddleware(tracer: Tracer, logger: Logger) {
   return function (
     _request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
   ): void {
     const startTime = process.hrtime.bigint();
     const span = tracer.createSpan("logging middleware");

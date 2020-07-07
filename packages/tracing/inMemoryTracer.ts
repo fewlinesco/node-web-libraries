@@ -32,17 +32,23 @@ class InMemorySpan implements Span {
   }
 
   context(): types.SpanContext {
+    const traceState: types.TraceState = {
+      get: () => undefined,
+      set: () => {
+        return;
+      },
+      serialize: () => "",
+      unset: () => {
+        return;
+      },
+    };
+
     return {
       isRemote: undefined,
       spanId: this.id.toString(),
       traceFlags: 0,
       traceId: "",
-      traceState: {
-        get: () => undefined,
-        set: () => {},
-        serialize: () => "",
-        unset: () => {},
-      },
+      traceState,
     };
   }
 
