@@ -9,7 +9,7 @@ Itp provides the basic types for a `Config` object for using a `config.json` fil
 ## Installation
 
 ```shell
-yarn add @fewlnes/fwl-config
+yarn add @fewlines/fwl-config
 ```
 
 ## Usage
