@@ -2,7 +2,7 @@
   "author": "Fewlines",
   "description": "Database part of Fewlines Web Libraries",
   "dependencies": {
-    "pg": "7.0.0"
+    "pg": "8.3.0"
   },
   "devDependencies": {
     "@fewlines/eslint-config": "3.0.0",
@@ -43,5 +43,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "1.1.0"
+  "version": "1.1.1"
 }
