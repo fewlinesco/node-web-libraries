@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.3 - 2020-07-27
+
+- Added more typing.
+
 ## 2.0.2 - 2020-06-30
 
 - Fixed custom router's `delete` method to call the right express method.

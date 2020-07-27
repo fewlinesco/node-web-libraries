@@ -9,6 +9,7 @@ import {
 } from "../../index";
 
 export interface GetUsersByIdParams {
+  [key: string]: string;
   id: string;
 }
 
@@ -40,7 +41,7 @@ export function getUserById() {
   };
 }
 
-export type CreateUserParams = {};
+export type CreateUserParams = Record<string, unknown>;
 export interface CreateUserBody {
   name: string;
 }
