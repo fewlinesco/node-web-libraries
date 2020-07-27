@@ -2,7 +2,7 @@
 
 ## 2.0.3 - 2020-07-27
 
-- Added more typing.
+- The `createApp` router argument is now typed as `Router`.
 
 ## 2.0.2 - 2020-06-30
 
@@ -22,6 +22,6 @@
 
 - Created the package @fewlines/fwl-web:
   - Router
-  - Loggin Middleware
+  - Logging Middleware
   - Http Statuses
   - Errors

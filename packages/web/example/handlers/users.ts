@@ -9,7 +9,6 @@ import {
 } from "../../index";
 
 export interface GetUsersByIdParams {
-  [key: string]: string;
   id: string;
 }
 
