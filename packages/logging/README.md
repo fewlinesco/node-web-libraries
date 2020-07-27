@@ -44,7 +44,7 @@ JSONLogger.log("this is a log", { additionalData: "value" });
 // {"additionalData":"value","message":"this is a log","service":"service-name"}
 ```
 
-Or you could create a new logger with additionnal data:
+Or you could create a new logger with additional data:
 
 ```typescript
 const myProcessLogger = KVLogger.withMeta({process: "my-process});

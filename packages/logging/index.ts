@@ -1,22 +1,24 @@
 import logfmt from "logfmt";
 
 export interface Logger {
-  log: (message: string, metadata?: object) => void;
-  withMeta: (metadata: object) => Logger;
+  log: (message: string, metadata?: Metadata) => void;
+  withMeta: (metadata: Metadata) => Logger;
 }
+
+export type Metadata = Record<string, string | number>;
 
 class KVLogger implements Logger {
   private service: string;
-  private metadata: object;
-  constructor(service: string, metadata: object = {}) {
+  private metadata: Metadata;
+  constructor(service: string, metadata: Metadata = {}) {
     this.service = service;
     this.metadata = { ...metadata, service };
   }
 
-  log(message: string, metadata: object = {}): void {
+  log(message: string, metadata: Metadata = {}): void {
     logfmt.log({ ...this.metadata, ...metadata, message });
   }
-  withMeta(metadata: object): KVLogger {
+  withMeta(metadata: Metadata): KVLogger {
     return new KVLogger(this.service, { ...this.metadata, ...metadata });
   }
 }
@@ -24,18 +26,18 @@ class KVLogger implements Logger {
 class JSONLogger implements Logger {
   private logger;
   private service: string;
-  private metadata: object;
-  constructor(service: string, metadata: object = {}) {
+  private metadata: Metadata;
+  constructor(service: string, metadata: Metadata = {}) {
     this.logger = new logfmt();
     this.logger.stringify = JSON.stringify;
     this.service = service;
     this.metadata = { ...metadata, service };
   }
 
-  log(message: string, metadata: object = {}): void {
+  log(message: string, metadata: Metadata = {}): void {
     this.logger.log({ ...this.metadata, ...metadata, message });
   }
-  withMeta(metadata: object): JSONLogger {
+  withMeta(metadata: Metadata): JSONLogger {
     return new JSONLogger(this.service, { ...this.metadata, ...metadata });
   }
 }
