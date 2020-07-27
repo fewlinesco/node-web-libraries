@@ -2,16 +2,16 @@
   "author": "Fewlines",
   "description": "Tracing part of Fewlines Web Libraries",
   "dependencies": {
-    "@opentelemetry/core": "^0.5.2",
-    "@opentelemetry/exporter-zipkin": "^0.5.2",
-    "@opentelemetry/node": "^0.5.2",
-    "@opentelemetry/plugin-dns": "^0.5.2",
-    "@opentelemetry/plugin-express": "^0.5.2",
-    "@opentelemetry/plugin-http": "^0.5.2",
-    "@opentelemetry/plugin-https": "^0.5.2",
-    "@opentelemetry/plugin-pg": "^0.6.0",
-    "@opentelemetry/plugin-pg-pool": "^0.6.0",
-    "@opentelemetry/tracing": "^0.5.2"
+    "@opentelemetry/core": "^0.9.0",
+    "@opentelemetry/exporter-zipkin": "^0.9.0",
+    "@opentelemetry/node": "^0.9.0",
+    "@opentelemetry/plugin-dns": "^0.8.0",
+    "@opentelemetry/plugin-express": "^0.8.0",
+    "@opentelemetry/plugin-http": "^0.9.0",
+    "@opentelemetry/plugin-https": "^0.9.0",
+    "@opentelemetry/plugin-pg": "^0.8.0",
+    "@opentelemetry/plugin-pg-pool": "^0.8.0",
+    "@opentelemetry/tracing": "^0.9.0"
   },
   "devDependencies": {
     "@fewlines/eslint-config": "^3.0.0",
@@ -59,5 +59,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.2.0"
+  "version": "0.2.1"
 }

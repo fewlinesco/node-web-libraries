@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 0.2.1 - 2020-07-27
+
+- Dependencies bump:
+  - `@opentelemetry/core`: `0.5.2` => `0.9.0`
+  - `@opentelemetry/exporter-zipkin`: `0.5.2` => `0.9.0`
+  - `@opentelemetry/node`: `0.5.2` => `0.9.0`
+  - `@opentelemetry/plugin-dns`: `0.5.2` => `0.8.0`
+  - `@opentelemetry/plugin-express`: `0.5.2` => `0.8.0`
+  - `@opentelemetry/plugin-http`: `0.5.2` => `0.9.0`
+  - `@opentelemetry/plugin-https`: `0.5.2` => `0.9.0`
+  - `@opentelemetry/plugin-pg`: `0.6.1` => `0.8.0`
+  - `@opentelemetry/plugin-pg-pool`: `0.6.1` => `0.8.0`
+  - `@opentelemetry/tracing`: `0.5.2` => `0.9.0`
+
 ## 0.2.0 - 2020-06-30
 
 - Added `InMemoryTracer` and `InMemorySpan`.
