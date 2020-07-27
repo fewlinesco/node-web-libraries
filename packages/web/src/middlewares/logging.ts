@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer, Span } from "@fewlines/fwl-tracing";
+import { NextFunction, Request, Response } from "express";
 
 type Middleware = (
   request: Request,
