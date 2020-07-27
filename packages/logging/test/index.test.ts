@@ -14,7 +14,7 @@ describe("Key Value Logger", () => {
     );
   });
 
-  test("Should log with additionnal metadata", () => {
+  test("Should log with additional metadata", () => {
     const logger = createLogger("service-name");
     const enhancedLogger = logger.withMeta({ user: 1 });
     enhancedLogger.log("test message");
@@ -38,7 +38,7 @@ describe("JSON Logger", () => {
     );
   });
 
-  test("Should log with additionnal metadata", () => {
+  test("Should log with additional metadata", () => {
     const logger = createLogger("service-name", "json");
     const enhancedLogger = logger.withMeta({ user: 1 });
     enhancedLogger.log("test message");
