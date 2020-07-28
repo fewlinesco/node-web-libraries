@@ -47,11 +47,11 @@ JSONLogger.log("this is a log", { additionalData: "value" });
 Or you could create a new logger with additional data:
 
 ```typescript
-const myProcessLogger = KVLogger.withMeta({process: "my-process});
+const myProcessLogger = KVLogger.withMeta({ process: "my-process" });
 myProcessLogger.log("this is a log");
 // service=service-name process=my-process message="this is a log"
 
-const myProcessJSONLogger = JSONLogger.withMeta({process: "my-process});
+const myProcessJSONLogger = JSONLogger.withMeta({ process: "my-process" });
 myProcessJSONLogger.log("this is a log");
 // {"message":"this is a log","service":"service-name","process":"my-process"}
 ```

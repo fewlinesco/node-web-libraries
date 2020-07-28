@@ -4,7 +4,7 @@
 
 This is part of the Fewlines Web Libraries packages.
 
-It provides an interface other a postgres Pool.
+The database query runner provided by this package works in a similar way to the Pool entity from PostgreSQL
 
 ## Installation
 
@@ -20,8 +20,9 @@ You first need to create a new `DatabaseQueryRunner`:
 import * as database from "@fewlines/fwl-database";
 
 // config.database should come from an implementation of @fewlines/fwl-config
-const databaseQueryRunner: database.DatabaseQueryRunner =
-  database.connect(config.database);
+const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
+  config.database
+);
 ```
 
 `DatabaseQueryRunner` gives you two methods: `query` and `close`.
@@ -31,7 +32,7 @@ const databaseQueryRunner: database.DatabaseQueryRunner =
 `query` takes a query and a list of values:
 
 ```typescript
-databaseQueryRunner.query("SELECT * FROM my_table WHERE id = $1", [id])
+databaseQueryRunner.query("SELECT * FROM my_table WHERE id = $1", [id]);
 ```
 
 This function follows the same logic as the underlying [node-pg](https://node-postgres.com/features/queries) package.
@@ -51,10 +52,10 @@ If you want to get the result of your transaction, you would need to return your
 
 ```typescript
 const { rows } = await databaseQueryRunner.transaction((client) => {
-  return client.query("INSERT INTO my_table (id, name) VALUES ($1, $2) RETURNING id", [
-    "10f9a111-bf5c-4e73-96ac-5de87d962929",
-    "in-transaction",
-  ]);
+  return client.query(
+    "INSERT INTO my_table (id, name) VALUES ($1, $2) RETURNING id",
+    ["10f9a111-bf5c-4e73-96ac-5de87d962929", "in-transaction"]
+  );
 });
 
 // rows contains [{id: "10f9a111-bf5c-4e73-96ac-5de87d962929"}]
@@ -75,7 +76,7 @@ try {
       return Promise.reject(new Error("anotherService failed"));
     }
   });
-} catch(error) {
+} catch (error) {
   // typeof error === TransactionError
   // error.message === "anotherService failed"
 }

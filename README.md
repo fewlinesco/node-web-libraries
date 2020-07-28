@@ -1,6 +1,6 @@
 # FWL
 
-FWL (prononced fuel) are Fewlines Web Libraries.
+FWL (pronounced "fuel") are Fewlines Web Libraries.
 
 They are an ensemble of packages that allow us to build backend services in Typescript.
 

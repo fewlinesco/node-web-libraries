@@ -8,9 +8,7 @@ import {
   UnmanagedError,
 } from "../../index";
 
-export interface GetUsersByIdParams {
-  id: string;
-}
+export type GetUsersByIdParams = any;
 
 const users = [
   { id: "f55bce0a-a2d3-49a8-8fd6-5a6d2d5b3a18", name: "John Doe" },
