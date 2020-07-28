@@ -1,10 +1,11 @@
-import { Router as expressRouter, Request, Response } from "express";
-import { json as jsonParser } from "body-parser";
-import * as Express from "express-serve-static-core";
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fewlines/fwl-tracing";
-import { HttpStatus } from "./http-statuses";
+import { json as jsonParser } from "body-parser";
+import { Router as expressRouter, Request, Response } from "express";
+import * as Express from "express-serve-static-core";
+
 import { UnmanagedError, WebError } from "./errors";
+import { HttpStatus } from "./http-statuses";
 
 enum ResolveOrReject {
   RESOLVE,
@@ -20,7 +21,7 @@ export type ResolveFunction = (
   returnValue?: unknown,
 ) => HandlerPromise;
 
-type HandlerWithoutBody<T extends object> = (
+type HandlerWithoutBody<T extends Record<string, unknown>> = (
   tracer: Tracer,
   resolve: ResolveFunction,
   reject: RejectFunction,
@@ -72,7 +73,7 @@ export class Router {
     this.router = expressRouter();
   }
 
-  private withBodyResponse<T extends object, U>(
+  private withBodyResponse<T extends Record<string, unknown>, U>(
     handler: HandlerWithBody<T, U>,
   ) {
     return async (request: Request, response: Response): Promise<void> => {
@@ -98,28 +99,31 @@ export class Router {
     };
   }
 
-  post<T extends object, U>(
+  post<T extends Record<string, unknown>, U>(
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
     this.router.post(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  patch<T extends object, U>(
+  patch<T extends Record<string, unknown>, U>(
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
     this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  delete<T extends object, U>(
+  delete<T extends Record<string, unknown>, U>(
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
     this.router.delete(path, jsonParser(), this.withBodyResponse(handler));
   }
 
-  get<T extends object>(path: string, handler: HandlerWithoutBody<T>): void {
+  get<T extends Record<string, unknown>>(
+    path: string,
+    handler: HandlerWithoutBody<T>,
+  ): void {
     this.router.get(path, async (request: Request, response: Response) => {
       const resolve = resolveFactory(response);
       const reject = rejectFactory(response);

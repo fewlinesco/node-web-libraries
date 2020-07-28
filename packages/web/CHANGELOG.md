@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.3 - 2020-07-27
+
+- The `createApp` router argument is now typed as `Router`.
+- `GetUsersByIdParams` has been temporary typed as `any` to prevent `ESLint` error.
+
 ## 2.0.2 - 2020-06-30
 
 - Fixed custom router's `delete` method to call the right express method.
@@ -18,6 +23,6 @@
 
 - Created the package @fewlines/fwl-web:
   - Router
-  - Loggin Middleware
+  - Logging Middleware
   - Http Statuses
   - Errors

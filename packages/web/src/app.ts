@@ -1,6 +1,8 @@
 import express, { Application } from "express";
 
-export function createApp(router, middlewares = []): Application {
+import { Router } from "./router";
+
+export function createApp(router: Router, middlewares = []): Application {
   const app = express();
 
   middlewares.forEach((middleware) => app.use(middleware));

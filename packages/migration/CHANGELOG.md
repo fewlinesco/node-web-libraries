@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.1.5 - 2020-07-27
+
+- Dependencies bump:
+  - `uuid`: `8.0.0` => `8.2.0`
+
 ## 0.1.4 - 2020-06-15
 
 - Fixed the CLI call.

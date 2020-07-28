@@ -1,4 +1,5 @@
 import { Tracer } from "@fewlines/fwl-tracing";
+
 import { HandlerPromise, HttpStatus, ResolveFunction } from "../../index";
 
 export function pingHandler() {
