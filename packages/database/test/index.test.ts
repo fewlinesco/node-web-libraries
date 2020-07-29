@@ -105,7 +105,7 @@ describe("transactions", () => {
 
   test("it should return a TransactionError if we try to get a transaction inside of a transaction", async () => {
     expect.assertions(2);
-    const noOp = () => Promise.resolve();
+    const noOp = (): Promise<void> => Promise.resolve();
     try {
       await db.transaction((client) => client.transaction(noOp));
     } catch (error) {
