@@ -3,7 +3,7 @@
   "description": "Web part of Fewlines Web Libraries",
   "dependencies": {
     "@fewlines/fwl-logging": "1.0.0",
-    "@fewlines/fwl-tracing": "1.0.0",
+    "@fwl/tracing": "0.2.1",
     "express": "4.17.1"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
   ],
   "license": "MIT",
   "main": "dist/index.js",
-  "name": "@fewlines/fwl-web",
+  "name": "@fwl/web",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
@@ -46,5 +46,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "2.0.3"
+  "version": "0.1.0"
 }

@@ -1,4 +1,4 @@
-import { Tracer } from "@fewlines/fwl-tracing";
+import { Tracer } from "@fwl/tracing";
 
 import {
   HandlerPromise,
@@ -8,7 +8,7 @@ import {
   UnmanagedError,
 } from "../../index";
 
-export type GetUsersByIdParams = any;
+export type GetUsersByIdParams = { id: string };
 
 const users = [
   { id: "f55bce0a-a2d3-49a8-8fd6-5a6d2d5b3a18", name: "John Doe" },
@@ -30,7 +30,7 @@ export function getUserById() {
       if (!user) {
         // This is just for the example but it
         // should be a user defined error
-        return reject(UnmanagedError());
+        return reject(UnmanagedError(new Error("No user found")));
       }
 
       return resolve(HttpStatus.OK, user);
@@ -47,17 +47,21 @@ export function createUser() {
   return (
     tracer: Tracer,
     resolve: ResolveFunction,
-    _reject: RejectFunction,
+    reject: RejectFunction,
     _params: CreateUserParams,
     body: CreateUserBody,
   ): HandlerPromise => {
     return tracer.span("create-user", async () => {
-      users.push({
-        id: "86f57c73-4e2a-47aa-a050-d8b3c10705cf",
-        name: body.name,
-      });
+      if (body.name) {
+        users.push({
+          id: "86f57c73-4e2a-47aa-a050-d8b3c10705cf",
+          name: body.name,
+        });
 
-      return resolve(HttpStatus.CREATED);
+        return resolve(HttpStatus.CREATED);
+      } else {
+        return reject(UnmanagedError(new Error("No name provided")));
+      }
     });
   };
 }

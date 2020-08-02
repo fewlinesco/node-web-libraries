@@ -62,7 +62,7 @@ router.get<{ name: string }>("/my/:name", myHandler(database));
 
 ```typescript
 import { Request } from "express";
-import { Tracer } from "@fewlines/fwl-tracing";
+import { Tracer } from "@fwl/tracing";
 import {
   HandlerPromise,
   HttpStatus,
@@ -156,7 +156,7 @@ createApp(router, [loggingMiddleware(tracer, logger)]);
 ```typescript
 import { Application } from "express";
 import { Logger } from "@fewlines/fwl-logging";
-import { Tracer } from "@fewlines/fwl-tracing";
+import { Tracer } from "@fwl/tracing";
 import { createApp, loggingMiddleware, Router } from "@fewlines/fwl-web";
 import { handler } from "./handlers";
 

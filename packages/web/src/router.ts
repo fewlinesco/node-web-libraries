@@ -1,5 +1,5 @@
 import { Logger } from "@fewlines/fwl-logging";
-import { Tracer } from "@fewlines/fwl-tracing";
+import { Tracer } from "@fwl/tracing";
 import { json as jsonParser } from "body-parser";
 import { Router as expressRouter, Request, Response } from "express";
 import * as Express from "express-serve-static-core";
@@ -40,6 +40,9 @@ type HandlerWithBody<T, U> = (
 
 function rejectFactory(response: Response): RejectFunction {
   return function reject(error: WebError): HandlerPromise {
+    if (error.parentError) {
+      response.req.private.error = error.parentError;
+    }
     response.status(error.httpStatus).json(error.getMessage());
     return Promise.resolve(ResolveOrReject.REJECT);
   };
@@ -93,7 +96,7 @@ export class Router {
         if (exception instanceof WebError) {
           reject(exception);
         } else {
-          reject(UnmanagedError());
+          reject(UnmanagedError(exception));
         }
       }
     };
@@ -134,7 +137,7 @@ export class Router {
         if (exception instanceof WebError) {
           reject(exception);
         } else {
-          reject(UnmanagedError());
+          reject(UnmanagedError(exception));
         }
       }
     });

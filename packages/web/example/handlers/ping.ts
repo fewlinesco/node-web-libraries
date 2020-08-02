@@ -1,4 +1,4 @@
-import { Tracer } from "@fewlines/fwl-tracing";
+import { Tracer } from "@fwl/tracing";
 
 import { HandlerPromise, HttpStatus, ResolveFunction } from "../../index";
 
