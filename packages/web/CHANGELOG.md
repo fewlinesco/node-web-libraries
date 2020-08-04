@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.2.0 - 2020-08-04
+
+- `ResolveFunction` now accept 4 arguments: an HTTP status code, some data, a headers object and options.
+  - This allows for redirects using 301, 302, 307 or 308 status code with the redirect URI as the second parameter.
+  - This allows for sending files by setting `{ file: true }` as the options fourth argument.
+- `router.get` can now be used without a Generic Type if you have no Query Parameter to deal with (or with `router.get<EmptyParams>`).
+- A route with POST, PATCH, PUT or DELETE can use `EmptyBody` as its second Generic if you have no Body.
+
 ## 0.1.0 - 2020-08-03
 
 - Package renamed from `@fewlines/fwl-web` to `@fwl/web`.
