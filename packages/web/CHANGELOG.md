@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.0 - 2020-08-03
+
+- Package renamed from `@fewlines/fwl-web` to `@fwl/web`.
+- `UnamangedError` takes an `Error` as first argument to be able to display the error mesage in the logging middleware.
+- `NotFoundError` and `BadRequestError` takes an option `Error` second argument to display the error message in the logging middleware.
+
 ## 2.0.3 - 2020-07-27
 
 - The `createApp` router argument is now typed as `Router`.

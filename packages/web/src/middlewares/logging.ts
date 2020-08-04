@@ -1,41 +1,48 @@
 import { Logger } from "@fewlines/fwl-logging";
-import { Tracer, Span } from "@fewlines/fwl-tracing";
-import { NextFunction, Request, Response } from "express";
+import { Tracer, Span } from "@fwl/tracing";
+import { NextFunction, Request, Response, RequestHandler } from "express";
 
-type Middleware = (
-  request: Request,
-  response: Response,
-  next: NextFunction,
-) => void;
-
-export function loggingMiddleware(tracer: Tracer, logger: Logger): Middleware {
-  function onFinishFactory(span: Span, startTime: bigint): () => void {
+export function loggingMiddleware(
+  tracer: Tracer,
+  logger: Logger,
+): RequestHandler {
+  function onFinishFactory(
+    span: Span,
+    startTime: bigint,
+    request: Request,
+  ): () => void {
     return function onFinish(): void {
       const response = this as Response;
       response.removeListener("finish", onFinish);
-      const end = process.hrtime.bigint();
 
-      logger.log("", {
+      const end = process.hrtime.bigint();
+      const message = request.private.error
+        ? (request.private.error as Error).message
+        : "";
+
+      logger.log(message, {
         path: response.req.path,
-        remoteaddr:
+        remoteaddr: (
           response.req.headers["x-forwarded-for"] ||
-          response.req.connection.remoteAddress,
+          response.req.connection.remoteAddress
+        ).toString(),
         method: response.req.method,
         statusCode: response.statusCode,
-        duration: (end - startTime) / BigInt(1000),
+        duration: Number((end - startTime) / BigInt(1000)),
         traceid: span.context().traceId,
       });
       span.end();
     };
   }
+
   return function (
-    _request: Request,
+    request: Request,
     response: Response,
     next: NextFunction,
   ): void {
     const startTime = process.hrtime.bigint();
     const span = tracer.createSpan("logging middleware");
-    response.once("finish", onFinishFactory(span, startTime));
+    response.once("finish", onFinishFactory(span, startTime, request));
     next();
   };
 }

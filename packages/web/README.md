@@ -9,7 +9,7 @@ It provides a typed interface on top of Express with a way of defining errors, a
 ## Installation
 
 ```shell
-yarn add @fewlines/fwl-web
+yarn add @fwl/web
 ```
 
 ## Usage
@@ -62,13 +62,13 @@ router.get<{ name: string }>("/my/:name", myHandler(database));
 
 ```typescript
 import { Request } from "express";
-import { Tracer } from "@fewlines/fwl-tracing";
+import { Tracer } from "@fwl/tracing";
 import {
   HandlerPromise,
   HttpStatus,
   RejectFunction,
   ResolveFunction,
-} from "@fewlines/fwl-web";
+} from "@fwl/web";
 
 // We create a handler that accept dependencies and return the real handler
 export function myHandler(database) {
@@ -117,7 +117,7 @@ Here is how to define our `MyNotFoundError` in the previous example:
 
 ```typescript
 // src/errors.ts
-import { HttpStatus, WebError, WebErrorMessages } from "@fewlines/fwl-web";
+import { HttpStatus, WebError, WebErrorMessages } from "@fwl/web";
 
 const Errors: WebErrorMessages = {
   MY_RESOURCE_NOT_FOUND: { code: 400001, message: "My Resource not found" },
@@ -156,8 +156,8 @@ createApp(router, [loggingMiddleware(tracer, logger)]);
 ```typescript
 import { Application } from "express";
 import { Logger } from "@fewlines/fwl-logging";
-import { Tracer } from "@fewlines/fwl-tracing";
-import { createApp, loggingMiddleware, Router } from "@fewlines/fwl-web";
+import { Tracer } from "@fwl/tracing";
+import { createApp, loggingMiddleware, Router } from "@fwl/web";
 import { handler } from "./handlers";
 
 export function bootstrap(tracer: Tracer, logger: Logger): Application {

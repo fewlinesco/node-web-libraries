@@ -1,5 +1,5 @@
 import { Logger } from "@fewlines/fwl-logging";
-import { Tracer } from "@fewlines/fwl-tracing";
+import { Tracer } from "@fwl/tracing";
 import { Application } from "express";
 
 import { createApp, loggingMiddleware, Router } from "../index";

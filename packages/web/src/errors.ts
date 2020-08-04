@@ -26,21 +26,27 @@ export class WebError {
   public errorDetails?: WebErrorDetails;
   public message: string;
   public httpStatus: HttpStatus;
+  public parentError?: Error;
 
   constructor({
     error,
-    httpStatus,
     errorDetails,
+    httpStatus,
+    parentError,
   }: {
     error: ApplicationError;
     errorDetails?: WebErrorDetails;
     httpStatus: HttpStatus;
+    parentError?: Error;
   }) {
     this.applicationStatus = error.code;
     this.message = error.message;
     this.httpStatus = httpStatus;
     if (errorDetails) {
       this.errorDetails = errorDetails;
+    }
+    if (parentError) {
+      this.parentError = parentError;
     }
   }
 
@@ -56,26 +62,35 @@ export class WebError {
   }
 }
 
-export function NotFoundError(applicationStatus: ApplicationStatus): WebError {
+export function NotFoundError(
+  applicationStatus: ApplicationStatus,
+  error?: Error,
+): WebError {
   return new WebError({
     error: {
       code: applicationStatus,
       message: `[${applicationStatus}] Resource not found`,
     },
     httpStatus: HttpStatus.NOT_FOUND,
+    parentError: error,
   });
 }
 
-export function BadRequestError(applicationStatus): WebError {
+export function BadRequestError(
+  applicationStatus: ApplicationStatus,
+  error?: Error,
+): WebError {
   return new WebError({
     error: { code: 400000, message: `[${applicationStatus}] Bad Request` },
     httpStatus: HttpStatus.BAD_REQUEST,
+    parentError: error,
   });
 }
 
-export function UnmanagedError(): WebError {
+export function UnmanagedError(error: Error): WebError {
   return new WebError({
     error: { code: 500000, message: "Unexpected Error" },
     httpStatus: HttpStatus.INTERNAL_SERVER_ERROR,
+    parentError: error,
   });
 }
