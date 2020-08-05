@@ -138,7 +138,7 @@ export function myHandler(database) {
 
 #### Sending additional headers
 
-The `resolve` function accepts a third option arguments which is a `Record<string, string>` that contain headers that will be added to the request.
+The `resolve` function accepts a third option argument which is a `Record<string, string>` that contain headers that will be added to the request.
 
 ```typescript
 export function myHandler(database) {
