@@ -105,7 +105,51 @@ export function myHandler(database) {
 }
 ```
 
+If you don't have any Query parameters, these are functionnaly equivalent:
+
+```typescript
+router.get<Record<string, unknown>>("/ping", pingHandler());
+router.get<Router.EmptyParams>("/ping", pingHandler());
+router.get("/ping", pingHandler());
+```
+
 For more information, please look at the [example](./example/).
+
+#### Redirects
+
+To redirect a request, you can use one of the redirection HTTP Status:
+
+- `HttpStatus.MOVED_PERMANENTLY`: 301
+- `HttpStatus.MOVED_TEMPORARILY`: 302
+- `HttpStatus.TEMPORARY_REDIRECT`: 307
+- `HttpStatus.PERMANENT_REDIRECT`: 308
+
+The redirection URI will be the second argument and must be a string.
+
+```typescript
+export function myHandler(database) {
+  return (tracer: Tracer, resolve: ResolveFunction): HandlerPromise => {
+    return tracer.span("my-redirect-handler", async () => {
+      return resolve(HttpStatus.MOVED_PERMANENTLY, "http://anotherurl.com");
+    }
+  }
+}
+```
+
+#### Sending additional headers
+
+The `resolve` function accepts a third option argument which is a `Record<string, string>` that contain headers that will be added to the request.
+
+```typescript
+export function myHandler(database) {
+  return (tracer: Tracer, resolve: ResolveFunction): HandlerPromise => {
+    return tracer.span("my-resource-handler", async () => {
+      const csvData = "1,Frieda,Ewlines";
+      return resolve(HttpStatus.OK, csvData, {"Content-Type": "text/csv"})
+    }
+  }
+}
+```
 
 ### Dealing With Errors
 
@@ -163,7 +207,7 @@ import { handler } from "./handlers";
 export function bootstrap(tracer: Tracer, logger: Logger): Application {
   const router = new Router(tracer, logger);
 
-  router.get<{}>("/", handler(spartaApiClient));
+  router.get("/", handler(spartaApiClient));
 
   return createApp(router, [loggingMiddleware(tracer, logger)]);
 }
