@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.0 - 2020-08-06
+
+- Fix: Router Types were not exported correctly
+
 ## 0.2.0 - 2020-08-04
 
 - `ResolveFunction` now accept 4 arguments: an HTTP status code, some data, a headers object and options.
