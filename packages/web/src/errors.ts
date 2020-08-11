@@ -94,3 +94,11 @@ export function UnmanagedError(error: Error): WebError {
     parentError: error,
   });
 }
+
+export function UnauthorizedError(error: Error): WebError {
+  return new WebError({
+    error: { code: 401000, message: "Unauthorized" },
+    httpStatus: HttpStatus.UNAUTHORIZED,
+    parentError: error,
+  });
+}

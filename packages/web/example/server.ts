@@ -7,6 +7,7 @@ import * as csvHandler from "./handlers/csv";
 import * as imageHandler from "./handlers/image";
 import { pingHandler } from "./handlers/ping";
 import * as userHandler from "./handlers/users";
+import { authMiddleware } from "./middlewares/auth";
 
 export function start(tracer: Tracer, logger: Logger): Application {
   const router = new Router(tracer, logger);
@@ -26,5 +27,9 @@ export function start(tracer: Tracer, logger: Logger): Application {
 
   router.get("/csv", csvHandler.getCsv());
 
-  return createApp(router, [loggingMiddleware(tracer, logger)]);
+  const authRouter = new Router(tracer, logger, [authMiddleware(tracer)]);
+
+  authRouter.get("/auth-ping", pingHandler());
+
+  return createApp([authRouter, router], [loggingMiddleware(tracer, logger)]);
 }

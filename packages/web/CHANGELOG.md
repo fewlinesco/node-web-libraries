@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.0 - 2020-08-11
+
+- `createApp` now requires a `Router[]` argument instead of a `Router`
+
 ## 0.3.0 - 2020-08-06
 
 - Fix: Router Types were not exported correctly

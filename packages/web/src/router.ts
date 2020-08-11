@@ -1,7 +1,12 @@
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { json as jsonParser } from "body-parser";
-import { Router as expressRouter, Request, Response } from "express";
+import {
+  Router as expressRouter,
+  Request,
+  Response,
+  NextFunction,
+} from "express";
 import * as Express from "express-serve-static-core";
 
 import { UnmanagedError, WebError } from "./errors";
@@ -10,6 +15,12 @@ import { HttpStatus } from "./http-statuses";
 export type EmptyParams = Record<string, unknown>;
 
 export type EmptyBody = Record<string, unknown>;
+
+export type Middleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => void;
 
 export enum ResolveOrReject {
   RESOLVE,
@@ -47,7 +58,7 @@ export type HandlerPromise = Promise<ResolveOrReject>;
 
 export type RejectFunction = (error: WebError) => HandlerPromise;
 
-function rejectFactory(response: Response): RejectFunction {
+export function rejectFactory(response: Response): RejectFunction {
   return function reject(error: WebError): HandlerPromise {
     if (error.parentError) {
       response.req.private.error = error.parentError;
@@ -106,11 +117,13 @@ export class Router {
   private tracer: Tracer;
   private logger: Logger;
   private router: Express.Router;
+  private middlewares: Middleware[];
 
-  constructor(tracer: Tracer, logger: Logger) {
+  constructor(tracer: Tracer, logger: Logger, middlewares: Middleware[] = []) {
     this.tracer = tracer;
     this.logger = logger;
     this.router = expressRouter();
+    this.middlewares = middlewares;
   }
 
   private withBodyResponse<T extends Record<string, unknown>, U>(
@@ -143,41 +156,60 @@ export class Router {
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
-    this.router.post(path, jsonParser(), this.withBodyResponse(handler));
+    this.router.post(
+      path,
+      jsonParser(),
+      ...this.middlewares,
+      this.withBodyResponse(handler),
+    );
   }
 
   patch<T extends Record<string, unknown>, U>(
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
-    this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
+    this.router.patch(
+      path,
+      jsonParser(),
+      ...this.middlewares,
+      this.withBodyResponse(handler),
+    );
   }
 
   delete<T extends Record<string, unknown>, U>(
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
-    this.router.delete(path, jsonParser(), this.withBodyResponse(handler));
+    this.router.delete(
+      path,
+      jsonParser(),
+      ...this.middlewares,
+      this.withBodyResponse(handler),
+    );
   }
 
   get<T extends Record<string, unknown> = EmptyParams>(
     path: string,
     handler: HandlerWithoutBody<T>,
   ): void {
-    this.router.get(path, async (request: Request, response: Response) => {
-      const resolve = resolveFactory(response);
-      const reject = rejectFactory(response);
-      const params = { ...request.query, ...request.params } as T;
-      try {
-        await handler(this.tracer, resolve, reject, params, request);
-      } catch (exception) {
-        if (exception instanceof WebError) {
-          reject(exception);
-        } else {
-          reject(UnmanagedError(exception));
+    this.router.get(
+      path,
+      ...this.middlewares,
+      async (request: Request, response: Response) => {
+        const resolve = resolveFactory(response);
+        const reject = rejectFactory(response);
+        const params = { ...request.query, ...request.params } as T;
+        try {
+          await handler(this.tracer, resolve, reject, params, request);
+        } catch (exception) {
+          if (exception instanceof WebError) {
+            reject(exception);
+          } else {
+            reject(UnmanagedError(exception));
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   getRouter(): Express.Router {
