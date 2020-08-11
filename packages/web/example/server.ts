@@ -26,7 +26,8 @@ export function start(tracer: Tracer, logger: Logger): Application {
   router.get("/logo-image", imageHandler.getLogo());
 
   router.get("/csv", csvHandler.getCsv());
-  const authRouter = new Router(tracer, logger, [authMiddleware]);
+
+  const authRouter = new Router(tracer, logger, [authMiddleware(tracer)]);
 
   authRouter.get("/auth-ping", pingHandler());
 
