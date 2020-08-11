@@ -12,7 +12,6 @@ export function createApp(
   app.use(extendRequestMiddleware());
   globalMiddlewares.forEach((middleware) => app.use(middleware));
   routers.forEach((router) => app.use(router.getRouter()));
-  app.use(routers.map((router) => router.getRouter()));
 
   return app;
 }

@@ -5,7 +5,7 @@ import {
   Router as expressRouter,
   Request,
   Response,
-  RequestHandler,
+  NextFunction,
 } from "express";
 import * as Express from "express-serve-static-core";
 
@@ -16,7 +16,11 @@ export type EmptyParams = Record<string, unknown>;
 
 export type EmptyBody = Record<string, unknown>;
 
-export type RouterMiddlewares = RequestHandler[];
+export type Middleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => void;
 
 export enum ResolveOrReject {
   RESOLVE,
@@ -54,7 +58,7 @@ export type HandlerPromise = Promise<ResolveOrReject>;
 
 export type RejectFunction = (error: WebError) => HandlerPromise;
 
-function rejectFactory(response: Response): RejectFunction {
+export function rejectFactory(response: Response): RejectFunction {
   return function reject(error: WebError): HandlerPromise {
     if (error.parentError) {
       response.req.private.error = error.parentError;
@@ -113,14 +117,13 @@ export class Router {
   private tracer: Tracer;
   private logger: Logger;
   private router: Express.Router;
+  private middlewares: Middleware[];
 
-  constructor(tracer: Tracer, logger: Logger, middlewares?: RouterMiddlewares) {
+  constructor(tracer: Tracer, logger: Logger, middlewares: Middleware[] = []) {
     this.tracer = tracer;
     this.logger = logger;
     this.router = expressRouter();
-    if (middlewares) {
-      this.router.use(...middlewares);
-    }
+    this.middlewares = middlewares;
   }
 
   private withBodyResponse<T extends Record<string, unknown>, U>(
@@ -174,20 +177,24 @@ export class Router {
     path: string,
     handler: HandlerWithoutBody<T>,
   ): void {
-    this.router.get(path, async (request: Request, response: Response) => {
-      const resolve = resolveFactory(response);
-      const reject = rejectFactory(response);
-      const params = { ...request.query, ...request.params } as T;
-      try {
-        await handler(this.tracer, resolve, reject, params, request);
-      } catch (exception) {
-        if (exception instanceof WebError) {
-          reject(exception);
-        } else {
-          reject(UnmanagedError(exception));
+    this.router.get(
+      path,
+      ...this.middlewares,
+      async (request: Request, response: Response) => {
+        const resolve = resolveFactory(response);
+        const reject = rejectFactory(response);
+        const params = { ...request.query, ...request.params } as T;
+        try {
+          await handler(this.tracer, resolve, reject, params, request);
+        } catch (exception) {
+          if (exception instanceof WebError) {
+            reject(exception);
+          } else {
+            reject(UnmanagedError(exception));
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   getRouter(): Express.Router {
