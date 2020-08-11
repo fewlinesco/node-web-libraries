@@ -3,12 +3,13 @@ import express, { Application } from "express";
 import { extendRequestMiddleware } from "./middlewares/extend-request";
 import { Router } from "./router";
 
-export function createApp(router: Router, middlewares = []): Application {
+export function createApp(routers: Router[], globalMiddlewares = []): Application {
   const app = express();
 
   app.use(extendRequestMiddleware());
-  middlewares.forEach((middleware) => app.use(middleware));
-  app.use(router.getRouter());
+  globalMiddlewares.forEach((middleware) => app.use(middleware));
+  routers.forEach((router) => app.use(router.getRouter()))
+  app.use(routers.map((router) => router.getRouter()));
 
   return app;
 }
