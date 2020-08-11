@@ -2,7 +2,7 @@
   "author": "Fewlines",
   "description": "Web part of Fewlines Web Libraries",
   "dependencies": {
-    "@fewlines/fwl-logging": "1.0.0",
+    "@fewlines/fwl-logging": "1.0.1",
     "@fwl/tracing": "0.2.1",
     "express": "4.17.1"
   },
