@@ -1,7 +1,12 @@
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { json as jsonParser } from "body-parser";
-import { Router as expressRouter, Request, Response, RequestHandler } from "express";
+import {
+  Router as expressRouter,
+  Request,
+  Response,
+  RequestHandler,
+} from "express";
 import * as Express from "express-serve-static-core";
 
 import { UnmanagedError, WebError } from "./errors";
@@ -11,7 +16,7 @@ export type EmptyParams = Record<string, unknown>;
 
 export type EmptyBody = Record<string, unknown>;
 
-export type RouterMiddlewares = RequestHandler[]
+export type RouterMiddlewares = RequestHandler[];
 
 export enum ResolveOrReject {
   RESOLVE,
@@ -113,7 +118,9 @@ export class Router {
     this.tracer = tracer;
     this.logger = logger;
     this.router = expressRouter();
-    if (middlewares) { this.router.use(...middlewares) };
+    if (middlewares) {
+      this.router.use(...middlewares);
+    }
   }
 
   private withBodyResponse<T extends Record<string, unknown>, U>(

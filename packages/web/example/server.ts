@@ -2,7 +2,7 @@ import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { Application } from "express";
 
-import { createApp, loggingMiddleware,  Router } from "../index";
+import { createApp, loggingMiddleware, Router } from "../index";
 import * as csvHandler from "./handlers/csv";
 import * as imageHandler from "./handlers/image";
 import { pingHandler } from "./handlers/ping";
