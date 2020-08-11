@@ -5,7 +5,7 @@ import { Router } from "./router";
 
 export function createApp(
   routers: Router[],
-  globalMiddlewares = []
+  globalMiddlewares = [],
 ): Application {
   const app = express();
 

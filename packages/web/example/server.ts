@@ -8,10 +8,8 @@ import * as imageHandler from "./handlers/image";
 import { pingHandler } from "./handlers/ping";
 import * as userHandler from "./handlers/users";
 
-
 export function start(tracer: Tracer, logger: Logger): Application {
   const router = new Router(tracer, logger);
-
 
   router.get("/ping", pingHandler());
   router.get<userHandler.GetUsersByIdParams>(
