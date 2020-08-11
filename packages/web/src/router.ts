@@ -156,21 +156,36 @@ export class Router {
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
-    this.router.post(path, jsonParser(), this.withBodyResponse(handler));
+    this.router.post(
+      path,
+      jsonParser(),
+      ...this.middlewares,
+      this.withBodyResponse(handler),
+    );
   }
 
   patch<T extends Record<string, unknown>, U>(
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
-    this.router.patch(path, jsonParser(), this.withBodyResponse(handler));
+    this.router.patch(
+      path,
+      jsonParser(),
+      ...this.middlewares,
+      this.withBodyResponse(handler),
+    );
   }
 
   delete<T extends Record<string, unknown>, U>(
     path: string,
     handler: HandlerWithBody<T, U>,
   ): void {
-    this.router.delete(path, jsonParser(), this.withBodyResponse(handler));
+    this.router.delete(
+      path,
+      jsonParser(),
+      ...this.middlewares,
+      this.withBodyResponse(handler),
+    );
   }
 
   get<T extends Record<string, unknown> = EmptyParams>(
