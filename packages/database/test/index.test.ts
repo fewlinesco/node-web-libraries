@@ -1,19 +1,29 @@
+import { InMemoryTracer } from "@fwl/tracing";
+
 import * as database from "../index";
 
 let db: database.DatabaseQueryRunner;
+let tracer: InMemoryTracer;
 beforeAll(async () => {
-  db = database.connect({
-    username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-    host: process.env.DATABASE_SQL_HOST || "localhost",
-    password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-    database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-    port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-  });
+  tracer = new InMemoryTracer();
+  db = database.connect(
+    {
+      username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
+      host: process.env.DATABASE_SQL_HOST || "localhost",
+      password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
+      database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
+      port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
+    },
+    tracer,
+  );
   await db.query(
     "CREATE TABLE IF NOT EXISTS fwl (id UUID PRIMARY KEY, name varchar(32) NOT NULL)",
   );
 });
-beforeEach(() => db.query("TRUNCATE fwl"));
+beforeEach(async () => {
+  await db.query("TRUNCATE fwl");
+  tracer.spans = [];
+});
 
 afterAll(async () => {
   await db.query("DROP TABLE fwl");
@@ -126,5 +136,58 @@ describe("transactions", () => {
         "Can't close a connection inside a transaction",
       );
     }
+  });
+});
+
+describe("database tracing", () => {
+  test("The query should generate a corresponding span with the right name and attributes", async () => {
+    expect.assertions(3);
+    await db.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
+      "74fbf638-6241-42bd-b257-b9a3dd24feb6",
+      "test",
+    ]);
+    const spans = tracer.searchSpanByName("db-query");
+    expect(spans.length).toBe(1);
+    const span = spans[0];
+    expect(span.name).toBe("db-query");
+    expect(span.attributes["db.statement"]).toBe(
+      "INSERT INTO fwl (id, name) VALUES ($1, $2)",
+    );
+  });
+
+  test("The transaction and associated query should generate the corresponding span with the right name and attributes", async () => {
+    expect.assertions(5);
+    await db.transaction(async (client) => {
+      await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
+        "10f9a111-bf5c-4e73-96ac-5de87d962929",
+        "in-transaction",
+      ]);
+    });
+    const transactionSpan = tracer.searchSpanByName("db-transaction")[0];
+    expect(transactionSpan).toBeDefined();
+    expect(transactionSpan.name).toBe("db-transaction");
+    const querySpan = tracer.searchSpanByName("db-query")[0];
+    expect(querySpan).toBeDefined();
+    expect(querySpan.name).toBe("db-query");
+    expect(querySpan.attributes["db.statement"]).toBe(
+      "INSERT INTO fwl (id, name) VALUES ($1, $2)",
+    );
+  });
+
+  test("Closing the connection should generate the related span", async () => {
+    const testDb = database.connect(
+      {
+        username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
+        host: process.env.DATABASE_SQL_HOST || "localhost",
+        password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
+        database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
+        port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
+      },
+      tracer,
+    );
+    await testDb.close();
+    const closeSpan = tracer.searchSpanByName("db-close")[0];
+    expect(closeSpan).toBeDefined();
+    expect(closeSpan.name).toBe("db-close");
   });
 });
