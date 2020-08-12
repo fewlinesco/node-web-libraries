@@ -2,7 +2,7 @@
 
 ## 0.2.2 - 2020-08.12
 
-- Removed `pg` and `pg-pool` plugins, tracing integration for Postgres will be added to `@fwl-database`.
+- Removed `pg` and `pg-pool` plugins, tracing integration for Postgres will need to be added manually to a database wrapper like `@fewlines/fwl-database`
 
 ## 0.2.1 - 2020-07-27
 
