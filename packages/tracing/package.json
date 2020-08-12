@@ -9,8 +9,6 @@
     "@opentelemetry/plugin-express": "^0.8.0",
     "@opentelemetry/plugin-http": "^0.9.0",
     "@opentelemetry/plugin-https": "^0.9.0",
-    "@opentelemetry/plugin-pg": "^0.8.0",
-    "@opentelemetry/plugin-pg-pool": "^0.8.0",
     "@opentelemetry/tracing": "^0.9.0"
   },
   "devDependencies": {
@@ -59,5 +57,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.2.1"
+  "version": "0.3.0"
 }

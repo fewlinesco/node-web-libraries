@@ -21,14 +21,6 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
       enabled: true,
       path: "@opentelemetry/plugin-https",
     },
-    pg: {
-      enabled: true,
-      path: "@opentelemetry/plugin-pg",
-    },
-    "pg-pool": {
-      enabled: true,
-      path: "@opentelemetry/plugin-pg-pool",
-    },
   },
 });
 
