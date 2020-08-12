@@ -88,6 +88,9 @@ function resolveFactory(response: Response): ResolveFunction {
           `Unsupported type for redirection value, excepted string got ${typeof value}`,
         );
       }
+      if (headers) {
+        response.set(headers);
+      }
       response.redirect(status, value);
     } else if (options.file) {
       if (typeof value !== "string") {

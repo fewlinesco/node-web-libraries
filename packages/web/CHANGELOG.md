@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.1 - 2020-08-11
+
+- Headers are now sent with redirects
+
 ## 0.4.0 - 2020-08-11
 
 - `createApp` now requires a `Router[]` argument instead of a `Router`
