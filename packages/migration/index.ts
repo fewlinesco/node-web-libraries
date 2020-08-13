@@ -116,7 +116,7 @@ export async function dryRunPendingMigrations(
     await createSchemaMigrationsTable(databaseQueryRunner);
 
     const { rows } = await databaseQueryRunner.query(
-      /* sql */ `SELECT * FROM schema_migrations ORDER BY created_at DESC`,
+      `SELECT * FROM schema_migrations ORDER BY created_at DESC`,
     );
 
     const pendingMigrations = rows
@@ -128,7 +128,7 @@ export async function dryRunPendingMigrations(
         await client.query(query);
 
         await client.query(
-          /* sql */ `
+          `
           INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
           [uuidv4(), timestamp, fileName, query],
         );
