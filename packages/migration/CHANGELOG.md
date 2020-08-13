@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.1.6 - 2020-08-13
+
+- Dependencies bump:
+  - `@fewlines/fwl-database`: `1.1.0` => `1.1.1` 
+
 ## 0.1.5 - 2020-07-27
 
 - Dependencies bump:
