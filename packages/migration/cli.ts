@@ -42,7 +42,7 @@ export async function runCLI(): Promise<void> {
         const config = await getConfig(args[1]);
         dryRunPendingMigrations(config);
       }
-      throw new Error(ERRORS.migrate.tooManyArgs);
+      throw new Error(ERRORS.dryRun.tooManyArgs);
     } else if (args[0] === "--create") {
       if (args.length === 2) {
         createMigrationFile(args[1]);
