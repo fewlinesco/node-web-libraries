@@ -1,4 +1,8 @@
-import { runMigrations, createMigrationFile } from "./index";
+import {
+  runMigrations,
+  createMigrationFile,
+  dryRunPendingMigrations,
+} from "./index";
 import { getConfig } from "./utils/getConfig";
 
 type MigrationErrors = { [key: string]: { [key: string]: string } };
@@ -7,6 +11,10 @@ export const ERRORS: MigrationErrors = {
   migrate: {
     tooManyArgs:
       "Too many arguments arguments. To run a migration, please run 'migration --migrate path/to/config.json'",
+  },
+  dryRun: {
+    tooManyArgs:
+      "Too many arguments arguments. To run a migration dry run, please run 'migration --dry-run path/to/config.json'",
   },
   create: {
     tooManyArgs:
@@ -29,6 +37,12 @@ export async function runCLI(): Promise<void> {
       } else {
         throw new Error(ERRORS.migrate.tooManyArgs);
       }
+    } else if (args[0] === "--dry-run") {
+      if (args.length === 2) {
+        const config = await getConfig(args[1]);
+        dryRunPendingMigrations(config);
+      }
+      throw new Error(ERRORS.migrate.tooManyArgs);
     } else if (args[0] === "--create") {
       if (args.length === 2) {
         createMigrationFile(args[1]);
