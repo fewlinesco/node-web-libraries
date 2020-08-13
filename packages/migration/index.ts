@@ -98,3 +98,50 @@ export async function createMigrationFile(name: string): Promise<string> {
 
   return fileName;
 }
+
+export async function dryRunPendingMigrations(
+  config?: MigrateConfig,
+): Promise<void> {
+  const checkedConfig = config ? config : await getConfig();
+
+  const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
+    checkedConfig.database,
+  );
+
+  const sqlMigrationsFolder = checkedConfig.migration.dirPath || "./migrations";
+
+  try {
+    const queries = await getQueries(sqlMigrationsFolder);
+
+    await createSchemaMigrationsTable(databaseQueryRunner);
+
+    const { rows } = await databaseQueryRunner.query(
+      /* sql */ `SELECT * FROM schema_migrations ORDER BY created_at DESC`,
+    );
+
+    const pendingMigrations = rows
+      ? getPendingMigrations(rows, queries)
+      : queries;
+
+    await databaseQueryRunner.transaction(async (client) => {
+      for await (const { timestamp, fileName, query } of pendingMigrations) {
+        await client.query(query);
+
+        await client.query(
+          /* sql */ `
+          INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+          [uuidv4(), timestamp, fileName, query],
+        );
+        throw new Error("Rollback");
+      }
+    });
+  } catch (error) {
+    if (error.message === "Rollback") {
+      console.log("Migration dry run success !");
+      return;
+    }
+    throw error;
+  }
+
+  databaseQueryRunner.close();
+}
