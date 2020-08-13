@@ -96,7 +96,7 @@ describe("runCLI", () => {
       try {
         await runCLI();
       } catch (error) {
-        expect(error.message).toBe(ERRORS.migrate.tooManyArgs);
+        expect(error.message).toBe(ERRORS.dryRun.tooManyArgs);
       }
 
       done();
