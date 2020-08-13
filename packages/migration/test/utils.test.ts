@@ -1,4 +1,4 @@
-import * as database from "@fewlines/fwl-database";
+import * as database from "@fwl/database";
 
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getConfig } from "../utils/getConfig";

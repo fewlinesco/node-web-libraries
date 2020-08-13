@@ -1,5 +1,5 @@
 import { Config as DefaultConfig } from "@fewlines/fwl-config";
-import * as database from "@fewlines/fwl-database";
+import * as database from "@fwl/database";
 import * as fs from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
