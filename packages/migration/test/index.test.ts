@@ -18,9 +18,9 @@ jest.mock("../utils/getConfig", () => {
   };
 });
 
-let db: database.DatabaseQueryRunner;
+let db: database.DatabaseQueryRunnerWithoutTracing;
 beforeAll(async () => {
-  db = database.connect({
+  db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
@@ -38,7 +38,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  db = database.connect({
+  db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
@@ -62,7 +62,7 @@ describe("runMigrations", () => {
 
     await runMigrations(config);
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
@@ -86,7 +86,7 @@ describe("runMigrations", () => {
 
     await runMigrations(config);
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const dbTables = await db.transaction(async (client) => {
       try {
@@ -122,7 +122,7 @@ describe("runMigrations", () => {
 
     const config = await getConfig("./test/config.json");
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const dbTables = await db.transaction(async (client) => {
       try {
@@ -158,7 +158,7 @@ describe("runMigrations", () => {
 
     await runMigrations();
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
@@ -205,7 +205,7 @@ describe("runMigrations", () => {
 
     await runMigrations();
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 

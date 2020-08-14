@@ -33,7 +33,7 @@ export type SchemaMigrationsRow = {
 export async function runMigrations(config?: MigrateConfig): Promise<void> {
   const checkedConfig = config ? config : await getConfig();
 
-  const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
+  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
     checkedConfig.database,
   );
 
@@ -104,7 +104,7 @@ export async function dryRunPendingMigrations(
 ): Promise<void> {
   const checkedConfig = config ? config : await getConfig();
 
-  const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
+  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
     checkedConfig.database,
   );
 
