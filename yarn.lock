@@ -314,12 +314,13 @@
   resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-3.0.0.tgz#2d8c2be46b8bfec8222942b8ccc999d6d6d714f3"
   integrity sha512-5J9UukKUA4phA1zAgZJIcVLv8Ps5kpNGAD3jtPqe/Ee2HhLN6AZTlThmgUIqIvm/0ZpDI7d/mrBPNcnt0nOuYA==
 
-"@fewlines/fwl-logging@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@fewlines/fwl-logging/-/fwl-logging-1.0.1.tgz#5fa1ea63206f363cdd7c8359b6fd16a63ef35430"
-  integrity sha512-+37gzaT5Sn6+vIB3tfzQJ0FXX92EwA6139wUIHHOK8fm9OkxgHnz2yeRKN175Jdad3UrsUo5hQy+T64dXn5cJg==
+"@fwl/database@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@fwl/database/-/database-0.1.1.tgz#cde15f4d8145dee8a1c0ebe3b68e98a919e693b8"
+  integrity sha512-780migCQzlwjsr1TsAK/vLJL0AIoBPyLGWBEvDJwHUJpdAJk0uXMzELTzvlykcxD1YLNPIs9PApHYx6oiyG9Hg==
   dependencies:
-    logfmt "1.3.2"
+    "@fwl/tracing" "0.3.0"
+    pg "8.3.0"
 
 "@fwl/tracing@0.2.1":
   version "0.2.1"
