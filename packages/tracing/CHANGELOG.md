@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 0.3.0 - 2020-08.12
+## 0.3.1 - 2020-08-18
+
+- Now exports a `TracingConfig` type as well as a `defaultConfig`
+
+## 0.3.0 - 2020-08-12
 
 - Removed `pg` and `pg-pool` plugins, tracing integration for Postgres will need to be added manually to a database wrapper like `@fewlines/fwl-database`
 
