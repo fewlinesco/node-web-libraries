@@ -3,6 +3,6 @@ export interface TracingConfig {
   url?: string;
 }
 
-export const defaultConfig: TracingConfig = {
-  serviceName: "default",
+export const defaultConfig = {
+  url: "http://localhost:14268/api/traces",
 };
