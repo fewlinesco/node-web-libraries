@@ -14,7 +14,7 @@ There should not be differences of level between production and development as w
 ## Installation
 
 ```shell
-yarn add @fewlines/fwl-logging
+yarn add @fwl/logging
 ```
 
 ## Usage
@@ -22,10 +22,10 @@ yarn add @fewlines/fwl-logging
 You first need to create the Logger:
 
 ```typescript
-import { createLogger } from "@fewlines/fwl-logging";
+import { createLogger, EncoderTypeEnum } from "@fwl/logging";
 
-const KVLogger = createLogger("service-name");
-const JSONLogger = createLogger("service-name", "json");
+const KVLogger = createLogger({service: "service-name", encoder: EncoderTypeEnum.KV});
+const JSONLogger = createLogger({service: "service-name", encoder: EncoderTypeEnum.JSON});
 ```
 
 After that you make a simple log with the `.log` function with or without arguments:
