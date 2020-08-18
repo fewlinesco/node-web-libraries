@@ -2,13 +2,7 @@
 import { Tracer, Span } from "@fwl/tracing";
 import { Pool, QueryArrayResult, PoolClient } from "pg";
 
-interface PGOptions {
-  database: string;
-  host: string;
-  password: string;
-  port: number;
-  username: string;
-}
+import { DatabaseConfig, defaultConfig } from "./config/config";
 
 function close(pool: Pool): Promise<void> {
   return pool.end();
@@ -137,28 +131,29 @@ function queryRunnerWithoutTracing(
 }
 
 export function connect(
-  options: PGOptions,
   tracer: Tracer,
+  options?: DatabaseConfig,
 ): DatabaseQueryRunner {
+  const config = options ? options : defaultConfig;
   const pool = new Pool({
-    user: options.username,
-    password: options.password,
-    host: options.host,
-    database: options.database,
-    port: options.port,
+    user: config.username,
+    password: config.password,
+    host: config.host,
+    database: config.database,
+    port: config.port,
   });
   return queryRunner(pool, tracer);
 }
 
 export function connectWithoutTracing(
-  options: PGOptions,
+  config: DatabaseConfig,
 ): DatabaseQueryRunnerWithoutTracing {
   const pool = new Pool({
-    user: options.username,
-    password: options.password,
-    host: options.host,
-    database: options.database,
-    port: options.port,
+    user: config.username,
+    password: config.password,
+    host: config.host,
+    database: config.database,
+    port: config.port,
   });
   return queryRunnerWithoutTracing(pool);
 }

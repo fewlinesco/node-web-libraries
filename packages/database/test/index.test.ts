@@ -6,16 +6,13 @@ let db: database.DatabaseQueryRunner;
 let tracer: InMemoryTracer;
 beforeAll(async () => {
   tracer = new InMemoryTracer();
-  db = database.connect(
-    {
-      username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-      host: process.env.DATABASE_SQL_HOST || "localhost",
-      password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-      database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-      port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-    },
-    tracer,
-  );
+  db = database.connect(tracer, {
+    username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
+    host: process.env.DATABASE_SQL_HOST || "localhost",
+    password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
+    database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
+    port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
+  });
   await db.query(
     "CREATE TABLE IF NOT EXISTS fwl (id UUID PRIMARY KEY, name varchar(32) NOT NULL)",
   );
@@ -175,16 +172,13 @@ describe("database tracing", () => {
   });
 
   test("Closing the connection should generate the related span", async () => {
-    const testDb = database.connect(
-      {
-        username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-        host: process.env.DATABASE_SQL_HOST || "localhost",
-        password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-        database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-        port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-      },
-      tracer,
-    );
+    const testDb = database.connect(tracer, {
+      username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
+      host: process.env.DATABASE_SQL_HOST || "localhost",
+      password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
+      database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
+      port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
+    });
     await testDb.close();
     const closeSpan = tracer.searchSpanByName("db-close")[0];
     expect(closeSpan).toBeDefined();
