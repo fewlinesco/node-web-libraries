@@ -1,8 +1,8 @@
-import * as database from "@fewlines/fwl-database";
+import * as database from "@fwl/database";
 import * as fs from "fs";
 import * as path from "path";
 
-import { runMigrations } from "../index";
+import { runMigrations, dryRunPendingMigrations } from "../index";
 import { getConfig } from "../utils/getConfig";
 import { getQueries } from "../utils/getQueries";
 
@@ -18,9 +18,9 @@ jest.mock("../utils/getConfig", () => {
   };
 });
 
-let db: database.DatabaseQueryRunner;
+let db: database.DatabaseQueryRunnerWithoutTracing;
 beforeAll(async () => {
-  db = database.connect({
+  db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
@@ -38,7 +38,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  db = database.connect({
+  db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
@@ -62,7 +62,7 @@ describe("runMigrations", () => {
 
     await runMigrations(config);
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
@@ -86,7 +86,7 @@ describe("runMigrations", () => {
 
     await runMigrations(config);
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const dbTables = await db.transaction(async (client) => {
       try {
@@ -122,7 +122,7 @@ describe("runMigrations", () => {
 
     const config = await getConfig("./test/config.json");
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const dbTables = await db.transaction(async (client) => {
       try {
@@ -158,7 +158,7 @@ describe("runMigrations", () => {
 
     await runMigrations();
 
-    const db = database.connect(config.database);
+    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
@@ -194,6 +194,80 @@ describe("runMigrations", () => {
     await db.close();
 
     expect(updatedRows.length).toEqual(4);
+
+    done();
+  });
+
+  it("runs pending migrations in a transaction and rollback afterwards", async (done) => {
+    expect.assertions(1);
+
+    const config = await getConfig("./test/config.json");
+
+    await runMigrations();
+
+    const db = database.connectWithoutTracing(config.database);
+
+    const { rows } = await db.query("SELECT * FROM schema_migrations");
+
+    const currentMigrationNumber = rows.length;
+
+    const targetDir = path.join(
+      process.cwd(),
+      config ? config.migration.dirPath : "./migrations",
+    );
+
+    const fileName = "20200511073360-good_migration.sql";
+
+    const queryContent = `CREATE TABLE "good" ("id" uuid NOT NULL, "created_at" timestamp NOT NULL DEFAULT NOW(), "updated_at" timestamp NOT NULL DEFAULT NOW(), PRIMARY KEY ("id"));`;
+
+    await fs.promises
+      .appendFile(`${targetDir + "/" + fileName}`, `${queryContent}`)
+      .catch((error) => console.log(error));
+
+    await dryRunPendingMigrations(config);
+
+    await fs.promises
+      .unlink(`${config.migration.dirPath}/${fileName}`)
+      .catch((error) => console.log(error));
+
+    const { rows: updatedRows } = await db.query(
+      "SELECT * FROM schema_migrations",
+    );
+    expect(currentMigrationNumber).toEqual(updatedRows.length);
+
+    done();
+  });
+
+  it("runs pending migrations with one containing an error, rollbacks then throw the error", async (done) => {
+    expect.assertions(2);
+
+    const config = await getConfig("./test/config.json");
+
+    await runMigrations();
+
+    const targetDir = path.join(
+      process.cwd(),
+      config ? config.migration.dirPath : "./migrations",
+    );
+
+    const fileName = "20200511073360-bad_migration.sql";
+
+    const queryContent = `CREATE TABLE "bad" ("id" badtype NOT NULL, "created_at" timestamp NOT NULL DEFAULT NOW(), "updated_at" timestamp NOT NULL DEFAULT NOW(), PRIMARY KEY ("id"));`;
+
+    await fs.promises
+      .appendFile(`${targetDir + "/" + fileName}`, `${queryContent}`)
+      .catch((error) => console.log(error));
+
+    try {
+      await dryRunPendingMigrations(config);
+    } catch (error) {
+      expect(error).toBeInstanceOf(database.TransactionError);
+      expect(error.message).toBe(`type "badtype" does not exist`);
+    }
+
+    await fs.promises
+      .unlink(`${config.migration.dirPath}/${fileName}`)
+      .catch((error) => console.log(error));
 
     done();
   });

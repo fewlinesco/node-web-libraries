@@ -1,12 +1,12 @@
-import * as database from "@fewlines/fwl-database";
+import * as database from "@fwl/database";
 
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getConfig } from "../utils/getConfig";
 import { getQueries } from "../utils/getQueries";
 
-let db: database.DatabaseQueryRunner;
+let db: database.DatabaseQueryRunnerWithoutTracing;
 beforeAll(async (done) => {
-  db = database.connect({
+  db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",

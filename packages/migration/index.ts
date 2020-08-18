@@ -1,5 +1,5 @@
 import { Config as DefaultConfig } from "@fewlines/fwl-config";
-import * as database from "@fewlines/fwl-database";
+import * as database from "@fwl/database";
 import * as fs from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -33,7 +33,7 @@ export type SchemaMigrationsRow = {
 export async function runMigrations(config?: MigrateConfig): Promise<void> {
   const checkedConfig = config ? config : await getConfig();
 
-  const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
+  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
     checkedConfig.database,
   );
 
@@ -97,4 +97,51 @@ export async function createMigrationFile(name: string): Promise<string> {
   });
 
   return fileName;
+}
+
+export async function dryRunPendingMigrations(
+  config?: MigrateConfig,
+): Promise<void> {
+  const checkedConfig = config ? config : await getConfig();
+
+  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
+    checkedConfig.database,
+  );
+
+  const sqlMigrationsFolder = checkedConfig.migration.dirPath || "./migrations";
+
+  try {
+    const queries = await getQueries(sqlMigrationsFolder);
+
+    await createSchemaMigrationsTable(databaseQueryRunner);
+
+    const { rows } = await databaseQueryRunner.query(
+      `SELECT * FROM schema_migrations ORDER BY created_at DESC`,
+    );
+
+    const pendingMigrations = rows
+      ? getPendingMigrations(rows, queries)
+      : queries;
+
+    await databaseQueryRunner.transaction(async (client) => {
+      for await (const { timestamp, fileName, query } of pendingMigrations) {
+        await client.query(query);
+
+        await client.query(
+          `
+          INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+          [uuidv4(), timestamp, fileName, query],
+        );
+        throw new Error("Rollback");
+      }
+    });
+  } catch (error) {
+    if (error.message === "Rollback") {
+      console.log("Migration dry run success !");
+      return;
+    }
+    throw error;
+  }
+
+  databaseQueryRunner.close();
 }

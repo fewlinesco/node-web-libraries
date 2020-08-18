@@ -84,4 +84,22 @@ describe("runCLI", () => {
       done();
     });
   });
+
+  describe("--dry-run", () => {
+    const migrateArgs = ["", "", "--dry-run", "path/migration/dir"];
+
+    it("handles too many arguments", async (done) => {
+      expect.assertions(1);
+
+      process.argv = [...migrateArgs, "foo"];
+
+      try {
+        await runCLI();
+      } catch (error) {
+        expect(error.message).toBe(ERRORS.dryRun.tooManyArgs);
+      }
+
+      done();
+    });
+  });
 });
