@@ -3,7 +3,8 @@ import { LogLevel } from "@opentelemetry/core";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import { SimpleSpanProcessor } from "@opentelemetry/tracing";
-import { TracingConfig } from "config/config";
+
+import { TracingConfig } from "./config/config";
 
 export { Span } from "@opentelemetry/api";
 
