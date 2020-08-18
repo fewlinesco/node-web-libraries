@@ -146,10 +146,8 @@ export function connect(
 }
 
 export function connectWithoutTracing(
-  options?: DatabaseConfig,
+  config: DatabaseConfig,
 ): DatabaseQueryRunnerWithoutTracing {
-  const config = options ?? defaultConfig;
-
   const pool = new Pool({
     user: config.username,
     password: config.password,
