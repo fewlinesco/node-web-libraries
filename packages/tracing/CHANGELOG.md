@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.2 - 2020-08-18
+
+- Fix import issue in `tracer.ts`
+
 ## 0.3.1 - 2020-08-18
 
 - Now exports a `TracingConfig` type as well as a `defaultConfig`
