@@ -1,5 +1,6 @@
-import { LoggerConfig, EncoderTypeEnum } from "config/config";
 import logfmt from "logfmt";
+
+import { LoggerConfig, EncoderTypeEnum } from "./config/config";
 
 export interface Logger {
   log: (message: string, metadata?: Metadata) => void;

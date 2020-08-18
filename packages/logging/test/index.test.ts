@@ -1,3 +1,4 @@
+import { EncoderTypeEnum } from "../config/config";
 import { createLogger } from "../index";
 
 const spy = jest.spyOn(process.stdout, "write");
@@ -6,7 +7,10 @@ beforeEach(() => spy.mockReset());
 
 describe("Key Value Logger", () => {
   test("Should log", () => {
-    const logger = createLogger("service-name");
+    const logger = createLogger({
+      service: "service-name",
+      encoder: EncoderTypeEnum.KV,
+    });
     logger.log("test message");
 
     expect(spy).toHaveBeenCalledWith(
@@ -15,7 +19,10 @@ describe("Key Value Logger", () => {
   });
 
   test("Should log with additional metadata", () => {
-    const logger = createLogger("service-name");
+    const logger = createLogger({
+      service: "service-name",
+      encoder: EncoderTypeEnum.KV,
+    });
     const enhancedLogger = logger.withMeta({ user: 1 });
     enhancedLogger.log("test message");
 
@@ -27,7 +34,10 @@ describe("Key Value Logger", () => {
 
 describe("JSON Logger", () => {
   test("Should log", () => {
-    const logger = createLogger("service-name", "json");
+    const logger = createLogger({
+      service: "service-name",
+      encoder: EncoderTypeEnum.JSON,
+    });
     logger.log("test message");
 
     expect(spy).toHaveBeenCalledWith(
@@ -39,7 +49,10 @@ describe("JSON Logger", () => {
   });
 
   test("Should log with additional metadata", () => {
-    const logger = createLogger("service-name", "json");
+    const logger = createLogger({
+      service: "service-name",
+      encoder: EncoderTypeEnum.JSON,
+    });
     const enhancedLogger = logger.withMeta({ user: 1 });
     enhancedLogger.log("test message");
 
