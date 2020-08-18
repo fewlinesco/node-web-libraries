@@ -330,6 +330,20 @@
     "@opentelemetry/plugin-pg-pool" "^0.8.0"
     "@opentelemetry/tracing" "^0.9.0"
 
+"@fwl/tracing@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.3.0.tgz#285804bfa25bbdcb8069f7f6c00e33f598ed6334"
+  integrity sha512-UP1SNp7FGMQUWOygEh20GXipMPEn2eu78v0QRmYJt+LOkR62AE5Q9HsCfEpugemLKi8mienIsPxUMkry/Ui3NA==
+  dependencies:
+    "@opentelemetry/core" "^0.9.0"
+    "@opentelemetry/exporter-zipkin" "^0.9.0"
+    "@opentelemetry/node" "^0.9.0"
+    "@opentelemetry/plugin-dns" "^0.8.0"
+    "@opentelemetry/plugin-express" "^0.8.0"
+    "@opentelemetry/plugin-http" "^0.9.0"
+    "@opentelemetry/plugin-https" "^0.9.0"
+    "@opentelemetry/tracing" "^0.9.0"
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.0.0.tgz#10602de5570baea82f8afbfa2630b24e7a8cfe5b"

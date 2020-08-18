@@ -3,6 +3,7 @@ import { LogLevel } from "@opentelemetry/core";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import { SimpleSpanProcessor } from "@opentelemetry/tracing";
+import { TracingConfig } from "config/config";
 
 export { Span } from "@opentelemetry/api";
 
@@ -24,16 +25,12 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
   },
 });
 
-interface TracingOptions {
-  url?: string;
-  serviceName: string;
-}
-
-export function startTracer(options: TracingOptions): void {
+export function startTracer(options: TracingConfig): void {
   provider.addSpanProcessor(
     new SimpleSpanProcessor(
       new ZipkinExporter({
         serviceName: options.serviceName,
+        url: options.url,
       }),
     ),
   );
