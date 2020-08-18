@@ -6,6 +6,8 @@
 
 - Added `LoggingConfig` and `defaultConfig`
 
+- Breaking change: `createLogger()` now takes a `LoggingConfig` as an argument
+
 ## 1.0.1 - 2020-07-27
 
 - Added `Metadata` type.
