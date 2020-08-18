@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.1.2
+## 0.1.2 - 2020-08-18
 
 - Added `DatabaseConfig` type and `defaultConfig` export
 - `connect` and `connectWithoutTracing` now takes a config as an optional argument and uses the `defaultConfig` if none is passed
