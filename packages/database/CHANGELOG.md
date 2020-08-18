@@ -1,6 +1,11 @@
 # CHANGELOG
 
+## 0.1.1 - 20200-08-18
+
+- Added `@fwl/tracing` to dependencies which was forgotten in 0.1.0
+
 ## 0.1.0 - 2020-08-12
+
 - Package renamed from `@fewlines/fwl-database` to `@fwl/database` and resetted the version
 - Enabled basic tracing on `queryRunner` functions
 - `connect` now takes a required tracer argument, `connectWithoutTracing` is now the way to generate a `queryRunner` without tracing enabled
