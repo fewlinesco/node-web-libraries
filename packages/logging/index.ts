@@ -1,3 +1,4 @@
+import { LoggerConfig, EncoderTypeEnum } from "config/config";
 import logfmt from "logfmt";
 
 export interface Logger {
@@ -42,13 +43,10 @@ class JSONLogger implements Logger {
   }
 }
 
-export function createLogger(
-  service: string,
-  format: "KV" | "json" = "KV",
-): Logger {
-  if (format === "KV") {
-    return new KVLogger(service);
-  } else if (format === "json") {
-    return new JSONLogger(service);
+export function createLogger(config: LoggerConfig): Logger {
+  if (config.encoder === EncoderTypeEnum.KV) {
+    return new KVLogger(config.service);
+  } else if (config.encoder === EncoderTypeEnum.JSON) {
+    return new JSONLogger(config.service);
   }
 }
