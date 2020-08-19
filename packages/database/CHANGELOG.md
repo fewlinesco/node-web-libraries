@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.1.3 - 2020-08-19
+
+- Moved all logic from `index.ts` to `database.ts`, `index.ts` is now only used for exports
+- fix config export issue
+
 ## 0.1.2 - 2020-08-18
 
 - Added `DatabaseConfig` type and `defaultConfig` export

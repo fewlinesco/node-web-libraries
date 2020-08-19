@@ -3,7 +3,7 @@
   "description": "Database part of Fewlines Web Libraries",
   "dependencies": {
     "pg": "8.3.0",
-    "@fwl/tracing": "0.3.2"
+    "@fwl/tracing": "0.3.3"
   },
   "devDependencies": {
     "@fewlines/eslint-config": "3.0.0",
@@ -44,5 +44,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.2"
+  "version": "0.1.3"
 }
