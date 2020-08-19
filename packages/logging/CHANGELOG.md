@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.1 - 2020-08-19
+
+- Moved all logic to `logger.ts` and `index.ts` is now just used for exports
+
+- Fix config exports
+
 ## 0.1.0 - 2020-08-18
 
 - Renamed `@fwl/logging` from `@fewlines/fwl-logging`
