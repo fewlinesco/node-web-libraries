@@ -170,8 +170,8 @@ function checkDatabaseError(error: any): void {
   ) {
     throw new DuplicateEntryError(error);
   } else if (
-    error.code === "22P02" &&
-    (error.message as string).includes("invalid input syntax for type uuid")
+    error.code === "22P02" // &&
+    // (error.message as string).includes("invalid input syntax for type uuid")
   ) {
     console.log("should throw a baduuid");
     throw new BadUUIDError(error);
