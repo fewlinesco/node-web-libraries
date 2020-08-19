@@ -161,6 +161,7 @@ function queryRunnerWithoutTracing(
 }
 
 function checkDatabaseError(error: any): void {
+  console.log(error);
   if (
     error.code === "23505" &&
     (error.message as string).includes(
