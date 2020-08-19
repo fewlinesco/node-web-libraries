@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.3 - 2020-08-19
+
+- Fix config export
+
 ## 0.3.2 - 2020-08-18
 
 - Fix import issue in `tracer.ts`
