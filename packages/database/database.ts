@@ -41,6 +41,32 @@ export class TransactionError extends Error {
   }
 }
 
+export class DuplicateEntryError extends Error {
+  public PGError: Error;
+  constructor(error: Error) {
+    super(error.message);
+    this.PGError = error;
+    this.name = "DuplicateEntry";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, DuplicateEntryError);
+    }
+  }
+}
+
+export class BadUUIDError extends Error {
+  public PGError: Error;
+  constructor(error: Error) {
+    super(error.message);
+    this.PGError = error;
+    this.name = "BadUUID";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, BadUUIDError);
+    }
+  }
+}
+
 function queryRunner(
   pool: Pool,
   tracer: Tracer,
@@ -99,11 +125,15 @@ function queryRunnerWithoutTracing(
         close(pool);
       }
     },
-    query: (query, values = []): Promise<QueryArrayResult<any>> => {
-      if (txClient) {
-        return txClient.query(query, values);
-      } else {
-        return pool.query(query, values);
+    query: async (query, values = []): Promise<QueryArrayResult<any>> => {
+      try {
+        if (txClient) {
+          return await txClient.query(query, values);
+        } else {
+          return await pool.query(query, values);
+        }
+      } catch (error) {
+        checkDatabaseError(error);
       }
     },
     transaction: async (transactionFunction): Promise<any> => {
@@ -128,6 +158,26 @@ function queryRunnerWithoutTracing(
       }
     },
   };
+}
+
+function checkDatabaseError(error: any): void {
+  if (
+    error.code === "23505" &&
+    (error.message as string).includes(
+      "duplicate key value violates unique constraint",
+    )
+  ) {
+    throw new DuplicateEntryError(error);
+  } else if (
+    error.code === "22P02" &&
+    // Postgres 9 and 10 have a slightly different error messages so we test the two
+    ((error.message as string).includes("invalid input syntax for type uuid") ||
+      (error.message as string).includes("invalid input syntax for uuid"))
+  ) {
+    throw new BadUUIDError(error);
+  } else {
+    throw error;
+  }
 }
 
 export function connect(

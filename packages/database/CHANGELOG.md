@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.1.4 - 2020-08-19
+
+- Added new `Error` types -> `BadUUIDError` and `DuplicateEntryError`
+
+
 ## 0.1.3 - 2020-08-19
 
 - Moved all logic from `index.ts` to `database.ts`, `index.ts` is now only used for exports
