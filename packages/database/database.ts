@@ -133,7 +133,6 @@ function queryRunnerWithoutTracing(
           return await pool.query(query, values);
         }
       } catch (error) {
-        console.log("caught the error !", error);
         checkDatabaseError(error);
       }
     },
@@ -174,7 +173,9 @@ function checkDatabaseError(error: any): void {
     (error.message as string).includes("invalid input syntax for type uuid")
   ) {
     throw new BadUUIDError(error);
-  } else throw error;
+  } else {
+    throw error;
+  }
 }
 
 export function connect(
