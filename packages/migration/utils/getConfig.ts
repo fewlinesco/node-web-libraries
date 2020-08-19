@@ -1,9 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { MigrateConfig } from "../index";
+import { RunMigrationsConfig } from "../config/config";
 
-export async function getConfig(configPath?: string): Promise<MigrateConfig> {
+export async function getConfig(
+  configPath?: string,
+): Promise<RunMigrationsConfig> {
   const cleanConfigPath = path.join(
     process.cwd(),
     configPath ? configPath : "./config.json",

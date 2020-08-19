@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.1.0 - 2020-08-19
+
+- Renamed `@fwl/migration` from `@fewlines/fwl-migration`
+
+- Moved config to `config.ts` and separated it as `MigrateConfig` and `DatabaseConfig` which is imported from `@fwl/database`
+
+- **Breaking:** `runMigrations` now takes a mandatory config argument and doesn't try to fetch the configuration by itself. It is better done upwards and easier to debug if we only have a single way to provide the configuration.
+
+- Bump `@fwl/database` to `0.1.3`
+
 ## 0.1.6 - 2020-08-13
 
 - added `--dry-run` option to run pending migrations without commiting them to quickly check for errors

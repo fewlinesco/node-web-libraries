@@ -118,9 +118,9 @@ describe("runMigrations", () => {
   it("does each migrations if used as a CLI", async (done) => {
     expect.assertions(5);
 
-    await runMigrations();
-
     const config = await getConfig("./test/config.json");
+
+    await runMigrations(config);
 
     const db = database.connectWithoutTracing(config.database);
 
@@ -156,7 +156,7 @@ describe("runMigrations", () => {
 
     const config = await getConfig("./test/config.json");
 
-    await runMigrations();
+    await runMigrations(config);
 
     const db = database.connectWithoutTracing(config.database);
 
@@ -181,7 +181,7 @@ describe("runMigrations", () => {
 
     expect(updatedMigrationsFolder.length).toEqual(4);
 
-    await runMigrations();
+    await runMigrations(config);
 
     await fs.promises
       .unlink(`${config.migration.dirPath}/${fileName}`)
@@ -203,7 +203,7 @@ describe("runMigrations", () => {
 
     const config = await getConfig("./test/config.json");
 
-    await runMigrations();
+    await runMigrations(config);
 
     const db = database.connectWithoutTracing(config.database);
 
@@ -243,7 +243,7 @@ describe("runMigrations", () => {
 
     const config = await getConfig("./test/config.json");
 
-    await runMigrations();
+    await runMigrations(config);
 
     const targetDir = path.join(
       process.cwd(),
