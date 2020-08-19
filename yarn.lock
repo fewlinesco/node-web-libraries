@@ -321,14 +321,6 @@
   dependencies:
     logfmt "1.3.2"
 
-"@fwl/database@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@fwl/database/-/database-0.1.1.tgz#cde15f4d8145dee8a1c0ebe3b68e98a919e693b8"
-  integrity sha512-780migCQzlwjsr1TsAK/vLJL0AIoBPyLGWBEvDJwHUJpdAJk0uXMzELTzvlykcxD1YLNPIs9PApHYx6oiyG9Hg==
-  dependencies:
-    "@fwl/tracing" "0.3.0"
-    pg "8.3.0"
-
 "@fwl/tracing@0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.2.1.tgz#23d135d7cb1394807c40fcff1355045c63723198"
@@ -343,20 +335,6 @@
     "@opentelemetry/plugin-https" "^0.9.0"
     "@opentelemetry/plugin-pg" "^0.8.0"
     "@opentelemetry/plugin-pg-pool" "^0.8.0"
-    "@opentelemetry/tracing" "^0.9.0"
-
-"@fwl/tracing@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.3.0.tgz#285804bfa25bbdcb8069f7f6c00e33f598ed6334"
-  integrity sha512-UP1SNp7FGMQUWOygEh20GXipMPEn2eu78v0QRmYJt+LOkR62AE5Q9HsCfEpugemLKi8mienIsPxUMkry/Ui3NA==
-  dependencies:
-    "@opentelemetry/core" "^0.9.0"
-    "@opentelemetry/exporter-zipkin" "^0.9.0"
-    "@opentelemetry/node" "^0.9.0"
-    "@opentelemetry/plugin-dns" "^0.8.0"
-    "@opentelemetry/plugin-express" "^0.8.0"
-    "@opentelemetry/plugin-http" "^0.9.0"
-    "@opentelemetry/plugin-https" "^0.9.0"
     "@opentelemetry/tracing" "^0.9.0"
 
 "@istanbuljs/load-nyc-config@^1.0.0":
