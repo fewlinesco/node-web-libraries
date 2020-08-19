@@ -94,7 +94,7 @@ export async function createMigrationFile(name: string): Promise<string> {
 }
 
 export async function dryRunPendingMigrations(
-  config?: RunMigrationsConfig,
+  config: RunMigrationsConfig,
 ): Promise<void> {
   const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
     config.database,
