@@ -161,7 +161,6 @@ function queryRunnerWithoutTracing(
 }
 
 function checkDatabaseError(error: any): void {
-  console.log(error.message);
   if (
     error.code === "23505" &&
     (error.message as string).includes(
@@ -170,10 +169,11 @@ function checkDatabaseError(error: any): void {
   ) {
     throw new DuplicateEntryError(error);
   } else if (
-    error.code === "22P02" // &&
-    // (error.message as string).includes("invalid input syntax for type uuid")
+    error.code === "22P02" &&
+    // Postgres 9 and 10 have a slightly different error messages so we test the two
+    ((error.message as string).includes("invalid input syntax for type uuid") ||
+      (error.message as string).includes("invalid input syntax for uuid"))
   ) {
-    console.log("should throw a baduuid");
     throw new BadUUIDError(error);
   } else {
     throw error;
