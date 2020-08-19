@@ -150,7 +150,7 @@ describe("transactions", () => {
     }
   });
 
-  test("Should throw ", async () => {
+  test("Should throw a BadUUIDError", async () => {
     try {
       await db.query("INSERT INTO fwl (id, name) VALUES($1, $2)", [
         "74fbf638-6241-42bd-b257-b9a3dd24feb",
