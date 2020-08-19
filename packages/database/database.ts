@@ -41,6 +41,32 @@ export class TransactionError extends Error {
   }
 }
 
+export class DuplicateEntryError extends Error {
+  public PGError: Error;
+  constructor(error: Error) {
+    super(error.message);
+    this.PGError = error;
+    this.name = "DuplicateEntry";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, DuplicateEntryError);
+    }
+  }
+}
+
+export class BadUUIDError extends Error {
+  public PGError: Error;
+  constructor(error: Error) {
+    super(error.message);
+    this.PGError = error;
+    this.name = "BadUUID";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, BadUUIDError);
+    }
+  }
+}
+
 function queryRunner(
   pool: Pool,
   tracer: Tracer,
@@ -99,11 +125,16 @@ function queryRunnerWithoutTracing(
         close(pool);
       }
     },
-    query: (query, values = []): Promise<QueryArrayResult<any>> => {
-      if (txClient) {
-        return txClient.query(query, values);
-      } else {
-        return pool.query(query, values);
+    query: async (query, values = []): Promise<QueryArrayResult<any>> => {
+      try {
+        if (txClient) {
+          return await txClient.query(query, values);
+        } else {
+          return await pool.query(query, values);
+        }
+      } catch (error) {
+        console.log("caught the error !", error);
+        checkDatabaseError(error);
       }
     },
     transaction: async (transactionFunction): Promise<any> => {
@@ -128,6 +159,22 @@ function queryRunnerWithoutTracing(
       }
     },
   };
+}
+
+function checkDatabaseError(error: any): void {
+  if (
+    error.code === "23505" &&
+    (error.message as string).includes(
+      "duplicate key value violates unique constraint",
+    )
+  ) {
+    throw new DuplicateEntryError(error);
+  } else if (
+    error.code === "22P02" &&
+    (error.message as string).includes("invalid input syntax for type uuid")
+  ) {
+    throw new BadUUIDError(error);
+  } else throw error;
 }
 
 export function connect(
