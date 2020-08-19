@@ -127,6 +127,7 @@ function queryRunnerWithoutTracing(
     },
     query: async (query, values = []): Promise<QueryArrayResult<any>> => {
       try {
+        console.log(query, values);
         if (txClient) {
           return await txClient.query(query, values);
         } else {
