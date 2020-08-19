@@ -127,7 +127,6 @@ function queryRunnerWithoutTracing(
     },
     query: async (query, values = []): Promise<QueryArrayResult<any>> => {
       try {
-        console.log(query, values);
         if (txClient) {
           return await txClient.query(query, values);
         } else {
@@ -174,6 +173,7 @@ function checkDatabaseError(error: any): void {
     error.code === "22P02" &&
     (error.message as string).includes("invalid input syntax for type uuid")
   ) {
+    console.log("should throw a baduuid");
     throw new BadUUIDError(error);
   } else {
     throw error;
