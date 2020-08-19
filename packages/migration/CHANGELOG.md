@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## 0.2.0 - 2020-08-19
+## 0.1.0 - 2020-08-19
+
+- Renamed `@fwl/migration` from `@fewlines/fwl-migration`
 
 - Moved config to `config.ts` and separated it as `MigrateConfig` and `DatabaseConfig` which is imported from `@fwl/database`
 

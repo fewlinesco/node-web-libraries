@@ -34,7 +34,7 @@
   ],
   "license": "MIT",
   "main": "dist/index.js",
-  "name": "@fewlines/fwl-migration",
+  "name": "@fwl/migration",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
@@ -49,5 +49,5 @@
     "migration": "dist/runCli.js"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.6"
+  "version": "0.1.0"
 }
