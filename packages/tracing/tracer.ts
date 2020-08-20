@@ -1,12 +1,10 @@
-import { Span } from "@opentelemetry/api";
+import { Span as OpenTelemetrySpan, TimeInput } from "@opentelemetry/api";
 import { LogLevel } from "@opentelemetry/core";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 
 import { TracingConfig } from "./config/config";
-
-export { Span } from "@opentelemetry/api";
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.INFO,
@@ -51,11 +49,34 @@ export interface Tracer {
 export function getTracer(): Tracer {
   return {
     createSpan: (name: string): Span => {
-      return provider.getTracer("default").startSpan(name);
+      return spanFactory(provider.getTracer("default").startSpan(name));
     },
     span: <T>(name: string, callback: SpanCallback<T>): Promise<T> => {
-      const span = provider.getTracer("default").startSpan(name);
+      const span = spanFactory(provider.getTracer("default").startSpan(name));
       return callback(span).finally(() => span.end());
     },
   };
+}
+
+function spanFactory(otSpan: OpenTelemetrySpan): Span {
+  const setAttribute = (key: string, _value: unknown): Span => {
+    otSpan.setAttribute(key, "[REDACTED]");
+    return this;
+  };
+  const setDisclosedAttribute = (key: string, value: unknown): Span => {
+    otSpan.setAttribute(key, value);
+    return this;
+  };
+
+  return {
+    setAttribute,
+    setDisclosedAttribute,
+    end: otSpan.end,
+  };
+}
+
+export interface Span {
+  setAttribute(key: string, value: unknown): this;
+  setDisclosedAttribute(key: string, value: unknown): this;
+  end(endTime?: TimeInput): void;
 }

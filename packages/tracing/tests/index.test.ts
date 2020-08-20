@@ -75,7 +75,26 @@ describe("InMemorySpan:", () => {
       });
 
       const spanAttributes = tracer.searchSpanByName("test-span")[0].attributes;
-      const expectedAttributes = { "test-attribute": "testValue" };
+      const expectedAttributes = { "test-attribute": "[REDACTED]" };
+
+      expect(spanAttributes).toStrictEqual(expectedAttributes);
+
+      done();
+    });
+  });
+
+  describe("setDisclosedAttribute function:", () => {
+    test("it should add a single attribute to the span", async (done) => {
+      expect.assertions(1);
+
+      await tracer.span("test-span", async (span) => {
+        span.setDisclosedAttribute("test-disclosed-attribute", "testValue");
+
+        return span;
+      });
+
+      const spanAttributes = tracer.searchSpanByName("test-span")[0].attributes;
+      const expectedAttributes = { "test-disclosed-attribute": "testValue" };
 
       expect(spanAttributes).toStrictEqual(expectedAttributes);
 

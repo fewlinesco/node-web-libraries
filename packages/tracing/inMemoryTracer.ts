@@ -1,6 +1,8 @@
 import * as types from "@opentelemetry/api";
 
-interface Span extends types.Span {
+import { Span as FwlSpan } from "./tracer";
+
+interface Span extends FwlSpan {
   id: number;
   name: string;
   attributes: types.Attributes;
@@ -52,7 +54,12 @@ class InMemorySpan implements Span {
     };
   }
 
-  setAttribute(key: string, value: unknown): this {
+  setAttribute(key: string, _value: unknown): this {
+    this.attributes[key] = "[REDACTED]";
+    return this;
+  }
+
+  setDisclosedAttribute(key: string, value: unknown): this {
     this.attributes[key] = value;
     return this;
   }
