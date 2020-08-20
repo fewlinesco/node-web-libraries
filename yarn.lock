@@ -321,6 +321,14 @@
   dependencies:
     logfmt "1.3.2"
 
+"@fwl/database@0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@fwl/database/-/database-0.1.3.tgz#a77965ff1696f3df13838b20eb83e21ac7fed3e8"
+  integrity sha512-dZYVoI6Ev0K7pjoZDoNBjB0uwfmh/mcsAqpsairsvMKAMfRcv2KbgWe6hSofyvR0RKqXagXi94GQ6eolMgbPDg==
+  dependencies:
+    "@fwl/tracing" "0.3.3"
+    pg "8.3.0"
+
 "@fwl/tracing@0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.2.1.tgz#23d135d7cb1394807c40fcff1355045c63723198"

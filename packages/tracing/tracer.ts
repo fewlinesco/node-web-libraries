@@ -1,12 +1,15 @@
-import { Span } from "@opentelemetry/api";
+import {
+  Span as OpenTelemetrySpan,
+  Attributes,
+  TimeInput,
+  Status,
+} from "@opentelemetry/api";
 import { LogLevel } from "@opentelemetry/core";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 
 import { TracingConfig } from "./config/config";
-
-export { Span } from "@opentelemetry/api";
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.INFO,
@@ -51,11 +54,55 @@ export interface Tracer {
 export function getTracer(): Tracer {
   return {
     createSpan: (name: string): Span => {
-      return provider.getTracer("default").startSpan(name);
+      return spanFactory(provider.getTracer("default").startSpan(name));
     },
     span: <T>(name: string, callback: SpanCallback<T>): Promise<T> => {
-      const span = provider.getTracer("default").startSpan(name);
+      const span = spanFactory(provider.getTracer("default").startSpan(name));
       return callback(span).finally(() => span.end());
     },
   };
+}
+
+function spanFactory(otSpan: OpenTelemetrySpan): Span {
+  console.log("Span factory is called");
+  const setAttribute = (key: string, _value: unknown): Span => {
+    otSpan.setAttribute(key, "[REDACTED]");
+    return this;
+  };
+  const setDisclosedAttribute = (key: string, value: unknown): Span => {
+    otSpan.setAttribute(key, value);
+    return this;
+  };
+  const setAttributes = (attributes: Attributes): Span => {
+    const obfuscatedAttributes: Attributes = {};
+    Object.keys(attributes).forEach(
+      (key) => (obfuscatedAttributes[key] = "[REDACTED]"),
+    );
+    otSpan.setAttributes(obfuscatedAttributes);
+    return this;
+  };
+  const setDisclosedAttributes = (attributes: Attributes): Span => {
+    otSpan.setAttributes(attributes);
+    return this;
+  };
+
+  return {
+    ...otSpan,
+    setAttribute,
+    setDisclosedAttribute,
+    setAttributes,
+    setDisclosedAttributes,
+    addEvent: otSpan.addEvent as (
+      name: string,
+      attributesOrStartTime?: Attributes | TimeInput,
+      startTime?: TimeInput,
+    ) => Span,
+    setStatus: otSpan.setStatus as (status: Status) => Span,
+    updateName: otSpan.updateName as (name: string) => Span,
+  };
+}
+
+export interface Span extends OpenTelemetrySpan {
+  setDisclosedAttribute(key: string, value: unknown): this;
+  setDisclosedAttributes(attributes: Attributes): this;
 }

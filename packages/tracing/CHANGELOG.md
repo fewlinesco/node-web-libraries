@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.4.0 - 2020-08-20
+
+- The exported `Span` interface is now extended from the one provided by `@opentelemetry/api`.
+
+- When using `setAttribute` or `setAttributes` on a `Span`, it will obfuscate values by default. Use `setDisclosedAttribute` or `setDisclosedAttributes` to explicitely do so for a value.
+
+
 ## 0.3.3 - 2020-08-19
 
 - Fix config export

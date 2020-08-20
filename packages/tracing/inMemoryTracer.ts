@@ -1,6 +1,8 @@
 import * as types from "@opentelemetry/api";
 
-interface Span extends types.Span {
+import { Span as FwlSpan } from "./tracer";
+
+interface Span extends FwlSpan {
   id: number;
   name: string;
   attributes: types.Attributes;
@@ -52,12 +54,26 @@ class InMemorySpan implements Span {
     };
   }
 
-  setAttribute(key: string, value: unknown): this {
+  setAttribute(key: string, _value: unknown): this {
+    this.attributes[key] = "[REDACTED]";
+    return this;
+  }
+
+  setDisclosedAttribute(key: string, value: unknown): this {
     this.attributes[key] = value;
     return this;
   }
 
   setAttributes(attributes: types.Attributes): this {
+    const obfuscatedAttributes: types.Attributes = {};
+    Object.keys(attributes).forEach(
+      (key) => (obfuscatedAttributes[key] = "[REDACTED]"),
+    );
+    this.attributes = { ...this.attributes, ...obfuscatedAttributes };
+    return this;
+  }
+
+  setDisclosedAttributes(attributes: types.Attributes): this {
     this.attributes = { ...this.attributes, ...attributes };
     return this;
   }
@@ -138,7 +154,7 @@ export class InMemoryTracer {
       span?.parent,
     );
 
-    currentInMemorySpan.setAttributes(span.attributes);
+    currentInMemorySpan.setDisclosedAttributes(span.attributes);
 
     this.spans.unshift(currentInMemorySpan);
 
