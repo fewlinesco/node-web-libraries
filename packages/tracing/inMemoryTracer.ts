@@ -65,15 +65,6 @@ class InMemorySpan implements Span {
   }
 
   setAttributes(attributes: types.Attributes): this {
-    const obfuscatedAttributes: types.Attributes = {};
-    Object.keys(attributes).forEach(
-      (key) => (obfuscatedAttributes[key] = "[REDACTED]"),
-    );
-    this.attributes = { ...this.attributes, ...obfuscatedAttributes };
-    return this;
-  }
-
-  setDisclosedAttributes(attributes: types.Attributes): this {
     this.attributes = { ...this.attributes, ...attributes };
     return this;
   }
@@ -154,7 +145,7 @@ export class InMemoryTracer {
       span?.parent,
     );
 
-    currentInMemorySpan.setDisclosedAttributes(span.attributes);
+    currentInMemorySpan.setAttributes(span.attributes);
 
     this.spans.unshift(currentInMemorySpan);
 

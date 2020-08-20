@@ -1,9 +1,4 @@
-import {
-  Span as OpenTelemetrySpan,
-  Attributes,
-  TimeInput,
-  Status,
-} from "@opentelemetry/api";
+import { Span as OpenTelemetrySpan, TimeInput } from "@opentelemetry/api";
 import { LogLevel } from "@opentelemetry/core";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
@@ -64,7 +59,6 @@ export function getTracer(): Tracer {
 }
 
 function spanFactory(otSpan: OpenTelemetrySpan): Span {
-  console.log("Span factory is called");
   const setAttribute = (key: string, _value: unknown): Span => {
     otSpan.setAttribute(key, "[REDACTED]");
     return this;
@@ -73,36 +67,16 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
     otSpan.setAttribute(key, value);
     return this;
   };
-  const setAttributes = (attributes: Attributes): Span => {
-    const obfuscatedAttributes: Attributes = {};
-    Object.keys(attributes).forEach(
-      (key) => (obfuscatedAttributes[key] = "[REDACTED]"),
-    );
-    otSpan.setAttributes(obfuscatedAttributes);
-    return this;
-  };
-  const setDisclosedAttributes = (attributes: Attributes): Span => {
-    otSpan.setAttributes(attributes);
-    return this;
-  };
 
   return {
-    ...otSpan,
     setAttribute,
     setDisclosedAttribute,
-    setAttributes,
-    setDisclosedAttributes,
-    addEvent: otSpan.addEvent as (
-      name: string,
-      attributesOrStartTime?: Attributes | TimeInput,
-      startTime?: TimeInput,
-    ) => Span,
-    setStatus: otSpan.setStatus as (status: Status) => Span,
-    updateName: otSpan.updateName as (name: string) => Span,
+    end: otSpan.end,
   };
 }
 
-export interface Span extends OpenTelemetrySpan {
+export interface Span {
+  setAttribute(key: string, value: unknown): this;
   setDisclosedAttribute(key: string, value: unknown): this;
-  setDisclosedAttributes(attributes: Attributes): this;
+  end(endTime?: TimeInput): void;
 }

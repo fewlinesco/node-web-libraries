@@ -120,34 +120,6 @@ describe("InMemorySpan:", () => {
 
       const spanAttributes = tracer.searchSpanByName("test-span")[0].attributes;
 
-      expect(spanAttributes).toStrictEqual({
-        "test-attribute-1": "[REDACTED]",
-        "test-attribute-2": "[REDACTED]",
-        "test-attribute-3": "[REDACTED]",
-      });
-
-      done();
-    });
-  });
-
-  describe("setDisclosedAttributes function:", () => {
-    test("it should add a hash of attributes to the span", async (done) => {
-      expect.assertions(1);
-
-      const attributeHash = {
-        "test-disclosed-attribute-1": "testValue1",
-        "test-disclosed-attribute-2": "testValue2",
-        "test-disclosed-attribute-3": "testValue3",
-      };
-
-      await tracer.span("test-span", async (span) => {
-        span.setDisclosedAttributes(attributeHash);
-
-        return span;
-      });
-
-      const spanAttributes = tracer.searchSpanByName("test-span")[0].attributes;
-
       expect(spanAttributes).toStrictEqual(attributeHash);
 
       done();
