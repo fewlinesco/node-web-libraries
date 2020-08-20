@@ -14,13 +14,13 @@ class OAuth2Client {
     clientID,
     clientSecret,
     redirectURI,
-    openIDConfiguration,
-  }: OAuth2ClientConstructor) {
+  }: // openIDConfiguration,
+  OAuth2ClientConstructor) {
     this.openIDConfigurationURL = openIDConfigurationURL;
     this.clientID = clientID;
     this.clientSecret = clientSecret;
     this.redirectURI = redirectURI;
-    this.openIDConfiguration = openIDConfiguration;
+    // this.openIDConfiguration = openIDConfiguration;
   }
 
   private async getOpenIDConfiguration(): Promise<OpenIDConfiguration> {
@@ -31,24 +31,27 @@ class OAuth2Client {
     return openIDConfiguration;
   }
 
-  async init(): Promise<OAuth2Client> {
-    const openIDConfiguration = await this.getOpenIDConfiguration();
+  // async init(): Promise<OAuth2Client> {
+  //   const openIDConfiguration = await this.getOpenIDConfiguration();
 
-    const CompleteOAuth2ClientConstructorParams = {
-      openIDConfigurationURL: this.openIDConfigurationURL,
-      clientID: this.clientID,
-      clientSecret: this.clientSecret,
-      redirectURI: this.redirectURI,
-      openIDConfiguration: openIDConfiguration,
-    };
+  //   const CompleteOAuth2ClientConstructorParams = {
+  //     openIDConfigurationURL: this.openIDConfigurationURL,
+  //     clientID: this.clientID,
+  //     clientSecret: this.clientSecret,
+  //     redirectURI: this.redirectURI,
+  //     openIDConfiguration: openIDConfiguration,
+  //   };
 
-    return new OAuth2Client(CompleteOAuth2ClientConstructorParams);
-  }
+  //   return new OAuth2Client(CompleteOAuth2ClientConstructorParams);
+  // }
 
-  getAuthorizationURL(): URL {
+  async getAuthorizationURL(): Promise<URL> {
+    this.openIDConfiguration = this.openIDConfiguration
+      ? this.openIDConfiguration
+      : await this.getOpenIDConfiguration();
+
     const authorizeURL = new URL(
-      "/oauth/authorize",
-      this.openIDConfiguration.issuer,
+      this.openIDConfiguration.authorization_endpoint,
     );
     authorizeURL.searchParams.append("client_id", this.clientID);
     authorizeURL.searchParams.append("response_type", "code");
@@ -61,8 +64,9 @@ class OAuth2Client {
     return authorizeURL;
   }
 
-  getTokensFromAuthorizationCode(_authorizationCode): string[] {
+  getTokensFromAuthorizationCode(authorizationCode: string): string[] {
     // Verify RS256 vs HS256
+    const decodedJWT = atob(authorizationCode);
     // Decode
 
     return [""];

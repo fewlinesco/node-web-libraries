@@ -5,7 +5,7 @@ export type OpenIDConfiguration = {
   token_endpoint_auth_methods_supported: string[];
   token_endpoint: string;
   subject_types_supported: string;
-  scopes_supported: [string];
+  scopes_supported: string[];
   response_types_supported: string[];
   request_uri: boolean;
   request_parameter_supported: boolean;
@@ -15,7 +15,7 @@ export type OpenIDConfiguration = {
   grant_types_supported: string[];
   claims_supported: string[];
   claim_types_supported: string[];
-  authorization_endpoint: string[];
+  authorization_endpoint: string;
 };
 
 export type OAuth2ClientConstructor = {
