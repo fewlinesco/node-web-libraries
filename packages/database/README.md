@@ -25,7 +25,7 @@ const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
 );
 ```
 
-Tracing is activated by default and you require a tracer to pass to the `connect` method, if you wish to use this package without tracing enabled you can do so:
+Tracing is activated by default and requires a tracer to pass to the `connect` method, if you wish to use this package without tracing enabled you can do so:
 
 ```typescript
 import * as database from "@fwl/database";
