@@ -9,7 +9,7 @@ It provides a migration tool using SQL files.
 ## Installation
 
 ```shell
-yarn add @fewlines/fwl-migration
+yarn add @fwl/migration
 ```
 
 ## Usage
@@ -31,12 +31,6 @@ To run `migration`, you need to create a `config.json` with the following data s
     "host": string;
     "port": number;
   },
-  "http": {
-    "port": number;
-  },
-  "tracing": {
-    "serviceName": string;
-  },
   "migration": {
     "dirPath": string;
   }
@@ -48,6 +42,7 @@ To run `migration`, you need to create a `config.json` with the following data s
 To use `migration` as a CLI, simply run one of those command, depending on your needs:
 
 - "migration --migrate path/to/config.json": run the migration process.
+- "migration --dry-run path/to/config.json": run the migration process and rolls it back right away.
 - "migration --create name_of_the_file": create a timestamped migration file in the path set up in `config.json`.
 
 ### Package
@@ -56,22 +51,25 @@ If you need more customization and control over the migration process, you can i
 
 #### runMigrations
 
-You will have to give a config as argument if you created it somewhere else than the root folder, like so:
+You will have to give a config of `runMigrationsConfig` type as argument but you can also use default settings by using the provided `defaultConfig` for the migrations folder and the database config:
 
 ```ts
-import * as migration from "@fewlines/fwl-migration";
+import * as migration from "@fwl/migration";
+import {defaultConfig as databaseDefaultConfig} from "@fwl/database";
 
-import config from "path/to/config";
-
-migration.runMigrations(config);
+migration.runMigrations({
+  database: databaseDefaultConfig,
+  migration: migration.defaultConfig,
+});
 ```
+
 
 #### createMigrationFile
 
 The `createMigrationFile` takes the name of the file as an argument:
 
 ```ts
-import * as migration from "@fewlines/fwl-migration";
+import * as migration from "@fwl/migration";
 
 migration.createMigrationFile("name_of_the_file");
 ```
