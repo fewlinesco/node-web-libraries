@@ -7,6 +7,7 @@ class OAuth2Client {
   clientID: string;
   clientSecret: string;
   redirectURI: string;
+  audience: string;
   openIDConfiguration?: OpenIDConfiguration;
 
   constructor({
@@ -14,13 +15,13 @@ class OAuth2Client {
     clientID,
     clientSecret,
     redirectURI,
-  }: // openIDConfiguration,
-  OAuth2ClientConstructor) {
+    audience,
+  }: OAuth2ClientConstructor) {
     this.openIDConfigurationURL = openIDConfigurationURL;
     this.clientID = clientID;
     this.clientSecret = clientSecret;
     this.redirectURI = redirectURI;
-    // this.openIDConfiguration = openIDConfiguration;
+    this.audience = audience;
   }
 
   private async getOpenIDConfiguration(): Promise<OpenIDConfiguration> {
@@ -30,20 +31,6 @@ class OAuth2Client {
 
     return openIDConfiguration;
   }
-
-  // async init(): Promise<OAuth2Client> {
-  //   const openIDConfiguration = await this.getOpenIDConfiguration();
-
-  //   const CompleteOAuth2ClientConstructorParams = {
-  //     openIDConfigurationURL: this.openIDConfigurationURL,
-  //     clientID: this.clientID,
-  //     clientSecret: this.clientSecret,
-  //     redirectURI: this.redirectURI,
-  //     openIDConfiguration: openIDConfiguration,
-  //   };
-
-  //   return new OAuth2Client(CompleteOAuth2ClientConstructorParams);
-  // }
 
   async getAuthorizationURL(): Promise<URL> {
     this.openIDConfiguration = this.openIDConfiguration
@@ -64,9 +51,9 @@ class OAuth2Client {
     return authorizeURL;
   }
 
+  // Second step oauth flow send payload
   getTokensFromAuthorizationCode(authorizationCode: string): string[] {
     // Verify RS256 vs HS256
-    const decodedJWT = atob(authorizationCode);
     // Decode
 
     return [""];

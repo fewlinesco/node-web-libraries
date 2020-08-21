@@ -23,5 +23,6 @@ export type OAuth2ClientConstructor = {
   clientID: string;
   clientSecret: string;
   redirectURI: string;
+  audience: string;
   openIDConfiguration?: OpenIDConfiguration;
 };

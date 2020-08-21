@@ -1,6 +1,9 @@
 {
   "author": "Fewlines",
   "description": "Tracing part of Fewlines Web Libraries",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1"
+  },
   "devDependencies": {
     "@fewlines/eslint-config": "3.0.0",
     "@types/jest": "26.0.7",
@@ -48,8 +51,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.0",
-  "dependencies": {
-    "jsonwebtoken": "^8.5.1"
-  }
+  "version": "0.1.0"
 }
