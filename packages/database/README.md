@@ -9,7 +9,7 @@ The database query runner provided by this package works in a similar way to the
 ## Installation
 
 ```shell
-yarn add @fewlines/fwl-database
+yarn add @fwl/database
 ```
 
 ## Usage
@@ -17,11 +17,21 @@ yarn add @fewlines/fwl-database
 You first need to create a new `DatabaseQueryRunner`:
 
 ```typescript
-import * as database from "@fewlines/fwl-database";
+import * as database from "@fwl/database";
 
-// config.database should come from an implementation of @fewlines/fwl-config
 const databaseQueryRunner: database.DatabaseQueryRunner = database.connect(
-  config.database
+  tracer,
+  config
+);
+```
+
+Tracing is activated by default and requires a tracer to pass to the `connect` method, if you wish to use this package without tracing enabled you can do so:
+
+```typescript
+import * as database from "@fwl/database";
+
+const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
+  config
 );
 ```
 
