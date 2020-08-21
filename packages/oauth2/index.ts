@@ -51,12 +51,30 @@ class OAuth2Client {
     return authorizeURL;
   }
 
-  // Second step oauth flow send payload
-  getTokensFromAuthorizationCode(authorizationCode: string): string[] {
-    // Verify RS256 vs HS256
-    // Decode
+  async getTokensFromAuthorizationCode(
+    authorizationCode: string,
+  ): Promise<string[]> {
+    const callback = {
+      client_id: this.clientID,
+      client_secret: this.clientSecret,
+      code: authorizationCode,
+      grant_type: "authorization_code",
+      redirect_uri: this.redirectURI,
+    };
 
-    return [""];
+    const tokens = await fetch(this.openIDConfiguration.token_endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(callback),
+    })
+      .then((response) => response.json())
+      .catch((error) => {
+        throw error;
+      });
+
+    return tokens;
   }
 }
 
