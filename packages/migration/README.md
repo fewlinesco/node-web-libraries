@@ -20,7 +20,7 @@ It will look into the migrations folder and execute each SQL queries, in the cor
 
 ### `config.json`
 
-To run `migration`, you need to create a `config.json` with the following data structure:
+To run `migration` as a cli, you need to create a `config.json` with the following data structure:
 
 ```ts
 {
