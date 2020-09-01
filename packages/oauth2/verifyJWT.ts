@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { JWKSDT } from "types";
 
 import { rsaPublicKeyToPEM } from "./rsaPublicKeyToPEM";
 
@@ -32,7 +33,7 @@ export async function verifyJWT<T>({
   clientSecret,
   jwksURI,
 }: VerifyJWTProps): Promise<T> {
-  const JWKS =
+  const JWKS: JWKSDT =
     jwksURI && (await fetch(jwksURI).then((response) => response.json()));
 
   return new Promise((resolve, reject) => {

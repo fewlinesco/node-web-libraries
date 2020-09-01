@@ -81,6 +81,8 @@ describe("verifyJWT", () => {
     });
 
     test("is should throw an error if wrong audience", async () => {
+      expect.assertions(1);
+
       const verifyJWTProps = {
         accessToken: JWT,
         audience: "wrongAudience",

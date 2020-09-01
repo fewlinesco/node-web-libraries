@@ -1,6 +1,5 @@
-export { getJWKS } from "./getJWKS";
 export { verifyJWT } from "./verifyJWT";
-import { OpenIDConfiguration, OAuth2ClientConstructor } from "./types";
+import { OpenIDConfiguration, OAuth2ClientConstructor, JWKSDT } from "./types";
 
 class OAuth2Client {
   openIDConfigurationURL: string;
@@ -27,7 +26,11 @@ class OAuth2Client {
   private async getOpenIDConfiguration(): Promise<OpenIDConfiguration> {
     const openIDConfiguration: OpenIDConfiguration = await fetch(
       this.openIDConfigurationURL,
-    ).then((response) => response.json());
+    )
+      .then((response) => response.json())
+      .catch((error) => {
+        throw error;
+      });
 
     return openIDConfiguration;
   }
@@ -40,6 +43,7 @@ class OAuth2Client {
     const authorizeURL = new URL(
       this.openIDConfiguration.authorization_endpoint,
     );
+
     authorizeURL.searchParams.append("client_id", this.clientID);
     authorizeURL.searchParams.append("response_type", "code");
     authorizeURL.searchParams.append("redirect_uri", this.redirectURI);
@@ -51,9 +55,27 @@ class OAuth2Client {
     return authorizeURL;
   }
 
+  async getJWKS(): Promise<JWKSDT> {
+    this.openIDConfiguration = this.openIDConfiguration
+      ? this.openIDConfiguration
+      : await this.getOpenIDConfiguration();
+
+    const JWKS: JWKSDT = await fetch(this.openIDConfiguration.jwks_uri)
+      .then((response) => response.json())
+      .catch((error) => {
+        throw error;
+      });
+
+    return JWKS;
+  }
+
   async getTokensFromAuthorizationCode(
     authorizationCode: string,
   ): Promise<string[]> {
+    this.openIDConfiguration = this.openIDConfiguration
+      ? this.openIDConfiguration
+      : await this.getOpenIDConfiguration();
+
     const callback = {
       client_id: this.clientID,
       client_secret: this.clientSecret,

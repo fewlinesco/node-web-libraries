@@ -26,3 +26,14 @@ export type OAuth2ClientConstructor = {
   audience: string;
   openIDConfiguration?: OpenIDConfiguration;
 };
+
+export type JWKSDT = {
+  keys: {
+    use: string;
+    n: string;
+    kty: string;
+    kid: string;
+    e: string;
+    alg: string;
+  }[];
+};
