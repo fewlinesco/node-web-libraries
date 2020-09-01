@@ -63,11 +63,7 @@ export async function verifyJWT<T>({
     } else if (alg === "RS256") {
       if (kid) {
         if (JWKS) {
-          const validKey = JWKS.keys.find((keyObject) =>
-            Object.entries(keyObject).find(([key, value]) => {
-              return key === "kid" && value === kid;
-            }),
-          );
+          const validKey = JWKS.keys.find((keyObject) => keyObject.kid === kid);
 
           if (validKey) {
             const { e, n } = validKey;
@@ -85,14 +81,18 @@ export async function verifyJWT<T>({
             );
           } else {
             reject(
-              new InvalidKeyIDRS256("Invalid key ID for RS256 encoded JWT"),
+              new InvalidKeyIDRS256(
+                "Invalid key ID (kid) for RS256 encoded JWT",
+              ),
             );
           }
         } else {
           reject(new MissingJWKSURI("Missing JWKS URI for RS256 encoded JWT"));
         }
       } else {
-        reject(new MissingKeyIDHS256("Missing key id for RS256 encoded JWT"));
+        reject(
+          new MissingKeyIDHS256("Missing key ID (kid) for RS256 encoded JWT"),
+        );
       }
     } else {
       reject(new AlgoNotSupported("Encoding algo not supported"));

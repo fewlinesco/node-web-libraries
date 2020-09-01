@@ -7,7 +7,7 @@ describe("decodeJWTPart", () => {
 
   const mockedJWTPayload = {
     aud: ["connect-account"],
-    exp: Date.now(),
+    exp: Date.now() + 300,
     iss: "foo",
     scope: "phone email",
     sub: "2a14bdd2-3628-4912-a76e-fd514b5c27a8",

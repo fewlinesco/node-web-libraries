@@ -36,7 +36,7 @@ describe("OAuth2Client", () => {
     grant_types_supported: ["authorization_code"],
     claims_supported: ["normal", "distributed"],
     claim_types_supported: [""],
-    authorization_endpoint: "",
+    authorization_endpoint: "http://mocked-auth-endpoint.test",
   };
 
   describe("getAuthorizationURL", () => {
@@ -90,10 +90,6 @@ describe("OAuth2Client", () => {
     test("should return a JWKS", async () => {
       expect.assertions(1);
 
-      fetch.once(JSON.stringify(mockedOpenIdConf));
-
-      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
-
       const mockedJWKS = {
         keys: [
           {
@@ -107,7 +103,11 @@ describe("OAuth2Client", () => {
         ],
       };
 
-      fetch.once(JSON.stringify(mockedJWKS));
+      fetch
+        .once(JSON.stringify(mockedOpenIdConf))
+        .once(JSON.stringify(mockedJWKS));
+
+      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
       const JWKS = await oauthClient.getJWKS();
 
@@ -119,11 +119,11 @@ describe("OAuth2Client", () => {
     test("should initialize the openIDConfiguration", async () => {
       expect.assertions(2);
 
-      fetch.once(JSON.stringify(mockedOpenIdConf));
+      fetch.once(JSON.stringify(mockedOpenIdConf)).once(JSON.stringify({}));
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      await oauthClient.getAuthorizationURL();
+      await oauthClient.getTokensFromAuthorizationCode("mockedAuthCode");
 
       expect(oauthClient.openIDConfiguration).not.toBe(undefined);
       expect(oauthClient.openIDConfiguration).toEqual(
@@ -143,11 +143,11 @@ describe("OAuth2Client", () => {
         access_token: "mockedAccessToken",
       };
 
-      fetch.once(JSON.stringify(mockedOpenIdConf));
+      fetch
+        .once(JSON.stringify(mockedOpenIdConf))
+        .once(JSON.stringify(mockedOAuthTokens));
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
-
-      fetch.once(JSON.stringify(mockedOAuthTokens));
 
       const mockedAuthCode = "foo";
 

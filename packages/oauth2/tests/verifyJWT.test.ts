@@ -36,7 +36,7 @@ describe("verifyJWT", () => {
 
     const mockedJWTPayload = {
       aud: ["connect-account"],
-      exp: Date.now(),
+      exp: Date.now() + 300,
       iss: "foo",
       scope: "phone email",
       sub: "2a14bdd2-3628-4912-a76e-fd514b5c27a8",
@@ -201,7 +201,9 @@ describe("verifyJWT", () => {
       await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch(
         (error) => {
           expect(error).toBeInstanceOf(InvalidKeyIDRS256);
-          expect(error.message).toBe("Invalid key ID for RS256 encoded JWT");
+          expect(error.message).toBe(
+            "Invalid key ID (kid) for RS256 encoded JWT",
+          );
         },
       );
     });
@@ -241,7 +243,9 @@ J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
       await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch(
         (error) => {
           expect(error).toBeInstanceOf(MissingKeyIDHS256);
-          expect(error.message).toBe("Missing key id for RS256 encoded JWT");
+          expect(error.message).toBe(
+            "Missing key ID (kid) for RS256 encoded JWT",
+          );
         },
       );
     });
