@@ -1,6 +1,6 @@
 import OAuth2Client from "index";
 
-type JWKS = {
+export type JWKS = {
   keys: {
     use: string;
     n: string;

@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 
-function decodeJWTPart(JWTPart: string): Record<string, unknown> {
+import { JWKS } from "./getJWKS";
+import { rsaPublicKeyToPEM } from "./rsaPublicKeyToPEM";
+
+function decodeJWTPart<T>(JWTPart: string): T {
   const base64 = JWTPart.replace(/-/g, "+").replace(/_/g, "/");
   const buff = new Buffer(base64, "base64");
   const decoded = buff.toString("ascii");
@@ -14,18 +17,29 @@ function decodeJWTPart(JWTPart: string): Record<string, unknown> {
       .join(""),
   );
 
-  return JSON.parse(jsonPayload);
+  return JSON.parse(jsonPayload) as T;
 }
 
-export async function verifyJWT<T>(
-  accessToken: string,
-  audience: string | string[],
-  clientSecret?: string,
-): Promise<T> {
+type VerifyJWTProps = {
+  accessToken: string;
+  audience: string | string[];
+  clientSecret?: string;
+  jwksURI?: string;
+};
+
+export async function verifyJWT<T>({
+  accessToken,
+  audience,
+  clientSecret,
+  jwksURI,
+}: VerifyJWTProps): Promise<T> {
+  const JWKS: JWKS =
+    jwksURI && (await fetch(jwksURI).then((response) => response.json()));
+
   return new Promise((resolve, reject) => {
     const [header, payload] = accessToken.split(".");
 
-    const { alg, kid } = decodeJWTPart(header);
+    const { alg, kid } = decodeJWTPart<{ alg: string; kid: string }>(header);
     const { aud } = decodeJWTPart(payload);
 
     if (
@@ -52,13 +66,33 @@ export async function verifyJWT<T>(
       }
     } else if (alg === "RS256") {
       if (kid) {
-        // get JWKS
-        // jwt kid find in curled kid
+        if (JWKS) {
+          const validKey = JWKS.keys.find((keyObject) =>
+            Object.entries(keyObject).find(([key, value]) => {
+              return key === "kid" && value === kid;
+            }),
+          );
 
-        // https://github.com/auth0/node-jwks-rsa/blob/44beb3b6b62335eb618efe28b47883369acd3964/src/utils.js#L35
-        // Decode with jsonwebtoken
+          if (validKey) {
+            const { e, n } = validKey;
+            const publicKey = rsaPublicKeyToPEM(n, e);
 
-        console.log();
+            return jwt.verify(
+              accessToken,
+              publicKey,
+              {
+                algorithms: ["RS256"],
+              },
+              (error: jwt.VerifyErrors | null, decoded: unknown) => {
+                return error ? reject(error) : resolve(decoded as T);
+              },
+            );
+          } else {
+            reject(new Error("Invalid key ID for HS256 encoded JWT"));
+          }
+        } else {
+          reject(new Error("Missing JWKS URI for HS256 encoded JWT"));
+        }
       } else {
         reject(new Error("Missing key id for HS256 encoded JWT"));
       }
