@@ -2,7 +2,13 @@ import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 
-import { InvalidAudience } from "../src/errors";
+import {
+  InvalidAudience,
+  AlgoNotSupported,
+  MissingClientSecret,
+  InvalidKeyIDRS256,
+  MissingKeyIDHS256,
+} from "../src/errors";
 import { verifyJWT } from "../src/verifyJWT";
 
 enableFetchMocks();
@@ -25,7 +31,7 @@ describe("verifyJWT", () => {
     ],
   };
 
-  describe("SH256 signed JWT", () => {
+  describe("HS256 signed JWT", () => {
     const mockedClientSecret = "bar";
 
     const mockedJWTPayload = {
@@ -64,6 +70,24 @@ describe("verifyJWT", () => {
 
       await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch((error) =>
         expect(error).toBeInstanceOf(JsonWebTokenError),
+      );
+    });
+
+    test("it should throw an error if missing client secret", async () => {
+      expect.assertions(2);
+
+      const verifyJWTProps = {
+        accessToken: JWT,
+        audience: "connect-account",
+      };
+
+      await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch(
+        (error) => {
+          expect(error).toBeInstanceOf(MissingClientSecret);
+          expect(error.message).toBe(
+            "Missing Client Secret for HS256 encoded JWT",
+          );
+        },
       );
     });
 
@@ -132,7 +156,7 @@ describe("verifyJWT", () => {
     });
 
     test("is should throw an error if wrong audience", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
 
       fetch.once(JSON.stringify(mockedFetchResponse));
 
@@ -142,14 +166,89 @@ describe("verifyJWT", () => {
         jwksURI: "mockeckJWKSURI",
       };
 
-      await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch((error) =>
-        expect(error.message).toBe("Invalid audience"),
+      await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch(
+        (error) => {
+          expect(error).toBeInstanceOf(InvalidAudience);
+          expect(error.message).toBe("Invalid audience");
+        },
+      );
+    });
+
+    test("should throw an error if invalid key id", async () => {
+      expect.assertions(2);
+
+      const mockedFetchResponse = {
+        keys: [
+          {
+            e: "AQAB",
+            kty: "RSA",
+            kid: "wrongKid",
+            n:
+              "y3M7JqY49JeL/ornP7ZY2QlO76akS36Rj1iKVSIlFH754NnqmtGwMrCVZzCWrc882trbGuDhml2psOmCIBjKBpnghNLBZALGNRelCqfV7Cy+EMrQvQ+UWbogT7xfPoL+VYjCZKTeXosfzMNMZFum/Vnk/vYBKilXZfQH1t4sohU=",
+            alg: "RS256",
+          },
+        ],
+      };
+
+      fetch.once(JSON.stringify(mockedFetchResponse));
+
+      const verifyJWTProps = {
+        accessToken: mockedRS256JWT,
+        audience: "connect-account",
+        jwksURI: "mockeckJWKSURI",
+      };
+
+      await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch(
+        (error) => {
+          expect(error).toBeInstanceOf(InvalidKeyIDRS256);
+          expect(error.message).toBe("Invalid key ID for RS256 encoded JWT");
+        },
+      );
+    });
+
+    test("should throw an error if missing key id", async () => {
+      expect.assertions(2);
+
+      fetch.once(JSON.stringify(mockedFetchResponse));
+
+      const mockedPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIICXgIBAAKBgQDLczsmpjj0l4v+iuc/tljZCU7vpqRLfpGPWIpVIiUUfvng2eqa
+0bAysJVnMJatzzza2tsa4OGaXamw6YIgGMoGmeCE0sFkAsY1F6UKp9XsLL4QytC9
+D5RZuiBPvF8+gv5ViMJkpN5eix/Mw0xkW6b9WeT+9gEqKVdl9AfW3iyiFQIDAQAB
+AoGBAJya+6o5g1gLm5B5PZ5Wb7fJKYDhxk/ygntUDU+Q8/f98by6IZPA2x95u9dt
+mF78SfyxQL1E44QemvN6G1c3nbHtPUA661kaRN/QUr4Dw59csuytSpaYXP6RDjem
+U51EIA2ShybKkzRvQE67t4hMPx7q8cfHQ39YzdKXcUFV6qC1AkEA8PqUguzCIrIA
++5OabpMjJcKveu9RPLC7/Kwh7RwOefvty2VpDjRYR/CcgV3jVFnJ23iQ6qfIBTuE
+5agQX3A0AwJBANghyVur/psj4PDDcdMe2eTK7kJE39m2JddpYv58UzLaay1nAOh7
+g/GMzi9goJqgTXCq8hdUNtukbOLlO/jREgcCQBU1eKytOcjj8cIyk3z35jgEkn03
+Yub8hw8N905vEbcavSsRmdVuNfbe7mdUZBWgcWuniNmeOrR7MI8l44sCzRECQQDA
+YlK6Jv8bWXSA23gWVP/fiENM+cHIKTrF5CkaHdBxE7sTTvyf9FIeURe3VGuhN8+2
+2nNkELJEELhbv3ECqhdBAkEAuHYa4b0ePMj6VvObOJOylfHqPM5NJ19PSxjvq7f8
+J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
+-----END RSA PRIVATE KEY-----`;
+
+      const missingKidJWT =
+        jwt.sign({ audience: "fooBar" }, mockedPrivateKey, {
+          algorithm: "RS256",
+        }) + "ps8pa863Ic58ig2Tovqh19ShIjuBPv7nEOS3WSY8n74";
+
+      const verifyJWTProps = {
+        accessToken: missingKidJWT,
+        audience: "fooBar",
+        jwksURI: "mockeckJWKSURI",
+      };
+
+      await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch(
+        (error) => {
+          expect(error).toBeInstanceOf(MissingKeyIDHS256);
+          expect(error.message).toBe("Missing key id for RS256 encoded JWT");
+        },
       );
     });
   });
 
   test("it should throw an error algo is != from RS256 or HS256", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
 
     fetch.once(JSON.stringify(mockedFetchResponse));
 
@@ -164,8 +263,9 @@ describe("verifyJWT", () => {
       jwksURI: "mockeckJWKSURI",
     };
 
-    await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch((error) =>
-      expect(error.message).toBe("Encoding algo not supported"),
-    );
+    await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch((error) => {
+      expect(error).toBeInstanceOf(AlgoNotSupported);
+      expect(error.message).toBe("Encoding algo not supported");
+    });
   });
 });

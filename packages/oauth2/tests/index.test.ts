@@ -36,7 +36,7 @@ describe("OAuth2Client", () => {
     grant_types_supported: ["authorization_code"],
     claims_supported: ["normal", "distributed"],
     claim_types_supported: [""],
-    authorization_endpoint: "http://mocked-auth-endpoint.test",
+    authorization_endpoint: "",
   };
 
   describe("getAuthorizationURL", () => {

@@ -85,14 +85,14 @@ export async function verifyJWT<T>({
             );
           } else {
             reject(
-              new InvalidKeyIDRS256("Invalid key ID for HS256 encoded JWT"),
+              new InvalidKeyIDRS256("Invalid key ID for RS256 encoded JWT"),
             );
           }
         } else {
-          reject(new MissingJWKSURI("Missing JWKS URI for HS256 encoded JWT"));
+          reject(new MissingJWKSURI("Missing JWKS URI for RS256 encoded JWT"));
         }
       } else {
-        reject(new MissingKeyIDHS256("Missing key id for HS256 encoded JWT"));
+        reject(new MissingKeyIDHS256("Missing key id for RS256 encoded JWT"));
       }
     } else {
       reject(new AlgoNotSupported("Encoding algo not supported"));
