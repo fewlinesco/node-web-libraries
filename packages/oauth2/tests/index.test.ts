@@ -2,22 +2,9 @@ import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
 
 import OAuth2Client from "../index";
-import { OAuth2ClientConstructor, OpenIDConfiguration } from "../types";
+import { OAuth2ClientConstructor, OpenIDConfiguration } from "../src/types";
 
 enableFetchMocks();
-
-const mockedFetchResponse = {
-  keys: [
-    {
-      e: "AQAB",
-      kty: "RSA",
-      kid: "d6512f53-9774-4a58-830c-981886c8bb43",
-      n:
-        "y3M7JqY49JeL/ornP7ZY2QlO76akS36Rj1iKVSIlFH754NnqmtGwMrCVZzCWrc882trbGuDhml2psOmCIBjKBpnghNLBZALGNRelCqfV7Cy+EMrQvQ+UWbogT7xfPoL+VYjCZKTeXosfzMNMZFum/Vnk/vYBKilXZfQH1t4sohU=",
-      alg: "RS256",
-    },
-  ],
-};
 
 describe("OAuth2Client", () => {
   beforeEach(() => {
@@ -34,11 +21,11 @@ describe("OAuth2Client", () => {
 
   const mockedOpenIdConf: OpenIDConfiguration = {
     userinfo_signing_alg_values_supported: ["none"],
-    userinfo_endpoint: "",
+    userinfo_endpoint: "http://mocked-userinfo-endpoint.test",
     token_endpoint_auth_signing_alg_values_supported: ["HS256", "RS256"],
     token_endpoint_auth_methods_supported: [""],
     token_endpoint: "http://mocked-tokens-endpoint.test",
-    subject_types_supported: "",
+    subject_types_supported: "client_secret_basic",
     scopes_supported: ["email phone"],
     response_types_supported: ["code"],
     request_uri: false,
@@ -46,7 +33,7 @@ describe("OAuth2Client", () => {
     jwks_uri: "http://mocked-jwks-uri.test",
     issuer: "",
     id_token_signing_alg_values_supported: ["HS256", "RS256"],
-    grant_types_supported: [""],
+    grant_types_supported: ["authorization_code"],
     claims_supported: ["normal", "distributed"],
     claim_types_supported: [""],
     authorization_endpoint: "http://mocked-auth-endpoint.test",

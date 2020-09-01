@@ -1,5 +1,19 @@
-export { verifyJWT } from "./verifyJWT";
-import { OpenIDConfiguration, OAuth2ClientConstructor, JWKSDT } from "./types";
+export { verifyJWT } from "./src/verifyJWT";
+import {
+  MissingJWKSURI,
+  InvalidKeyIDRS256,
+  MissingKeyIDHS256,
+  AlgoNotSupported,
+  InvalidAudience,
+  MissingClientSecret,
+} from "./src/errors";
+import {
+  OpenIDConfiguration,
+  OAuth2ClientConstructor,
+  JWKSDT,
+} from "./src/types";
+import { decodeJWTPart } from "./src/utils/decodeJWTPart";
+import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
 
 class OAuth2Client {
   openIDConfigurationURL: string;
@@ -102,4 +116,15 @@ class OAuth2Client {
 
 export default OAuth2Client;
 
-export { OpenIDConfiguration, OAuth2ClientConstructor };
+export {
+  OpenIDConfiguration,
+  OAuth2ClientConstructor,
+  decodeJWTPart,
+  rsaPublicKeyToPEM,
+  MissingJWKSURI,
+  InvalidKeyIDRS256,
+  MissingKeyIDHS256,
+  AlgoNotSupported,
+  InvalidAudience,
+  MissingClientSecret,
+};

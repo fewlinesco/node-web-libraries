@@ -1,4 +1,4 @@
-import { rsaPublicKeyToPEM } from "../rsaPublicKeyToPEM";
+import { rsaPublicKeyToPEM } from "../src/utils/rsaPublicKeyToPEM";
 
 describe("rsaPublicKeyToPEM", () => {
   test("it should create valid rsa public key modulus and exponent", () => {

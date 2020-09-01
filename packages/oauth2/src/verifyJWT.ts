@@ -1,24 +1,16 @@
 import jwt from "jsonwebtoken";
-import { JWKSDT } from "types";
 
-import { rsaPublicKeyToPEM } from "./rsaPublicKeyToPEM";
-
-function decodeJWTPart<T>(JWTPart: string): T {
-  const base64 = JWTPart.replace(/-/g, "+").replace(/_/g, "/");
-  const buff = new Buffer(base64, "base64");
-  const decoded = buff.toString("ascii");
-
-  const jsonPayload = decodeURIComponent(
-    decoded
-      .split("")
-      .map((c) => {
-        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join(""),
-  );
-
-  return JSON.parse(jsonPayload) as T;
-}
+import {
+  InvalidAudience,
+  MissingClientSecret,
+  InvalidKeyIDRS256,
+  MissingJWKSURI,
+  MissingKeyIDHS256,
+  AlgoNotSupported,
+} from "./errors";
+import { JWKSDT } from "./types";
+import { decodeJWTPart } from "./utils/decodeJWTPart";
+import { rsaPublicKeyToPEM } from "./utils/rsaPublicKeyToPEM";
 
 type VerifyJWTProps = {
   accessToken: string;
@@ -46,7 +38,7 @@ export async function verifyJWT<T>({
       (typeof aud === "string" && aud !== audience) ||
       (Array.isArray(aud) && !aud.includes(audience))
     ) {
-      reject(new Error("Invalid audience"));
+      reject(new InvalidAudience("Invalid audience"));
     }
 
     if (alg === "HS256") {
@@ -62,7 +54,11 @@ export async function verifyJWT<T>({
           },
         );
       } else {
-        reject(new Error("Missing Client Secret for HS256 encoded JWT"));
+        reject(
+          new MissingClientSecret(
+            "Missing Client Secret for HS256 encoded JWT",
+          ),
+        );
       }
     } else if (alg === "RS256") {
       if (kid) {
@@ -88,16 +84,18 @@ export async function verifyJWT<T>({
               },
             );
           } else {
-            reject(new Error("Invalid key ID for HS256 encoded JWT"));
+            reject(
+              new InvalidKeyIDRS256("Invalid key ID for HS256 encoded JWT"),
+            );
           }
         } else {
-          reject(new Error("Missing JWKS URI for HS256 encoded JWT"));
+          reject(new MissingJWKSURI("Missing JWKS URI for HS256 encoded JWT"));
         }
       } else {
-        reject(new Error("Missing key id for HS256 encoded JWT"));
+        reject(new MissingKeyIDHS256("Missing key id for HS256 encoded JWT"));
       }
     } else {
-      reject(new Error("Encoding algo not supported"));
+      reject(new AlgoNotSupported("Encoding algo not supported"));
     }
   });
 }

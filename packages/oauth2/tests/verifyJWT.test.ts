@@ -2,7 +2,8 @@ import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 
-import { verifyJWT } from "../verifyJWT";
+import { InvalidAudience } from "../src/errors";
+import { verifyJWT } from "../src/verifyJWT";
 
 enableFetchMocks();
 
@@ -81,7 +82,7 @@ describe("verifyJWT", () => {
     });
 
     test("is should throw an error if wrong audience", async () => {
-      expect.assertions(1);
+      expect.assertions(2);
 
       const verifyJWTProps = {
         accessToken: JWT,
@@ -89,8 +90,11 @@ describe("verifyJWT", () => {
         clientSecret: mockedClientSecret,
       };
 
-      await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch((error) =>
-        expect(error.message).toBe("Invalid audience"),
+      await verifyJWT<Record<string, unknown>>(verifyJWTProps).catch(
+        (error) => {
+          expect(error).toBeInstanceOf(InvalidAudience);
+          expect(error.message).toBe("Invalid audience");
+        },
       );
     });
   });
