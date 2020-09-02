@@ -6,6 +6,7 @@ import {
   MissingKeyIDHS256,
   AlgoNotSupported,
   InvalidAudience,
+  ScopesNotSupported,
 } from "./src/errors";
 import {
   OpenIDConfiguration,
@@ -21,6 +22,7 @@ class OAuth2Client {
   clientSecret: string;
   redirectURI: string;
   audience: string;
+  scopes: string[];
   openIDConfiguration?: OpenIDConfiguration;
 
   constructor({
@@ -29,12 +31,14 @@ class OAuth2Client {
     clientSecret,
     redirectURI,
     audience,
+    scopes,
   }: OAuth2ClientConstructor) {
     this.openIDConfigurationURL = openIDConfigurationURL;
     this.clientID = clientID;
     this.clientSecret = clientSecret;
     this.redirectURI = redirectURI;
     this.audience = audience;
+    this.scopes = scopes;
   }
 
   private async setOpenIDConfiguration(): Promise<void> {
@@ -55,9 +59,20 @@ class OAuth2Client {
   async getAuthorizationURL(): Promise<URL> {
     await this.setOpenIDConfiguration();
 
-    const authorizeURL = new URL(
-      this.openIDConfiguration.authorization_endpoint,
-    );
+    const {
+      authorization_endpoint,
+      scopes_supported,
+    } = this.openIDConfiguration;
+
+    const areScopesSupported = this.scopes
+      .filter((scope) => scope !== "openid")
+      .every((scope) => scopes_supported[0].split(" ").includes(scope));
+
+    if (!areScopesSupported) {
+      throw new ScopesNotSupported("Scopes are not supported");
+    }
+
+    const authorizeURL = new URL(authorization_endpoint);
 
     authorizeURL.searchParams.append("client_id", this.clientID);
     authorizeURL.searchParams.append("response_type", "code");
@@ -65,10 +80,7 @@ class OAuth2Client {
       "redirect_uri",
       encodeURIComponent(decodeURIComponent(this.redirectURI)),
     );
-    authorizeURL.searchParams.append(
-      "scope",
-      this.openIDConfiguration.scopes_supported.join(" "),
-    );
+    authorizeURL.searchParams.append("scope", this.scopes.join(" "));
 
     return authorizeURL;
   }
@@ -199,4 +211,5 @@ export {
   MissingKeyIDHS256,
   AlgoNotSupported,
   InvalidAudience,
+  ScopesNotSupported,
 };

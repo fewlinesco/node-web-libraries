@@ -24,6 +24,7 @@ export type OAuth2ClientConstructor = {
   clientSecret: string;
   redirectURI: string;
   audience: string;
+  scopes: string[];
   openIDConfiguration?: OpenIDConfiguration;
 };
 
