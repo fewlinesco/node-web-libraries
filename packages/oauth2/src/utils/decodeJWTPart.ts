@@ -1,4 +1,4 @@
-export function decodeJWTPart<T>(JWTPart: string): T {
+export function decodeJWTPart<T = unknown>(JWTPart: string): T {
   const base64 = JWTPart.replace(/-/g, "+").replace(/_/g, "/");
   const buff = Buffer.from(base64, "base64");
   const decoded = buff.toString("ascii");

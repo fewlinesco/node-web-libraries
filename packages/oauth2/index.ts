@@ -1,10 +1,11 @@
+import jwt from "jsonwebtoken";
+
 import {
   MissingJWKSURI,
   InvalidKeyIDRS256,
   MissingKeyIDHS256,
   AlgoNotSupported,
   InvalidAudience,
-  MissingClientSecret,
 } from "./src/errors";
 import {
   OpenIDConfiguration,
@@ -13,7 +14,6 @@ import {
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
-import { verifyJWT } from "./src/verifyJWT";
 
 class OAuth2Client {
   openIDConfigurationURL: string;
@@ -73,7 +73,7 @@ class OAuth2Client {
     return authorizeURL;
   }
 
-  async getJWKS(): Promise<JWKSDT> {
+  private async getJWKS(): Promise<JWKSDT> {
     await this.setOpenIDConfiguration();
 
     const JWKS: JWKSDT = await fetch(this.openIDConfiguration.jwks_uri)
@@ -112,6 +112,79 @@ class OAuth2Client {
 
     return tokens;
   }
+
+  async verifyJWT<T = unknown>(accessToken: string, algo: string): Promise<T> {
+    await this.setOpenIDConfiguration();
+
+    const JWKS = await this.getJWKS();
+
+    return new Promise((resolve, reject) => {
+      const [header, payload] = accessToken.split(".");
+
+      const { alg, kid } = decodeJWTPart<{ alg: string; kid: string }>(header);
+      const { aud } = decodeJWTPart<{ aud: string }>(payload);
+
+      if (
+        (typeof aud === "string" && aud !== this.audience) ||
+        (Array.isArray(aud) && !aud.includes(this.audience))
+      ) {
+        reject(new InvalidAudience("Invalid audience"));
+      }
+
+      if (alg === "HS256" && algo === "HS256") {
+        jwt.verify(
+          accessToken,
+          this.clientSecret,
+          {
+            algorithms: ["HS256"],
+          },
+          (error: jwt.VerifyErrors | null, decoded: unknown) => {
+            return error ? reject(error) : resolve(decoded as T);
+          },
+        );
+      } else if (alg === "RS256" && algo === "RS256") {
+        if (kid) {
+          if (JWKS) {
+            const validKey = JWKS.keys.find(
+              (keyObject) => keyObject.kid === kid,
+            );
+
+            if (validKey) {
+              const { e, n } = validKey;
+              const publicKey = rsaPublicKeyToPEM(n, e);
+
+              return jwt.verify(
+                accessToken,
+                publicKey,
+                {
+                  algorithms: ["RS256"],
+                },
+                (error: jwt.VerifyErrors | null, decoded: unknown) => {
+                  return error ? reject(error) : resolve(decoded as T);
+                },
+              );
+            } else {
+              reject(
+                new InvalidKeyIDRS256(
+                  "Invalid key ID (kid) for RS256 encoded JWT",
+                ),
+              );
+            }
+          } else {
+            reject(
+              new MissingJWKSURI("Missing JWKS URI for RS256 encoded JWT"),
+            );
+          }
+        } else {
+          reject(
+            new MissingKeyIDHS256("Missing key ID (kid) for RS256 encoded JWT"),
+          );
+        }
+      } else {
+        reject(new AlgoNotSupported("Encoding algo not supported"));
+      }
+    });
+  }
 }
 
 export default OAuth2Client;
@@ -119,7 +192,6 @@ export default OAuth2Client;
 export {
   OpenIDConfiguration,
   OAuth2ClientConstructor,
-  verifyJWT,
   decodeJWTPart,
   rsaPublicKeyToPEM,
   MissingJWKSURI,
@@ -127,5 +199,4 @@ export {
   MissingKeyIDHS256,
   AlgoNotSupported,
   InvalidAudience,
-  MissingClientSecret,
 };
