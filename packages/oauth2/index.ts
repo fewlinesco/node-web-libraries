@@ -17,12 +17,12 @@ import { decodeJWTPart } from "./src/utils/decodeJWTPart";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
 
 class OAuth2Client {
-  openIDConfigurationURL: string;
-  clientID: string;
-  clientSecret: string;
-  redirectURI: string;
-  audience: string;
-  scopes: string[];
+  readonly openIDConfigurationURL: string;
+  readonly clientID: string;
+  readonly clientSecret: string;
+  readonly redirectURI: string;
+  readonly audience: string;
+  readonly scopes: string[];
   openIDConfiguration?: OpenIDConfiguration;
 
   constructor({
