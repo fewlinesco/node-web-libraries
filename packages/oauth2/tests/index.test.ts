@@ -19,12 +19,13 @@ describe("OAuth2Client", () => {
   });
 
   const oauthClientConstructorProps: OAuth2ClientConstructor = {
-    openIDConfigurationURL: "mockedOpenIdConfURL",
+    openIDConfigurationURL: "http://mocked-openid-url.test",
     clientID: "mockedClientID",
     clientSecret: "mockedClientSecret",
-    redirectURI: "mockedRedirectURI",
+    redirectURI: "http://mocked-redirect-url.test",
     audience: "connect-account",
     scopes: ["email", "phone"],
+    fetch: fetch,
   };
 
   const mockedOpenIdConf: OpenIDConfiguration = {
@@ -94,7 +95,7 @@ describe("OAuth2Client", () => {
       const authURL = await oauthClient.getAuthorizationURL();
 
       const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=mockedRedirectURI&scope=email+phone";
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%253A%252F%252Fmocked-redirect-url.test&scope=email+phone";
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -109,7 +110,7 @@ describe("OAuth2Client", () => {
       const authURL = await oauthClient.getAuthorizationURL("http://foo.bar");
 
       const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=mockedRedirectURI&scope=email+phone&state=http%253A%252F%252Ffoo.bar";
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%253A%252F%252Fmocked-redirect-url.test&scope=email+phone&state=http%253A%252F%252Ffoo.bar";
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -169,13 +170,17 @@ describe("OAuth2Client", () => {
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      const expectedTokens = await oauthClient.getTokensFromAuthorizationCode(
+      const tokens = await oauthClient.getTokensFromAuthorizationCode(
         mockedAuthCode,
       );
 
-      expect(expectedTokens).toEqual(
-        expect.objectContaining(mockedOAuthTokens),
-      );
+      const expectedTokens = {
+        refresh_token: "mockedRefreshToken",
+        id_token: "mockedIdToken",
+        access_token: "mockedAccessToken",
+      };
+
+      expect(expectedTokens).toEqual(expect.objectContaining(tokens));
     });
   });
 

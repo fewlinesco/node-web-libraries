@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import nodeFetch from "node-fetch";
 
 import {
   MissingJWKSURI,
@@ -12,6 +13,7 @@ import {
   OpenIDConfiguration,
   OAuth2ClientConstructor,
   JWKSDT,
+  OAuth2Tokens,
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
@@ -23,6 +25,7 @@ class OAuth2Client {
   readonly redirectURI: string;
   readonly audience: string;
   readonly scopes: string[];
+  private fetch: any;
   openIDConfiguration?: OpenIDConfiguration;
 
   constructor({
@@ -32,6 +35,7 @@ class OAuth2Client {
     redirectURI,
     audience,
     scopes,
+    fetch,
   }: OAuth2ClientConstructor) {
     this.openIDConfigurationURL = openIDConfigurationURL;
     this.clientID = clientID;
@@ -39,13 +43,14 @@ class OAuth2Client {
     this.redirectURI = redirectURI;
     this.audience = audience;
     this.scopes = scopes;
+    this.fetch = fetch ? fetch : nodeFetch;
   }
 
   private async setOpenIDConfiguration(): Promise<void> {
     if (this.openIDConfiguration) {
       return Promise.resolve();
     } else {
-      await fetch(this.openIDConfigurationURL)
+      await this.fetch(this.openIDConfigurationURL)
         .then((response) => response.json())
         .then((openIDConfiguration) => {
           this.openIDConfiguration = openIDConfiguration;
@@ -59,7 +64,7 @@ class OAuth2Client {
   private async getJWKS(): Promise<JWKSDT> {
     await this.setOpenIDConfiguration();
 
-    const JWKS: JWKSDT = await fetch(this.openIDConfiguration.jwks_uri)
+    const JWKS: JWKSDT = await this.fetch(this.openIDConfiguration.jwks_uri)
       .then((response) => response.json())
       .catch((error) => {
         throw error;
@@ -106,7 +111,7 @@ class OAuth2Client {
 
   async getTokensFromAuthorizationCode(
     authorizationCode: string,
-  ): Promise<string[]> {
+  ): Promise<OAuth2Tokens> {
     await this.setOpenIDConfiguration();
 
     const callback = {
@@ -117,17 +122,28 @@ class OAuth2Client {
       redirect_uri: this.redirectURI,
     };
 
-    const tokens = await fetch(this.openIDConfiguration.token_endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const tokenEndpointResponse = await this.fetch(
+      this.openIDConfiguration.token_endpoint,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(callback),
       },
-      body: JSON.stringify(callback),
-    })
+    )
       .then((response) => response.json())
       .catch((error) => {
         throw error;
       });
+
+    const { access_token, refresh_token, id_token } = tokenEndpointResponse;
+
+    const tokens: OAuth2Tokens = { access_token, refresh_token };
+
+    if (id_token) {
+      tokens.id_token = id_token;
+    }
 
     return tokens;
   }
@@ -219,4 +235,5 @@ export {
   AlgoNotSupported,
   InvalidAudience,
   ScopesNotSupported,
+  OAuth2Tokens,
 };

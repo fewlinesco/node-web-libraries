@@ -25,6 +25,7 @@ export type OAuth2ClientConstructor = {
   redirectURI: string;
   audience: string;
   scopes: string[];
+  fetch?: any;
 };
 
 export type JWKSDT = {
@@ -36,4 +37,10 @@ export type JWKSDT = {
     e: string;
     alg: string;
   }[];
+};
+
+export type OAuth2Tokens = {
+  refresh_token: string;
+  access_token: string;
+  id_token?: string;
 };
