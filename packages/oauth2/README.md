@@ -3,7 +3,7 @@
 **Disclaimer**: this package is made for our internal usage and is only open source for convenience so we might not consider Pull Requests or Issues. Feel free to fork though.
 
 This is part of the Fewlines Web Libraries packages.
-It mainly provides an abstraction for the OAuth2 flow, and a secure way to verify JWT, regardless of its algorithm used.
+It mainly provides an abstraction for the OAuth2 flow, and a secure way to verify JWT for HS256 and RS256 algorithms
 
 ## Installation
 
@@ -16,10 +16,11 @@ yarn add @fwl/oauth2
 You first need to initialize the client instance, called `OAuth2Client`. This class takes the following constructor parameters:
 
 - `openIDConfigurationURL`: The URL to retrieve the OpenID configuration.
-- `clientID`/`clientSecret`: A unique pair of credentials that authenticate the Application from which the User intents to sign in.
-- redirectURI: URI used to redirect to the original Application website after a successful login in on Connect.
-- audience: The name of the Application.
-- scopes: It represents the kind of information and actions that an Application is able to access on another Application. Every scope has to be authorized by the User during sign in operation.
+- `clientID`: Client ID of the online service (e.g. internet website, application) that uses the Provider Authentication and Authorization service for its User.
+- `clientSecret`: Paired with the client ID, used to authenticate the Application from which the User intent to sign in.
+- `redirectURI`: URI used to redirect to the original Application website after a successful login in on Connect.
+- `audience`: The audience of the Application (its name for Connect)..
+- `scopes`: It represents the kind of information and actions that an Application is able to access on another Application. Every scope has to be authorized by the User during sign in operation.
 
 ```typescript
 const oauthClientConstructorProps: OAuth2ClientConstructor = {
@@ -49,7 +50,11 @@ const authURL = await oauthClient.getAuthorizationURL();
 ### getTokensFromAuthorizationCode
 
 ```typescript
-async getTokensFromAuthorizationCode(authorizationCode: string,): Promise<string[]>{};
+async getAuthorizationURL(): Promise<URL>{}
+```
+
+```typescript
+async getTokensFromAuthorizationCode(authorizationCode: string): Promise<string[]>{};
 ```
 
 Returns a list containing the `access_token`, `refresh_token`, and `id_token` if present.
