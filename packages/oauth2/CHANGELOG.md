@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3 - 2020-09-03
+
+- Fixed issue regarding encoding of `redirect_uri` and `state` in query string.
+
 ## 0.1.2 - 2020-09-03
 
 - Added `node-fetch`.
