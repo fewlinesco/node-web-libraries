@@ -1,3 +1,4 @@
+import { FetchMock } from "jest-fetch-mock/types";
 import jwt from "jsonwebtoken";
 import nodeFetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 
@@ -13,6 +14,7 @@ import {
   OpenIDConfiguration,
   OAuth2ClientConstructor,
   JWKSDT,
+  OAuth2Tokens,
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
@@ -110,7 +112,7 @@ class OAuth2Client {
 
   async getTokensFromAuthorizationCode(
     authorizationCode: string,
-  ): Promise<string[]> {
+  ): Promise<OAuth2Tokens> {
     await this.setOpenIDConfiguration();
 
     const callback = {
@@ -121,19 +123,24 @@ class OAuth2Client {
       redirect_uri: this.redirectURI,
     };
 
-    const tokens = await this.fetch(this.openIDConfiguration.token_endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const tokenEndpointResponse = await this.fetch(
+      this.openIDConfiguration.token_endpoint,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(callback),
       },
-      body: JSON.stringify(callback),
-    })
+    )
       .then((response) => response.json())
       .catch((error) => {
         throw error;
       });
 
-    return tokens;
+    const { access_token, refresh_token, id_token } = tokenEndpointResponse;
+
+    return { access_token, refresh_token, id_token };
   }
 
   async verifyJWT<T = unknown>(accessToken: string, algo: string): Promise<T> {
@@ -223,4 +230,5 @@ export {
   AlgoNotSupported,
   InvalidAudience,
   ScopesNotSupported,
+  OAuth2Tokens,
 };

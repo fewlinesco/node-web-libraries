@@ -40,3 +40,9 @@ export type JWKSDT = {
     alg: string;
   }[];
 };
+
+export type OAuth2Tokens = {
+  refresh_token: string;
+  access_token: string;
+  id_token?: string;
+};

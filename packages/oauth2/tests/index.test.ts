@@ -170,13 +170,17 @@ describe("OAuth2Client", () => {
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      const expectedTokens = await oauthClient.getTokensFromAuthorizationCode(
+      const tokens = await oauthClient.getTokensFromAuthorizationCode(
         mockedAuthCode,
       );
 
-      expect(expectedTokens).toEqual(
-        expect.objectContaining(mockedOAuthTokens),
-      );
+      const expectedTokens = {
+        refresh_token: "mockedRefreshToken",
+        id_token: "mockedIdToken",
+        access_token: "mockedAccessToken",
+      };
+
+      expect(expectedTokens).toEqual(expect.objectContaining(tokens));
     });
   });
 
