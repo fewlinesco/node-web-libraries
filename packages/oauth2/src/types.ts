@@ -1,3 +1,5 @@
+import { RequestInfo, RequestInit, Response } from "node-fetch";
+
 export type OpenIDConfiguration = {
   userinfo_signing_alg_values_supported: string[];
   userinfo_endpoint: string;
@@ -25,6 +27,7 @@ export type OAuth2ClientConstructor = {
   redirectURI: string;
   audience: string;
   scopes: string[];
+  fetch?: (url: RequestInfo, init?: RequestInit) => Promise<Response>;
 };
 
 export type JWKSDT = {
