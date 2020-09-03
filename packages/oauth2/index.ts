@@ -139,7 +139,13 @@ class OAuth2Client {
 
     const { access_token, refresh_token, id_token } = tokenEndpointResponse;
 
-    return { access_token, refresh_token, id_token };
+    const tokens: OAuth2Tokens = { access_token, refresh_token };
+
+    if (id_token) {
+      tokens.id_token = id_token;
+    }
+
+    return tokens;
   }
 
   async verifyJWT<T = unknown>(accessToken: string, algo: string): Promise<T> {
