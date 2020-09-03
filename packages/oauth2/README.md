@@ -36,13 +36,41 @@ const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
 ## Usage
 
-The initialized instance of `OAuth2Client` provides the following methods to help with the OAuth2 flow:
+The initialized instance of `OAuth2Client` provides the following methods to help with the OAuth2 flow. Each method will initialize the open OpenID configuration returned from the URL provided if not initialized yet.
 
 ### getAuthorizationURL
 
+Return the authorization URL used to start the OAuth2 flow, and retrieve the `authorization_code`.
+
+```typescript
+const authURL = await oauthClient.getAuthorizationURL();
+```
+
 ### getTokensFromAuthorizationCode
 
+```typescript
+async getTokensFromAuthorizationCode(authorizationCode: string,): Promise<string[]>{};
+```
+
+Returns a list containing the `access_token`, `refresh_token`, and `id_token` if present.
+
+```typescript
+const tokens = await oauthClient.getTokensFromAuthorizationCode(
+  "authorization_code"
+);
+```
+
 ### verifyJWT
+
+```typescript
+async verifyJWT<T = unknown>(accessToken: string, algo: string): Promise<T> {};
+```
+
+Used to verify the JWT (i.e. `access_token`). It provides a series of checks, like audiences, algorithm or public key.
+
+```typescript
+const decoded = await oauthClient.verifyJWT(JWT, "RS256");
+```
 
 ## Utils
 
