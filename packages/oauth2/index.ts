@@ -1,6 +1,5 @@
-import { FetchMock } from "jest-fetch-mock/types";
 import jwt from "jsonwebtoken";
-import nodeFetch, { RequestInfo, RequestInit, Response } from "node-fetch";
+import nodeFetch from "node-fetch";
 
 import {
   MissingJWKSURI,
@@ -26,7 +25,7 @@ class OAuth2Client {
   readonly redirectURI: string;
   readonly audience: string;
   readonly scopes: string[];
-  private fetch: (url: RequestInfo, init?: RequestInit) => Promise<Response>;
+  private fetch: any;
   openIDConfiguration?: OpenIDConfiguration;
 
   constructor({
