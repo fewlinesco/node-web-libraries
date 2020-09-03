@@ -99,24 +99,6 @@ describe("OAuth2Client", () => {
       expect(authURL.href).toMatch(expectedAuthURL);
     });
 
-    test("openid scope should not prevent the return of a valid auth URL", async () => {
-      expect.assertions(1);
-
-      fetch.once(JSON.stringify(mockedOpenIdConf));
-
-      const oauthClient = new OAuth2Client({
-        ...oauthClientConstructorProps,
-        scopes: ["phone", "openid"],
-      });
-
-      const authURL = await oauthClient.getAuthorizationURL();
-
-      const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=mockedRedirectURI&scope=phone+openid";
-
-      expect(authURL.href).toMatch(expectedAuthURL);
-    });
-
     test("is should throw an error if the provided scopes are not supported", async () => {
       expect.assertions(2);
 
@@ -153,35 +135,6 @@ describe("OAuth2Client", () => {
     });
 
     test("should return the tokens from connect", async () => {
-      expect.assertions(1);
-
-      const mockedAuthCode = "foo";
-
-      const mockedOAuthTokens = {
-        token_type: "Bearer",
-        scope: "openid email phone",
-        refresh_token: "mockedRefreshToken",
-        id_token: "mockedIdToken",
-        expires_in: 3600,
-        access_token: "mockedAccessToken",
-      };
-
-      fetch
-        .once(JSON.stringify(mockedOpenIdConf))
-        .once(JSON.stringify(mockedOAuthTokens));
-
-      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
-
-      const expectedTokens = await oauthClient.getTokensFromAuthorizationCode(
-        mockedAuthCode,
-      );
-
-      expect(expectedTokens).toEqual(
-        expect.objectContaining(mockedOAuthTokens),
-      );
-    });
-
-    test("should return a 500 http error if ", async () => {
       expect.assertions(1);
 
       const mockedAuthCode = "foo";
