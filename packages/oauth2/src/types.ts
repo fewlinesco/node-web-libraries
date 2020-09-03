@@ -25,7 +25,6 @@ export type OAuth2ClientConstructor = {
   redirectURI: string;
   audience: string;
   scopes: string[];
-  openIDConfiguration?: OpenIDConfiguration;
 };
 
 export type JWKSDT = {

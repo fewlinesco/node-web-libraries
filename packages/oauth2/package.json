@@ -1,6 +1,6 @@
 {
   "author": "Fewlines",
-  "description": "Oauth2 part of Fewlines Web Libraries",
+  "description": "OAuth2 part of Fewlines Web Libraries",
   "dependencies": {
     "jsonwebtoken": "8.5.1"
   },

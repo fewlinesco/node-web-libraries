@@ -56,6 +56,18 @@ class OAuth2Client {
     }
   }
 
+  private async getJWKS(): Promise<JWKSDT> {
+    await this.setOpenIDConfiguration();
+
+    const JWKS: JWKSDT = await fetch(this.openIDConfiguration.jwks_uri)
+      .then((response) => response.json())
+      .catch((error) => {
+        throw error;
+      });
+
+    return JWKS;
+  }
+
   async getAuthorizationURL(): Promise<URL> {
     await this.setOpenIDConfiguration();
 
@@ -64,9 +76,9 @@ class OAuth2Client {
       scopes_supported,
     } = this.openIDConfiguration;
 
-    const areScopesSupported = this.scopes
-      .filter((scope) => scope !== "openid")
-      .every((scope) => scopes_supported[0].split(" ").includes(scope));
+    const areScopesSupported = this.scopes.every((scope) =>
+      scopes_supported.includes(scope),
+    );
 
     if (!areScopesSupported) {
       throw new ScopesNotSupported("Scopes are not supported");
@@ -83,18 +95,6 @@ class OAuth2Client {
     authorizeURL.searchParams.append("scope", this.scopes.join(" "));
 
     return authorizeURL;
-  }
-
-  private async getJWKS(): Promise<JWKSDT> {
-    await this.setOpenIDConfiguration();
-
-    const JWKS: JWKSDT = await fetch(this.openIDConfiguration.jwks_uri)
-      .then((response) => response.json())
-      .catch((error) => {
-        throw error;
-      });
-
-    return JWKS;
   }
 
   async getTokensFromAuthorizationCode(

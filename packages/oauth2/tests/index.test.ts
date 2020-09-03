@@ -34,7 +34,7 @@ describe("OAuth2Client", () => {
     token_endpoint_auth_methods_supported: [""],
     token_endpoint: "http://mocked-tokens-endpoint.test",
     subject_types_supported: "client_secret_basic",
-    scopes_supported: ["email phone profile"],
+    scopes_supported: ["email", "phone", "openid"],
     response_types_supported: ["code"],
     request_uri: false,
     request_parameter_supported: false,
@@ -153,6 +153,35 @@ describe("OAuth2Client", () => {
     });
 
     test("should return the tokens from connect", async () => {
+      expect.assertions(1);
+
+      const mockedAuthCode = "foo";
+
+      const mockedOAuthTokens = {
+        token_type: "Bearer",
+        scope: "openid email phone",
+        refresh_token: "mockedRefreshToken",
+        id_token: "mockedIdToken",
+        expires_in: 3600,
+        access_token: "mockedAccessToken",
+      };
+
+      fetch
+        .once(JSON.stringify(mockedOpenIdConf))
+        .once(JSON.stringify(mockedOAuthTokens));
+
+      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
+
+      const expectedTokens = await oauthClient.getTokensFromAuthorizationCode(
+        mockedAuthCode,
+      );
+
+      expect(expectedTokens).toEqual(
+        expect.objectContaining(mockedOAuthTokens),
+      );
+    });
+
+    test("should return a 500 http error if ", async () => {
       expect.assertions(1);
 
       const mockedAuthCode = "foo";
