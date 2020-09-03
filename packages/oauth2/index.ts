@@ -68,7 +68,7 @@ class OAuth2Client {
     return JWKS;
   }
 
-  async getAuthorizationURL(state: string): Promise<URL> {
+  async getAuthorizationURL(state?: string): Promise<URL> {
     await this.setOpenIDConfiguration();
 
     const {
@@ -85,7 +85,6 @@ class OAuth2Client {
     }
 
     const authorizeURL = new URL(authorization_endpoint);
-    const redirectState = new URL(state);
 
     authorizeURL.searchParams.append("client_id", this.clientID);
     authorizeURL.searchParams.append("response_type", "code");
@@ -94,7 +93,10 @@ class OAuth2Client {
       encodeURIComponent(decodeURIComponent(this.redirectURI)),
     );
     authorizeURL.searchParams.append("scope", this.scopes.join(" "));
-    authorizeURL.searchParams.append("state", redirectState.toString());
+    authorizeURL.searchParams.append(
+      "state",
+      encodeURIComponent(decodeURIComponent(state)),
+    );
 
     return authorizeURL;
   }
