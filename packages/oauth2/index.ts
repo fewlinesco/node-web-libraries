@@ -93,10 +93,13 @@ class OAuth2Client {
       encodeURIComponent(decodeURIComponent(this.redirectURI)),
     );
     authorizeURL.searchParams.append("scope", this.scopes.join(" "));
-    authorizeURL.searchParams.append(
-      "state",
-      encodeURIComponent(decodeURIComponent(state)),
-    );
+
+    if (state) {
+      authorizeURL.searchParams.append(
+        "state",
+        encodeURIComponent(decodeURIComponent(state)),
+      );
+    }
 
     return authorizeURL;
   }
