@@ -76,7 +76,7 @@ describe("OAuth2Client", () => {
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      await oauthClient.getAuthorizationURL();
+      await oauthClient.getAuthorizationURL("http://foo.bar");
 
       expect(oauthClient.openIDConfiguration).not.toBe(undefined);
       expect(oauthClient.openIDConfiguration).toEqual(
@@ -91,10 +91,10 @@ describe("OAuth2Client", () => {
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      const authURL = await oauthClient.getAuthorizationURL();
+      const authURL = await oauthClient.getAuthorizationURL("http://foo.bar");
 
       const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=mockedRedirectURI&scope=email+phone";
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=mockedRedirectURI&scope=email+phone&state=http%3A%2F%2Ffoo.bar%2F";
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -111,7 +111,7 @@ describe("OAuth2Client", () => {
         scopes: ["github"],
       });
 
-      await oauthClient.getAuthorizationURL().catch((error) => {
+      await oauthClient.getAuthorizationURL("http://foo.bar").catch((error) => {
         expect(error).toBeInstanceOf(ScopesNotSupported);
         expect(error.message).toBe("Scopes are not supported");
       });
