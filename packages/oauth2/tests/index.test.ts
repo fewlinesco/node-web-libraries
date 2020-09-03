@@ -99,6 +99,21 @@ describe("OAuth2Client", () => {
       expect(authURL.href).toMatch(expectedAuthURL);
     });
 
+    test("it should add the state at the end of the query string", async () => {
+      expect.assertions(1);
+
+      fetch.once(JSON.stringify(mockedOpenIdConf));
+
+      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
+
+      const authURL = await oauthClient.getAuthorizationURL("http://foo.bar");
+
+      const expectedAuthURL =
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=mockedRedirectURI&scope=email+phone&state=http%253A%252F%252Ffoo.bar";
+
+      expect(authURL.href).toMatch(expectedAuthURL);
+    });
+
     test("is should throw an error if the provided scopes are not supported", async () => {
       expect.assertions(2);
 

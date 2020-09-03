@@ -41,17 +41,17 @@ The initialized instance of `OAuth2Client` provides the following methods to hel
 
 ### getAuthorizationURL
 
-Return the authorization URL used to start the OAuth2 flow, and retrieve the `authorization_code`.
+```typescript
+async getAuthorizationURL(state?: string): Promise<URL>{}
+```
+
+The OAuth2 flow requires to move out of your application. If you need to keep some sort of state (like a user ID), you can pass said state to the function, which will be be added at the end of the query string. The function returns the authorization URL used to start the OAuth2 flow, and retrieve the `authorization_code`.
 
 ```typescript
-const authURL = await oauthClient.getAuthorizationURL();
+const authURL = await oauthClient.getAuthorizationURL("state");
 ```
 
 ### getTokensFromAuthorizationCode
-
-```typescript
-async getAuthorizationURL(): Promise<URL>{}
-```
 
 ```typescript
 async getTokensFromAuthorizationCode(authorizationCode: string): Promise<string[]>{};
