@@ -3,6 +3,7 @@
 ## 0.1.2 - 2020-09-03
 
 - Added `node-fetch`.
+- Fixed `getTokensFromAuthorizationCode` returned data and type.
 
 ## 0.1.1 - 2020-09-03
 

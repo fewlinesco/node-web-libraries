@@ -1,4 +1,4 @@
-import fetch, { FetchMock } from "jest-fetch-mock";
+import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 
