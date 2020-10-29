@@ -4,9 +4,9 @@ ENV NODE_ENV=development
 
 WORKDIR /app
 
-COPY ../../package.json ./
-COPY ../../yarn.lock ./
-COPY ./ ./packages/migration/
+COPY package.json ./
+COPY yarn.lock ./
+COPY ./packages/migration/ ./packages/migration/
 
 
 RUN yarn --cwd ./packages/migration build
