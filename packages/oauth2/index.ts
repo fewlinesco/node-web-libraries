@@ -1,3 +1,4 @@
+import jose from "jose";
 import jwt from "jsonwebtoken";
 import nodeFetch from "node-fetch";
 
@@ -216,6 +217,16 @@ class OAuth2Client {
         reject(new AlgoNotSupported("Encoding algo not supported"));
       }
     });
+  }
+
+  async decryptAndVerifyJWE<T = unknown>(
+    JWE: string,
+    signatureAlgo: "HS256" | "RS256",
+    privateKey: string,
+  ): Promise<T> {
+    const decryptedJWE = jose.JWE.decrypt(JWE, privateKey).toString();
+
+    return this.verifyJWT(decryptedJWE, signatureAlgo);
   }
 }
 
