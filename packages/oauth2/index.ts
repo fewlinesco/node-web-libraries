@@ -219,14 +219,8 @@ class OAuth2Client {
     });
   }
 
-  async decryptAndVerifyJWE<T = unknown>(
-    JWE: string,
-    signatureAlgo: "HS256" | "RS256",
-    privateKey: string,
-  ): Promise<T> {
-    const decryptedJWE = jose.JWE.decrypt(JWE, privateKey).toString();
-
-    return this.verifyJWT(decryptedJWE, signatureAlgo);
+  decryptJWE(JWE: string, privateKey: string): string {
+    return jose.JWE.decrypt(JWE, privateKey).toString();
   }
 }
 

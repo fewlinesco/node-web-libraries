@@ -2,7 +2,7 @@
   "author": "Fewlines",
   "description": "OAuth2 part of Fewlines Web Libraries",
   "dependencies": {
-    "jose": "^2.0.3",
+    "jose": "2.0.3",
     "jsonwebtoken": "8.5.1",
     "node-fetch": "2.6.0"
   },

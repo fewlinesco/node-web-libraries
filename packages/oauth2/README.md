@@ -71,10 +71,22 @@ const tokens = await oauthClient.getTokensFromAuthorizationCode(
 async verifyJWT<T = unknown>(accessToken: string, algo: string): Promise<T> {};
 ```
 
-Used to verify the JWT (i.e. `access_token`). It provides a series of checks, like audiences, algorithm or public key.
+Used to verify the JWS (i.e. `access_token`). It provides a series of checks, like audiences, algorithm or public key.
 
 ```typescript
-const decoded = await oauthClient.verifyJWT(JWT, "RS256");
+const decoded = await oauthClient.verifyJWT(JWS, "RS256");
+```
+
+### decryptJWE
+
+```typescript
+decryptJWE(JWE: string, privateKey: string): string
+```
+
+Used to decrypt the JWE (i.e. `access_token`), and returns the JWS.
+
+```typescript
+const decrypted = oauthClient.decryptJWE(JWE, privateKey);
 ```
 
 ## Utils
