@@ -1,6 +1,6 @@
-import jose from "jose";
 import jwt from "jsonwebtoken";
 import nodeFetch from "node-fetch";
+import jose from "node-jose";
 
 import {
   MissingJWKSURI,
@@ -219,9 +219,9 @@ class OAuth2Client {
     });
   }
 
-  decryptJWE(JWE: string, privateKey: string): string {
-    return jose.JWE.decrypt(JWE, privateKey).toString();
-  }
+  // decryptJWE(JWE: string, privateKey: string): string {
+  //   return jose.JWE.decrypt(JWE, privateKey).toString();
+  // }
 }
 
 export default OAuth2Client;

@@ -1,6 +1,8 @@
+import crypto from "crypto";
 import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
+import jose from "node-jose";
 
 import OAuth2Client, {
   InvalidAudience,
@@ -10,6 +12,7 @@ import OAuth2Client, {
   ScopesNotSupported,
 } from "../index";
 import { OAuth2ClientConstructor, OpenIDConfiguration } from "../src/types";
+import { jose2 } from "../src/utils/jose2";
 
 enableFetchMocks();
 
@@ -95,7 +98,7 @@ describe("OAuth2Client", () => {
       const authURL = await oauthClient.getAuthorizationURL();
 
       const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%253A%252F%252Fmocked-redirect-url.test&scope=email+phone";
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone";
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -110,7 +113,7 @@ describe("OAuth2Client", () => {
       const authURL = await oauthClient.getAuthorizationURL("http://foo.bar");
 
       const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%253A%252F%252Fmocked-redirect-url.test&scope=email+phone&state=http%253A%252F%252Ffoo.bar";
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone&state=http%3A%2F%2Ffoo.bar";
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -343,21 +346,20 @@ describe("OAuth2Client", () => {
       test("should throw an error if missing key id", async () => {
         expect.assertions(2);
 
-        const mockedPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
-MIICXgIBAAKBgQDLczsmpjj0l4v+iuc/tljZCU7vpqRLfpGPWIpVIiUUfvng2eqa
-0bAysJVnMJatzzza2tsa4OGaXamw6YIgGMoGmeCE0sFkAsY1F6UKp9XsLL4QytC9
-D5RZuiBPvF8+gv5ViMJkpN5eix/Mw0xkW6b9WeT+9gEqKVdl9AfW3iyiFQIDAQAB
-AoGBAJya+6o5g1gLm5B5PZ5Wb7fJKYDhxk/ygntUDU+Q8/f98by6IZPA2x95u9dt
-mF78SfyxQL1E44QemvN6G1c3nbHtPUA661kaRN/QUr4Dw59csuytSpaYXP6RDjem
-U51EIA2ShybKkzRvQE67t4hMPx7q8cfHQ39YzdKXcUFV6qC1AkEA8PqUguzCIrIA
-+5OabpMjJcKveu9RPLC7/Kwh7RwOefvty2VpDjRYR/CcgV3jVFnJ23iQ6qfIBTuE
-5agQX3A0AwJBANghyVur/psj4PDDcdMe2eTK7kJE39m2JddpYv58UzLaay1nAOh7
-g/GMzi9goJqgTXCq8hdUNtukbOLlO/jREgcCQBU1eKytOcjj8cIyk3z35jgEkn03
-Yub8hw8N905vEbcavSsRmdVuNfbe7mdUZBWgcWuniNmeOrR7MI8l44sCzRECQQDA
-YlK6Jv8bWXSA23gWVP/fiENM+cHIKTrF5CkaHdBxE7sTTvyf9FIeURe3VGuhN8+2
-2nNkELJEELhbv3ECqhdBAkEAuHYa4b0ePMj6VvObOJOylfHqPM5NJ19PSxjvq7f8
-J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
------END RSA PRIVATE KEY-----`;
+        const passphrase = "top secret";
+        const { privateKey } = crypto.generateKeyPairSync("rsa", {
+          modulusLength: 2048,
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+            cipher: "aes-256-cbc",
+            passphrase,
+          },
+        });
 
         fetch
           .once(JSON.stringify(mockedOpenIdConf))
@@ -367,7 +369,7 @@ J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
 
         const missingKidJWT = jwt.sign(
           { audience: "fooBar" },
-          mockedPrivateKey,
+          { key: privateKey, passphrase },
           {
             algorithm: RS256,
           },
@@ -399,6 +401,80 @@ J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
           expect(error.message).toBe("Encoding algo not supported");
         });
       });
+    });
+  });
+
+  describe("decryptJWS", () => {
+    const passphraseSignature = "top secret";
+    const { privateKey: privateKeyForSignature } = crypto.generateKeyPairSync(
+      "rsa",
+      {
+        modulusLength: 2048,
+        publicKeyEncoding: {
+          type: "spki",
+          format: "pem",
+        },
+        privateKeyEncoding: {
+          type: "pkcs8",
+          format: "pem",
+          cipher: "aes-256-cbc",
+          passphrase: passphraseSignature,
+        },
+      },
+    );
+
+    const signedJWT = jwt.sign(mockedJWTPayload, privateKeyForSignature);
+
+    const passphrase = "even more top secret";
+    const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
+      modulusLength: 2048,
+      publicKeyEncoding: {
+        type: "spki",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs8",
+        format: "pem",
+        cipher: "aes-256-cbc",
+        passphrase,
+      },
+    });
+
+    test("should ", async () => {
+      const privateKey2 = await jose.JWK.asKey(privateKey, "pkcs8");
+
+      // const { decrypt } = jose2(publicKey2, privateKey2);
+
+      // const JWS2 = await decrypt(JWE);
+
+      // console.log({ JWS2 });
+
+      // const keystore = jose.JWK.createKeyStore();
+      // const key = await jose.JWK.createKey("RSA", 2048, {
+      //   alg: "RSA-OAEP-256",
+      // });
+      // const kid = await keystore
+      //   .add(key.toPEM())
+      //   .then((result: jose.JWK.Key) => result.kid);
+
+      // jose.JWE.createDecrypt(key.toPEM())
+
+      // console.log(keystore.get(kid));
+
+      // const key = await jose.JWK.asKey(rawPrivateKeyForEncryption);
+      // const x = key.toPEM(true);
+      // console.log(x);
+
+      expect(1).toEqual(1);
+      // jose.JWE.createEncrypt(key).update(Buffer.from(signedJWT)).final();
+
+      //     const clearText = "foo";
+
+      //     // const payload =;
+
+      //     // const token = await jose.JWE.createEncrypt(options, key)
+      //     //   .update(payload, "utf8")
+      //     //   .final();
     });
   });
 });

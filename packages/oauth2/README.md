@@ -83,7 +83,7 @@ const decoded = await oauthClient.verifyJWT(JWS, "RS256");
 decryptJWE(JWE: string, privateKey: string): string
 ```
 
-Used to decrypt the JWE (i.e. `access_token`), and returns the JWS.
+Used to decrypt the JWE (i.e. `access_token`), and returns the JWS or the JWT.
 
 ```typescript
 const decrypted = oauthClient.decryptJWE(JWE, privateKey);
