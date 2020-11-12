@@ -6,9 +6,11 @@ import { RunMigrationsConfig } from "../config/config";
 export async function getConfig(
   configPath?: string,
 ): Promise<RunMigrationsConfig> {
-  const cleanConfigPath = path.join(
+  configPath = configPath ? configPath : "./config.json";
+
+  const cleanConfigPath = path.isAbsolute ? configPath : path.join(
     process.cwd(),
-    configPath ? configPath : "./config.json",
+    configPath
   );
 
   return fs.promises.readFile(cleanConfigPath, "utf8").then(JSON.parse);

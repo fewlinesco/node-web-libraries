@@ -1,4 +1,5 @@
 import * as database from "@fwl/database";
+import * as path from "path";
 
 import { createSchemaMigrationsTable } from "../utils/createSchemaMigrationsTable";
 import { getConfig } from "../utils/getConfig";
@@ -77,6 +78,30 @@ describe("getConfig", () => {
     expect.assertions(1);
 
     const config = await getConfig("./test/config.json");
+
+    const testConfig = {
+      database: {
+        database: "fwl_db",
+        password: "fwl_db",
+        username: "fwl_db",
+        host: "localhost",
+        port: 5432,
+      },
+      http: { port: 50100 },
+      tracing: { serviceName: "" },
+      migration: { dirPath: "./test/migrations" },
+    };
+
+    expect(config).toEqual(testConfig);
+
+    done();
+  });
+
+  it("can get the config from an absolute path", async (done) => {
+    expect.assertions(1);
+    const configPath = path.join(process.cwd(), "/test/config.json");
+
+    const config = await getConfig(configPath);
 
     const testConfig = {
       database: {
