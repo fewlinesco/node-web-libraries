@@ -18,9 +18,8 @@ jest.mock("../utils/getConfig", () => {
   };
 });
 
-let db: database.DatabaseQueryRunnerWithoutTracing;
 beforeAll(async () => {
-  db = database.connectWithoutTracing({
+  const db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
@@ -38,7 +37,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  db = database.connectWithoutTracing({
+  const db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
@@ -50,6 +49,7 @@ afterAll(async () => {
   await db.query("DROP TABLE IF EXISTS posts");
   await db.query("DROP TABLE IF EXISTS rogues");
   await db.query("DROP TABLE IF EXISTS users");
+  await db.query("DROP TABLE IF EXISTS good");
 
   await db.close();
 });
@@ -222,7 +222,10 @@ describe("runMigrations", () => {
 
     await fs.promises
       .appendFile(`${targetDir + "/" + fileName}`, `${queryContent}`)
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        throw error
+      });
 
     await dryRunPendingMigrations(config);
 
@@ -267,7 +270,7 @@ describe("runMigrations", () => {
 
     await fs.promises
       .unlink(`${config.migration.dirPath}/${fileName}`)
-      .catch((error) => console.log(error));
+      .catch((error) => fail(error));
 
     done();
   });
