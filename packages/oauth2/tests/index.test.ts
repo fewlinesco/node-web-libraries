@@ -12,7 +12,6 @@ import OAuth2Client, {
   ScopesNotSupported,
 } from "../index";
 import { OAuth2ClientConstructor, OpenIDConfiguration } from "../src/types";
-import { jose2 } from "../src/utils/jose2";
 
 enableFetchMocks();
 
@@ -404,11 +403,34 @@ describe("OAuth2Client", () => {
     });
   });
 
-  describe("decryptJWS", () => {
-    const passphraseSignature = "top secret";
-    const { privateKey: privateKeyForSignature } = crypto.generateKeyPairSync(
-      "rsa",
-      {
+  describe("decrypt JWE", () => {
+    test("it should correctly decrypt JWE based on a JWS", async () => {
+      expect.assertions(1);
+
+      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
+
+      const passphraseSignature = "top secret";
+      const { privateKey: privateKeyForSignature } = crypto.generateKeyPairSync(
+        "rsa",
+        {
+          modulusLength: 2048,
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+            cipher: "aes-256-cbc",
+            passphrase: passphraseSignature,
+          },
+        },
+      );
+
+      const {
+        publicKey: publicKeyForEncryption,
+        privateKey: privateKeyForEncryption,
+      } = crypto.generateKeyPairSync("rsa", {
         modulusLength: 2048,
         publicKeyEncoding: {
           type: "spki",
@@ -417,64 +439,89 @@ describe("OAuth2Client", () => {
         privateKeyEncoding: {
           type: "pkcs8",
           format: "pem",
-          cipher: "aes-256-cbc",
-          passphrase: passphraseSignature,
         },
-      },
-    );
+      });
 
-    const signedJWT = jwt.sign(mockedJWTPayload, privateKeyForSignature);
+      const mockedSignedJWT = jwt.sign(
+        mockedJWTPayload,
+        privateKeyForSignature,
+      );
 
-    const passphrase = "even more top secret";
-    const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-      modulusLength: 2048,
-      publicKeyEncoding: {
-        type: "spki",
-        format: "pem",
-      },
-      privateKeyEncoding: {
-        type: "pkcs8",
-        format: "pem",
-        cipher: "aes-256-cbc",
-        passphrase,
-      },
+      const josePublicKeyForEncryption = await jose.JWK.asKey(
+        publicKeyForEncryption,
+        "pem",
+      );
+
+      const mockedJWEWithJWS = await jose.JWE.createEncrypt(
+        { format: "compact" },
+        josePublicKeyForEncryption,
+      )
+        .update(Buffer.from(mockedSignedJWT))
+        .final();
+
+      const decryptedMockedJWEWithJWS = await oauthClient.decryptJWE(
+        mockedJWEWithJWS,
+        privateKeyForEncryption,
+        true,
+      );
+
+      expect(decryptedMockedJWEWithJWS).toStrictEqual(mockedSignedJWT);
     });
 
-    test("should ", async () => {
-      const privateKey2 = await jose.JWK.asKey(privateKey, "pkcs8");
+    test("it should correctly decrypt a JWE based on non-signed JWT", async () => {
+      expect.assertions(1);
 
-      // const { decrypt } = jose2(publicKey2, privateKey2);
+      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      // const JWS2 = await decrypt(JWE);
+      const mockedAccessTokenClearPayload = {
+        exp: 1605010807,
+        iss: "fewlines",
+        sub: "3dafcd27-a3a8-4a7e-81a3-9dd4cea44cfb",
+        aud: ["fenn"],
+        scope: "openid phone email",
+      };
+      const mockedJWEAccessToken =
+        "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4R0NNIn0.w4eo3k66Kr20CVrUQYDCgIR9ZFTFmbdtHvCGEGEYqQt3xJKo1zDT8nrkApHBTWgpg09BrvToBcHYhpZSCV9dbMSzjPWvjNlQTr5f7lOQ4Q34MQaCmH3LWr5toCYGl9iXJLolpW-r9vQNuwJIoYIinycXYJMCMgT72miKbHC66qJf1YoOgOqC9fc8E4V79fYuAaLmalEncqJHTn_u67e5qEZNqRrgFlxd4b9IPhMuRmaP3OICvtSFBIuFH64gVke6ckOwK-mGIIA-qQzwgkZrWnddmIMWKhSR7CwtXzKY46alHJrN1pvaAHBVqHCKi3JtBL_sCtpVZXHfCmhBqWcW2A.vxelVyonD7vTWBYX.yz7wOYxlwTRGeuABqlQ110Sw28nFsHjBig9kwyGFz4D6fqjrY_6mM2fYBZDbPuviumQifJ3vDvilV4dkIXJ9csSEgLlaLOK043kpT2T-2_XFnxdG7sfBHRimsg_ag889OjdZiGT4hMK-K_0lyZ8dOTHgcRMpLApX_s8Cog.kxPk7co7dttJ9l9ZrKxV9g";
 
-      // console.log({ JWS2 });
+      const mockedPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+        MIIEogIBAAKCAQEAyI/9q9TjkglfDJebAjC5vt6HFZYthcU2rc2/4bIETIUkwDcf
+        PoTrSFarccZ9pl9bAXlMfKhc6LcRB6XcBWACeDoblbgMzaZ/4rTUGrReUHB0HpmZ
+        kyXDkN8iezTNG2gKRhVrS2rjlpLKMIDKVfG/xXsNQmT4iVs07MBSJToTKT2lIzbE
+        u4sEZz9GUhwffeKBmh3uxX+ELxpp++eShD3pGPo5l3mkozEYRpa5tK2aXHfgNm1+
+        KLkWq9uNd+msj/4lC0AxQ5a8re4z5zP2IJoN9buJqvV7e8lpKoAPJ76jcBEEeZBD
+        LNvP+ZXcSRkhj6l/cJjYgQcr8DtoJ97F0MWlywIDAQABAoIBABCP837RIcnZhEPh
+        8ScJJw2gCr+5myDE3HMV3pagwMIg7JwC8U2UZGmg3p+SqKWokjdY8PwKW0HMfFeJ
+        VtYKy6lqAwUmIciJy13JWQqrgm5aGvy76nbAU5oPEyXhgl6VBOQsuKONvCWfEZtX
+        x125jQCd3MZy2CNfqMs0RpRUa2ioTSI2JWJnqsYuNEHysgCL9+jtEqDm62Qmp4nG
+        F02+EZilu8wM5XOKkv7Q/zsSimjTP5rXxAVhvlUvsJGTj67fFRnoY4LmAkSramgO
+        CHgvb3+GjiCbu4WFFf06P89dvt5Q6OtjWJEojmgbrrmjk9ccBtD4wtIS/JfbuIMF
+        jnDVMqECgYEA4pyN9pQGuXutEYZ4wAi8FR++ruNbPscuorUID/uW137H3oTuLXig
+        L2u64F7JQ9692sXfecmL53goY2+qSNo7xdfBSoF0q8MLlWL0VhU6S9vYHqa2TjDX
+        WPzNuQWIlxWzKTUVj0Jfw5TBbri+PaTn4hMEPCqkzbdW2sK4XZ0zU+cCgYEA4pKd
+        F+t825Prxqsky1e6vfwfgdLuhZeBRLPHzssAB0GtsvhmsBj36JmU/OdPXDKIPShO
+        fx0/jRmuureja+uNlXUUsBxQXfz4O5XS/otIsI3GxO415kezRNvB/eLAogO4JTvz
+        zH1B+1VnsBpealFQYGSZ6xqCN94OunyDnjPHIn0CgYBQPasvEr9G0no36Gu9Y9pl
+        iHYWqz7V/eWPi5atQiLpb2UKb/t+cmYWJIlphWay9542ZzZ4g1tcvPlgLFwZq9za
+        c0loPmq3nzrszLtD+ARKdDAUumd3TGgUhH+78i+pf++OudNGhPQv5u6PbC9A2LGb
+        JaysOVVd2nuQvr5Vt6JDJQKBgGwU4omJlXstmhighaHWzMdaYTFODOh/eHPsixEz
+        t2S+yPyKEHpKvuAfe3oVYb8qf+EkvCVZL3rA2KBLf9K4gEbenirQpunfBg9ujkNM
+        8DUAvOQuelnKtFLRvj29kIT43zwr2EYhLnuVpyvTuFxhQ8Vn2CDV+W5rKH1/bk3m
+        h0UFAoGAOWOocpeq5LpV0IYjvGUqPol/eVLU8TjHcesPbRpyYGPx6GgG2yFAtvQT
+        q/PrBnwqO+Qfe+TRkMPuCpvUFwZq7ytKlPiBCV5LqdmhoouZtA9fCulK47kwRQQt
+        8GdyvRZzfC3P2vdaezSk3Wv3bqhXmu7R4JXx+jFg1mao/i+BwfM=
+        -----END RSA PRIVATE KEY-----`;
 
-      // const keystore = jose.JWK.createKeyStore();
-      // const key = await jose.JWK.createKey("RSA", 2048, {
-      //   alg: "RSA-OAEP-256",
-      // });
-      // const kid = await keystore
-      //   .add(key.toPEM())
-      //   .then((result: jose.JWK.Key) => result.kid);
+      const decryptedMockedJWEAccessToken = await oauthClient.decryptJWE(
+        mockedJWEAccessToken,
+        mockedPrivateKey,
+        false,
+      );
 
-      // jose.JWE.createDecrypt(key.toPEM())
-
-      // console.log(keystore.get(kid));
-
-      // const key = await jose.JWK.asKey(rawPrivateKeyForEncryption);
-      // const x = key.toPEM(true);
-      // console.log(x);
-
-      expect(1).toEqual(1);
-      // jose.JWE.createEncrypt(key).update(Buffer.from(signedJWT)).final();
-
-      //     const clearText = "foo";
-
-      //     // const payload =;
-
-      //     // const token = await jose.JWE.createEncrypt(options, key)
-      //     //   .update(payload, "utf8")
-      //     //   .final();
+      if (typeof decryptedMockedJWEAccessToken !== "string") {
+        expect(decryptedMockedJWEAccessToken.iss).toStrictEqual(
+          mockedAccessTokenClearPayload.iss,
+        );
+      }
     });
   });
 });

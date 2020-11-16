@@ -44,3 +44,11 @@ export type OAuth2Tokens = {
   access_token: string;
   id_token?: string;
 };
+
+export type JWTClaims = {
+  iss: string;
+  sub: string;
+  aud: string[];
+  exp: number;
+  scope: string;
+};
