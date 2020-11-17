@@ -515,11 +515,10 @@ describe("OAuth2Client", () => {
         iss: string;
       }>(mockedJWEAccessToken, mockedPrivateKey, false);
 
-      if (typeof decryptedMockedJWEAccessToken !== "string") {
-        expect(decryptedMockedJWEAccessToken.iss).toStrictEqual(
-          mockedAccessTokenClearPayload.iss,
-        );
-      }
+      expect(decryptedMockedJWEAccessToken.iss).toStrictEqual(
+        mockedAccessTokenClearPayload.iss,
+      );
+      
     });
   });
 });
