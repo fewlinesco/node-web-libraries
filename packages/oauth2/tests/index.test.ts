@@ -459,7 +459,7 @@ describe("OAuth2Client", () => {
         .update(Buffer.from(mockedSignedJWT))
         .final();
 
-      const decryptedMockedJWEWithJWS = await oauthClient.decryptJWE(
+      const decryptedMockedJWEWithJWS = await oauthClient.decryptJWE<string>(
         mockedJWEWithJWS,
         privateKeyForEncryption,
         true,
@@ -511,11 +511,9 @@ describe("OAuth2Client", () => {
         8GdyvRZzfC3P2vdaezSk3Wv3bqhXmu7R4JXx+jFg1mao/i+BwfM=
         -----END RSA PRIVATE KEY-----`;
 
-      const decryptedMockedJWEAccessToken = await oauthClient.decryptJWE(
-        mockedJWEAccessToken,
-        mockedPrivateKey,
-        false,
-      );
+      const decryptedMockedJWEAccessToken = await oauthClient.decryptJWE<{
+        iss: string;
+      }>(mockedJWEAccessToken, mockedPrivateKey, false);
 
       if (typeof decryptedMockedJWEAccessToken !== "string") {
         expect(decryptedMockedJWEAccessToken.iss).toStrictEqual(

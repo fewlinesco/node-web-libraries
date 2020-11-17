@@ -15,7 +15,6 @@ import {
   OAuth2ClientConstructor,
   JWKSDT,
   OAuth2Tokens,
-  JWTClaims,
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
@@ -220,7 +219,7 @@ class OAuth2Client {
     });
   }
 
-  async decryptJWE<T = JWTClaims | string>(
+  async decryptJWE<T = unknown>(
     JWE: string,
     privateKey: string,
     isSigned: boolean,
@@ -234,8 +233,7 @@ class OAuth2Client {
     const { payload } = decryptedJWEToken;
 
     if (isSigned) {
-      const JWS: unknown = payload.toString();
-      return JWS as T;
+      return (payload.toString() as unknown) as T;
     } else {
       return JSON.parse(payload.toString()) as T;
     }
