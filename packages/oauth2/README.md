@@ -88,9 +88,15 @@ Used to decrypt the JWE (i.e. `access_token`), and returns the JWS or the JWT.
 The `privateKey` argument should be in PEM format.
 
 ```typescript
-const decrypted =
-  oauthClient.decryptJWE < string ||
-  { [key]: string } > (JWE, privateKey, true);
+// Signed JWE
+const decrypted = oauthClient.decryptJWE<string>(JWE, privateKey, true);
+
+// Un-signed JWE
+const decrypted = oauthClient.decryptJWE<{ [key: string]: string }>(
+  JWE,
+  privateKey,
+  false
+);
 ```
 
 ## Utils
