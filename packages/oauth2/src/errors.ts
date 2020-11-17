@@ -9,5 +9,3 @@ export class AlgoNotSupported extends Error {}
 export class InvalidAudience extends Error {}
 
 export class ScopesNotSupported extends Error {}
-
-export class WrongPrivateKey extends Error {}
