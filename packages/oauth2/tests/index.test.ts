@@ -1,6 +1,8 @@
+import crypto from "crypto";
 import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
+import jose from "node-jose";
 
 import OAuth2Client, {
   InvalidAudience,
@@ -95,7 +97,7 @@ describe("OAuth2Client", () => {
       const authURL = await oauthClient.getAuthorizationURL();
 
       const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%253A%252F%252Fmocked-redirect-url.test&scope=email+phone";
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone";
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -110,7 +112,7 @@ describe("OAuth2Client", () => {
       const authURL = await oauthClient.getAuthorizationURL("http://foo.bar");
 
       const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%253A%252F%252Fmocked-redirect-url.test&scope=email+phone&state=http%253A%252F%252Ffoo.bar";
+        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone&state=http%3A%2F%2Ffoo.bar";
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -343,21 +345,20 @@ describe("OAuth2Client", () => {
       test("should throw an error if missing key id", async () => {
         expect.assertions(2);
 
-        const mockedPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
-MIICXgIBAAKBgQDLczsmpjj0l4v+iuc/tljZCU7vpqRLfpGPWIpVIiUUfvng2eqa
-0bAysJVnMJatzzza2tsa4OGaXamw6YIgGMoGmeCE0sFkAsY1F6UKp9XsLL4QytC9
-D5RZuiBPvF8+gv5ViMJkpN5eix/Mw0xkW6b9WeT+9gEqKVdl9AfW3iyiFQIDAQAB
-AoGBAJya+6o5g1gLm5B5PZ5Wb7fJKYDhxk/ygntUDU+Q8/f98by6IZPA2x95u9dt
-mF78SfyxQL1E44QemvN6G1c3nbHtPUA661kaRN/QUr4Dw59csuytSpaYXP6RDjem
-U51EIA2ShybKkzRvQE67t4hMPx7q8cfHQ39YzdKXcUFV6qC1AkEA8PqUguzCIrIA
-+5OabpMjJcKveu9RPLC7/Kwh7RwOefvty2VpDjRYR/CcgV3jVFnJ23iQ6qfIBTuE
-5agQX3A0AwJBANghyVur/psj4PDDcdMe2eTK7kJE39m2JddpYv58UzLaay1nAOh7
-g/GMzi9goJqgTXCq8hdUNtukbOLlO/jREgcCQBU1eKytOcjj8cIyk3z35jgEkn03
-Yub8hw8N905vEbcavSsRmdVuNfbe7mdUZBWgcWuniNmeOrR7MI8l44sCzRECQQDA
-YlK6Jv8bWXSA23gWVP/fiENM+cHIKTrF5CkaHdBxE7sTTvyf9FIeURe3VGuhN8+2
-2nNkELJEELhbv3ECqhdBAkEAuHYa4b0ePMj6VvObOJOylfHqPM5NJ19PSxjvq7f8
-J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
------END RSA PRIVATE KEY-----`;
+        const passphrase = "top secret";
+        const { privateKey } = crypto.generateKeyPairSync("rsa", {
+          modulusLength: 2048,
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+            cipher: "aes-256-cbc",
+            passphrase,
+          },
+        });
 
         fetch
           .once(JSON.stringify(mockedOpenIdConf))
@@ -367,7 +368,7 @@ J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
 
         const missingKidJWT = jwt.sign(
           { audience: "fooBar" },
-          mockedPrivateKey,
+          { key: privateKey, passphrase },
           {
             algorithm: RS256,
           },
@@ -399,6 +400,125 @@ J9d/f9cP2lDcoNbRxMkVbeJqZE+0SYmeo8FzXUZT+9ryQA==
           expect(error.message).toBe("Encoding algo not supported");
         });
       });
+    });
+  });
+
+  describe("decrypt JWE", () => {
+    test("it should correctly decrypt JWE based on a JWS", async () => {
+      expect.assertions(1);
+
+      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
+
+      const passphraseSignature = "top secret";
+      const { privateKey: privateKeyForSignature } = crypto.generateKeyPairSync(
+        "rsa",
+        {
+          modulusLength: 2048,
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+            cipher: "aes-256-cbc",
+            passphrase: passphraseSignature,
+          },
+        },
+      );
+
+      const {
+        publicKey: publicKeyForEncryption,
+        privateKey: privateKeyForEncryption,
+      } = crypto.generateKeyPairSync("rsa", {
+        modulusLength: 2048,
+        publicKeyEncoding: {
+          type: "spki",
+          format: "pem",
+        },
+        privateKeyEncoding: {
+          type: "pkcs8",
+          format: "pem",
+        },
+      });
+
+      const mockedSignedJWT = jwt.sign(
+        mockedJWTPayload,
+        privateKeyForSignature,
+      );
+
+      const josePublicKeyForEncryption = await jose.JWK.asKey(
+        publicKeyForEncryption,
+        "pem",
+      );
+
+      const mockedJWEWithJWS = await jose.JWE.createEncrypt(
+        { format: "compact" },
+        josePublicKeyForEncryption,
+      )
+        .update(Buffer.from(mockedSignedJWT))
+        .final();
+
+      const decryptedMockedJWEWithJWS = await oauthClient.decryptJWE<string>(
+        mockedJWEWithJWS,
+        privateKeyForEncryption,
+        true,
+      );
+
+      expect(decryptedMockedJWEWithJWS).toStrictEqual(mockedSignedJWT);
+    });
+
+    test("it should correctly decrypt a JWE based on non-signed JWT", async () => {
+      expect.assertions(1);
+
+      const oauthClient = new OAuth2Client(oauthClientConstructorProps);
+
+      const mockedAccessTokenClearPayload = {
+        exp: 1605010807,
+        iss: "fewlines",
+        sub: "3dafcd27-a3a8-4a7e-81a3-9dd4cea44cfb",
+        aud: ["fenn"],
+        scope: "openid phone email",
+      };
+      const mockedJWEAccessToken =
+        "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4R0NNIn0.w4eo3k66Kr20CVrUQYDCgIR9ZFTFmbdtHvCGEGEYqQt3xJKo1zDT8nrkApHBTWgpg09BrvToBcHYhpZSCV9dbMSzjPWvjNlQTr5f7lOQ4Q34MQaCmH3LWr5toCYGl9iXJLolpW-r9vQNuwJIoYIinycXYJMCMgT72miKbHC66qJf1YoOgOqC9fc8E4V79fYuAaLmalEncqJHTn_u67e5qEZNqRrgFlxd4b9IPhMuRmaP3OICvtSFBIuFH64gVke6ckOwK-mGIIA-qQzwgkZrWnddmIMWKhSR7CwtXzKY46alHJrN1pvaAHBVqHCKi3JtBL_sCtpVZXHfCmhBqWcW2A.vxelVyonD7vTWBYX.yz7wOYxlwTRGeuABqlQ110Sw28nFsHjBig9kwyGFz4D6fqjrY_6mM2fYBZDbPuviumQifJ3vDvilV4dkIXJ9csSEgLlaLOK043kpT2T-2_XFnxdG7sfBHRimsg_ag889OjdZiGT4hMK-K_0lyZ8dOTHgcRMpLApX_s8Cog.kxPk7co7dttJ9l9ZrKxV9g";
+
+      const mockedPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+        MIIEogIBAAKCAQEAyI/9q9TjkglfDJebAjC5vt6HFZYthcU2rc2/4bIETIUkwDcf
+        PoTrSFarccZ9pl9bAXlMfKhc6LcRB6XcBWACeDoblbgMzaZ/4rTUGrReUHB0HpmZ
+        kyXDkN8iezTNG2gKRhVrS2rjlpLKMIDKVfG/xXsNQmT4iVs07MBSJToTKT2lIzbE
+        u4sEZz9GUhwffeKBmh3uxX+ELxpp++eShD3pGPo5l3mkozEYRpa5tK2aXHfgNm1+
+        KLkWq9uNd+msj/4lC0AxQ5a8re4z5zP2IJoN9buJqvV7e8lpKoAPJ76jcBEEeZBD
+        LNvP+ZXcSRkhj6l/cJjYgQcr8DtoJ97F0MWlywIDAQABAoIBABCP837RIcnZhEPh
+        8ScJJw2gCr+5myDE3HMV3pagwMIg7JwC8U2UZGmg3p+SqKWokjdY8PwKW0HMfFeJ
+        VtYKy6lqAwUmIciJy13JWQqrgm5aGvy76nbAU5oPEyXhgl6VBOQsuKONvCWfEZtX
+        x125jQCd3MZy2CNfqMs0RpRUa2ioTSI2JWJnqsYuNEHysgCL9+jtEqDm62Qmp4nG
+        F02+EZilu8wM5XOKkv7Q/zsSimjTP5rXxAVhvlUvsJGTj67fFRnoY4LmAkSramgO
+        CHgvb3+GjiCbu4WFFf06P89dvt5Q6OtjWJEojmgbrrmjk9ccBtD4wtIS/JfbuIMF
+        jnDVMqECgYEA4pyN9pQGuXutEYZ4wAi8FR++ruNbPscuorUID/uW137H3oTuLXig
+        L2u64F7JQ9692sXfecmL53goY2+qSNo7xdfBSoF0q8MLlWL0VhU6S9vYHqa2TjDX
+        WPzNuQWIlxWzKTUVj0Jfw5TBbri+PaTn4hMEPCqkzbdW2sK4XZ0zU+cCgYEA4pKd
+        F+t825Prxqsky1e6vfwfgdLuhZeBRLPHzssAB0GtsvhmsBj36JmU/OdPXDKIPShO
+        fx0/jRmuureja+uNlXUUsBxQXfz4O5XS/otIsI3GxO415kezRNvB/eLAogO4JTvz
+        zH1B+1VnsBpealFQYGSZ6xqCN94OunyDnjPHIn0CgYBQPasvEr9G0no36Gu9Y9pl
+        iHYWqz7V/eWPi5atQiLpb2UKb/t+cmYWJIlphWay9542ZzZ4g1tcvPlgLFwZq9za
+        c0loPmq3nzrszLtD+ARKdDAUumd3TGgUhH+78i+pf++OudNGhPQv5u6PbC9A2LGb
+        JaysOVVd2nuQvr5Vt6JDJQKBgGwU4omJlXstmhighaHWzMdaYTFODOh/eHPsixEz
+        t2S+yPyKEHpKvuAfe3oVYb8qf+EkvCVZL3rA2KBLf9K4gEbenirQpunfBg9ujkNM
+        8DUAvOQuelnKtFLRvj29kIT43zwr2EYhLnuVpyvTuFxhQ8Vn2CDV+W5rKH1/bk3m
+        h0UFAoGAOWOocpeq5LpV0IYjvGUqPol/eVLU8TjHcesPbRpyYGPx6GgG2yFAtvQT
+        q/PrBnwqO+Qfe+TRkMPuCpvUFwZq7ytKlPiBCV5LqdmhoouZtA9fCulK47kwRQQt
+        8GdyvRZzfC3P2vdaezSk3Wv3bqhXmu7R4JXx+jFg1mao/i+BwfM=
+        -----END RSA PRIVATE KEY-----`;
+
+      const decryptedMockedJWEAccessToken = await oauthClient.decryptJWE<{
+        iss: string;
+      }>(mockedJWEAccessToken, mockedPrivateKey, false);
+
+      expect(decryptedMockedJWEAccessToken.iss).toStrictEqual(
+        mockedAccessTokenClearPayload.iss,
+      );
+      
     });
   });
 });
