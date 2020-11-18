@@ -518,7 +518,6 @@ describe("OAuth2Client", () => {
       expect(decryptedMockedJWEAccessToken.iss).toStrictEqual(
         mockedAccessTokenClearPayload.iss,
       );
-      
     });
   });
 });
