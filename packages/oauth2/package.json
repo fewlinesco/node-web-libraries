@@ -3,7 +3,8 @@
   "description": "OAuth2 part of Fewlines Web Libraries",
   "dependencies": {
     "jsonwebtoken": "8.5.1",
-    "node-fetch": "2.6.0"
+    "node-fetch": "2.6.0",
+    "node-jose": "2.0.0"
   },
   "devDependencies": {
     "@fewlines/eslint-config": "3.0.0",
@@ -11,6 +12,7 @@
     "@types/jsonwebtoken": "8.5.0",
     "@types/node": "14.0.26",
     "@types/node-fetch": "2.5.7",
+    "@types/node-jose": "1.1.5",
     "@typescript-eslint/eslint-plugin": "3.7.0",
     "@typescript-eslint/parser": "3.7.0",
     "eslint": "7.5.0",
@@ -54,7 +56,7 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/fewlinesco/node-web-libraries/tree/master/packages/oauth2"
