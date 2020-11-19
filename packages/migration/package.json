@@ -43,7 +43,7 @@
     "prepare": "yarn build",
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "bin": {
     "migration": "dist/runCli.js"

@@ -23,4 +23,4 @@ COPY --from=build /app/packages/migration/node_modules/ ./packages/migration/nod
 
 RUN chmod +x ./packages/migration/dist/runCli.js
 
-ENTRYPOINT ["/app/packages/migration/dist/runCli.js"]
+ENTRYPOINT ["node", "--unhandled-rejections=strict" ,"/app/packages/migration/dist/runCli.js"]
