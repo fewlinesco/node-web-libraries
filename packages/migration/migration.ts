@@ -2,8 +2,9 @@ import * as database from "@fwl/database";
 import * as fs from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { config } from "yargs";
 
-import { RunMigrationsConfig } from "./config/config";
+import { MigrateConfig, RunMigrationsConfig } from "./config/config";
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { createTimestamp } from "./utils/createTimestamp";
 import { getConfig } from "./utils/getConfig";
@@ -68,12 +69,12 @@ export async function runMigrations(
   databaseQueryRunner.close();
 }
 
-export async function createMigrationFile(name: string): Promise<string> {
-  const config = await getConfig();
+export async function createMigrationFile(name: string, migrationPath?: string): Promise<string> {
+  const configuredPath = migrationPath ? migrationPath : "./migrations"
 
-  const targetDir = path.join(
+  const targetDir = path.isAbsolute(configuredPath) ? configuredPath : path.join(
     process.cwd(),
-    config ? config.migration.dirPath : "./migrations",
+    configuredPath
   );
 
   const fileName = `${createTimestamp(new Date())}-${name}.sql`;
@@ -124,16 +125,18 @@ export async function dryRunPendingMigrations(
           INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
           [uuidv4(), timestamp, fileName, query],
         );
-        throw new Error("Rollback");
       }
+
+      throw new Error("Rollback");
     });
   } catch (error) {
+    await databaseQueryRunner.close()
     if (error.message === "Rollback") {
       console.log("Migration dry run success !");
-      return;
+      return
     }
     throw error;
   }
 
-  databaseQueryRunner.close();
+  return databaseQueryRunner.close();
 }
