@@ -2,6 +2,7 @@ import { DatabaseConfig } from "@fwl/database";
 
 export interface MigrateConfig {
   dirPath: string;
+  tableName?: string;
 }
 
 export interface RunMigrationsConfig {

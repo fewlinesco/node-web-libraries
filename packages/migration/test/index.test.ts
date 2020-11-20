@@ -18,7 +18,7 @@ jest.mock("../utils/getConfig", () => {
   };
 });
 
-beforeAll(async () => {
+beforeEach(async () => {
   const db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
@@ -36,7 +36,7 @@ beforeAll(async () => {
   await db.close();
 });
 
-afterAll(async () => {
+afterEach(async () => {
   const db = database.connectWithoutTracing({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
@@ -45,6 +45,7 @@ afterAll(async () => {
     port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
   });
   await db.query("DROP TABLE IF EXISTS schema_migrations");
+  await db.query("DROP TABLE IF EXISTS custom_schema_migrations");
   await db.query("DROP TABLE IF EXISTS profiles");
   await db.query("DROP TABLE IF EXISTS posts");
   await db.query("DROP TABLE IF EXISTS rogues");
@@ -92,6 +93,44 @@ describe("runMigrations", () => {
       try {
         const schemaMigrationsTable = await client.query(
           "SELECT * FROM schema_migrations",
+        );
+        const usersTable = await client.query("SELECT * FROM users");
+        const profilesTable = await client.query("SELECT * FROM profiles");
+        const postsTable = await client.query("SELECT * FROM posts");
+
+        expect(schemaMigrationsTable.rows.length).toBe(3);
+        expect(usersTable.rows.length).toBe(0);
+        expect(profilesTable.rows.length).toBe(0);
+        expect(postsTable.rows.length).toBe(0);
+
+        return [schemaMigrationsTable, usersTable, profilesTable, postsTable];
+      } catch (error) {
+        expect(error).not.toBeDefined();
+      }
+    });
+
+    expect(dbTables.length).toEqual(4);
+
+    await db.close();
+
+    done();
+  });
+
+  it("does each migrations in  a custom table if configured", async (done) => {
+    expect.assertions(5);
+
+    const config = await getConfig("./test/config.json");
+
+    config.migration.tableName = "custom_schema_migrations"
+
+    await runMigrations(config);
+
+    const db = database.connectWithoutTracing(config.database);
+
+    const dbTables = await db.transaction(async (client) => {
+      try {
+        const schemaMigrationsTable = await client.query(
+          "SELECT * FROM custom_schema_migrations",
         );
         const usersTable = await client.query("SELECT * FROM users");
         const profilesTable = await client.query("SELECT * FROM profiles");

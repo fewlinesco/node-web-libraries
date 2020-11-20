@@ -15,7 +15,7 @@ beforeAll(async (done) => {
     port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
   });
 
-  await createSchemaMigrationsTable(db);
+  await createSchemaMigrationsTable(db, "schema_migrations");
 
   done();
 });

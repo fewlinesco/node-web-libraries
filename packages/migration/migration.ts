@@ -1,13 +1,12 @@
 import * as database from "@fwl/database";
+import { table } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
-import { config } from "yargs";
 
-import { MigrateConfig, RunMigrationsConfig } from "./config/config";
+import { RunMigrationsConfig } from "./config/config";
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { createTimestamp } from "./utils/createTimestamp";
-import { getConfig } from "./utils/getConfig";
 import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
 
@@ -33,14 +32,14 @@ export async function runMigrations(
   );
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
-
+  const tableName = config.migration.tableName || "schema_migrations";
   try {
     const queries = await getQueries(sqlMigrationsFolder);
 
-    await createSchemaMigrationsTable(databaseQueryRunner);
+    await createSchemaMigrationsTable(databaseQueryRunner, tableName);
 
     const { rows } = await databaseQueryRunner.query(
-      "SELECT * FROM schema_migrations ORDER BY created_at DESC",
+      `SELECT * FROM ${tableName} ORDER BY created_at DESC`,
     );
 
     const pendingMigrations = rows
@@ -53,7 +52,7 @@ export async function runMigrations(
           await client.query(query);
 
           await client.query(
-            `INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+            `INSERT INTO ${tableName} (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
             [uuidv4(), timestamp, fileName, query],
           );
         } catch (error) {
@@ -102,14 +101,15 @@ export async function dryRunPendingMigrations(
   );
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
+  const tableName = config.migration.tableName || "schema_migrations"
 
   try {
     const queries = await getQueries(sqlMigrationsFolder);
 
-    await createSchemaMigrationsTable(databaseQueryRunner);
+    await createSchemaMigrationsTable(databaseQueryRunner, tableName);
 
     const { rows } = await databaseQueryRunner.query(
-      `SELECT * FROM schema_migrations ORDER BY created_at DESC`,
+      `SELECT * FROM ${tableName} ORDER BY created_at DESC`,
     );
 
     const pendingMigrations = rows
@@ -122,7 +122,7 @@ export async function dryRunPendingMigrations(
 
         await client.query(
           `
-          INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+          INSERT INTO ${tableName} (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
           [uuidv4(), timestamp, fileName, query],
         );
       }

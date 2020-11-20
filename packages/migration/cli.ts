@@ -43,7 +43,7 @@ const migrateCommand = {
   handler: (argv) => {
     const overrides = {
       database: argv.databaseURL ? parseDatabaseURL(argv.databaseURL) : undefined,
-      migration: {dirPath: }
+      migration: {dirPath: argv.migrationsPath}
     }
     return  _loadConfig(argv.configPath, overrides)
    .then(config => runMigrations(config))
