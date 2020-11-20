@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import nodeFetch from "node-fetch";
+import jose from "node-jose";
 
 import {
   MissingJWKSURI,
@@ -216,6 +217,26 @@ class OAuth2Client {
         reject(new AlgoNotSupported("Encoding algo not supported"));
       }
     });
+  }
+
+  async decryptJWE<T = unknown>(
+    JWE: string,
+    privateKey: string,
+    isSigned: boolean,
+  ): Promise<T> {
+    const formattedJosePrivateKey = await jose.JWK.asKey(privateKey, "pem");
+
+    const decryptedJWEToken = await jose.JWE.createDecrypt(
+      formattedJosePrivateKey,
+    ).decrypt(JWE);
+
+    const { payload } = decryptedJWEToken;
+
+    if (isSigned) {
+      return (payload.toString() as unknown) as T;
+    } else {
+      return JSON.parse(payload.toString()) as T;
+    }
   }
 }
 

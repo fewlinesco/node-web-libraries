@@ -39,3 +39,8 @@ Provides an interface other OpenTelemetry.
 Provides a way of creating an Express application with custom Router and Handlers.
 
 [Web documentation](./packages/web/README.md)
+
+## OAuth2
+
+Provides a client that abstract Connect OAuth2 implementation, and gives tools to decrypt and verify JWS/JWE.
+[Web documentation](./packages/oauth2/README.md)
