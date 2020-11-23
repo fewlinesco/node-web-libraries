@@ -10,21 +10,20 @@ export async function getConfig(
 ): Promise<RunMigrationsConfig> {
   configPath = configPath ? configPath : "./config.json";
 
-  const cleanConfigPath = path.isAbsolute ? configPath : path.join(
-    process.cwd(),
-    configPath
-  );
+  const cleanConfigPath = path.isAbsolute
+    ? configPath
+    : path.join(process.cwd(), configPath);
 
   return fs.promises.readFile(cleanConfigPath, "utf8").then(JSON.parse);
 }
 
 export function parseDatabaseURL(databaseURL: string): DatabaseConfig {
-  const parsedDatabaseURL = new url.URL(databaseURL)
+  const parsedDatabaseURL = new url.URL(databaseURL);
   return {
     database: parsedDatabaseURL.pathname,
     host: parsedDatabaseURL.hostname,
     port: parseInt(parsedDatabaseURL.port),
     username: parsedDatabaseURL.username,
-    password: parsedDatabaseURL.password
-  }
+    password: parsedDatabaseURL.password,
+  };
 }

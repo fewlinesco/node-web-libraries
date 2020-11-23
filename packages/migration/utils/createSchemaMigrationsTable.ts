@@ -3,7 +3,8 @@ import * as database from "@fwl/database";
 export async function createSchemaMigrationsTable(
   databaseQueryRunner:
     | database.DatabaseQueryRunner
-    | database.DatabaseQueryRunnerWithoutTracing, databaseTable: string
+    | database.DatabaseQueryRunnerWithoutTracing,
+  databaseTable: string,
 ): Promise<void> {
   await databaseQueryRunner.query(`
       CREATE TABLE IF NOT EXISTS "${databaseTable}" (

@@ -19,10 +19,10 @@ export const defaultDatabaseConfig = {
   port: 5432,
   username: "postgres",
   password: "postgres",
-  database: "postgres"
-}
+  database: "postgres",
+};
 
 export const defaultMigrationConfig = {
   database: defaultDatabaseConfig,
-  migration: defaultMigrateConfig
-}
+  migration: defaultMigrateConfig,
+};

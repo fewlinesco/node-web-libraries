@@ -121,7 +121,7 @@ describe("runMigrations", () => {
 
     const config = await getConfig("./test/config.json");
 
-    config.migration.tableName = "custom_schema_migrations"
+    config.migration.tableName = "custom_schema_migrations";
 
     await runMigrations(config);
 
@@ -263,7 +263,7 @@ describe("runMigrations", () => {
       .appendFile(`${targetDir + "/" + fileName}`, `${queryContent}`)
       .catch((error) => {
         console.log(error);
-        throw error
+        throw error;
       });
 
     await dryRunPendingMigrations(config);

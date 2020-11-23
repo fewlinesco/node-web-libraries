@@ -1,5 +1,4 @@
 import * as database from "@fwl/database";
-import { table } from "console";
 import * as fs from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -32,7 +31,7 @@ export async function runMigrations(
   );
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
-  const tableName = config.migration.tableName || "schema_migrations";
+  const tableName = config.migration.tableName || "schema_migrations";
   try {
     const queries = await getQueries(sqlMigrationsFolder);
 
@@ -68,13 +67,15 @@ export async function runMigrations(
   databaseQueryRunner.close();
 }
 
-export async function createMigrationFile(name: string, migrationPath?: string): Promise<string> {
-  const configuredPath = migrationPath ? migrationPath : "./migrations"
+export async function createMigrationFile(
+  name: string,
+  migrationPath?: string,
+): Promise<string> {
+  const configuredPath = migrationPath ? migrationPath : "./migrations";
 
-  const targetDir = path.isAbsolute(configuredPath) ? configuredPath : path.join(
-    process.cwd(),
-    configuredPath
-  );
+  const targetDir = path.isAbsolute(configuredPath)
+    ? configuredPath
+    : path.join(process.cwd(), configuredPath);
 
   const fileName = `${createTimestamp(new Date())}-${name}.sql`;
 
@@ -101,7 +102,7 @@ export async function dryRunPendingMigrations(
   );
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
-  const tableName = config.migration.tableName || "schema_migrations"
+  const tableName = config.migration.tableName || "schema_migrations";
 
   try {
     const queries = await getQueries(sqlMigrationsFolder);
@@ -130,10 +131,10 @@ export async function dryRunPendingMigrations(
       throw new Error("Rollback");
     });
   } catch (error) {
-    await databaseQueryRunner.close()
+    await databaseQueryRunner.close();
     if (error.message === "Rollback") {
       console.log("Migration dry run success !");
-      return
+      return;
     }
     throw error;
   }
