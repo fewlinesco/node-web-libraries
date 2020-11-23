@@ -150,11 +150,12 @@ const dryRunCommand = {
   },
 };
 
-export async function runCLI(): Promise<any> {
-  return yargs
+export async function runCLI(): Promise<void> {
+  await yargs
     .command(migrateCommand)
     .command(createCommand)
     .command(dryRunCommand)
     .demandCommand()
-    .help("help").argv;
+    .help("help")
+    .argv
 }
