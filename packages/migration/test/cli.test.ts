@@ -141,7 +141,7 @@ describe("runCLI", () => {
     it("handles too many arguments", async (done) => {
       expect.assertions(6);
 
-      process.argv = [...migrateArgs, "foo", "bar", "braz"]
+      process.argv = [...migrateArgs, "foo", "bar", "braz"];
 
       const spyCreate = jest
         .spyOn(migration, "dryRunPendingMigrations")

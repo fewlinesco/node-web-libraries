@@ -156,6 +156,5 @@ export async function runCLI(): Promise<void> {
     .command(createCommand)
     .command(dryRunCommand)
     .demandCommand()
-    .help("help")
-    .argv
+    .help("help").argv;
 }
