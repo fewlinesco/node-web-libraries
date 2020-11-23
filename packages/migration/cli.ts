@@ -60,13 +60,20 @@ const migrateCommand = {
           "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
         type: "string",
       })
+      .option("migrationsTable", {
+        describe: "override the configured table hosting the migrations",
+        type: "string",
+      })
       .strict(),
   handler: (argv) => {
     const overrides = {
       database: argv.databaseURL
         ? parseDatabaseURL(argv.databaseURL)
         : undefined,
-      migration: { dirPath: argv.migrationsPath },
+      migration: {
+        dirPath: argv.migrationsPath,
+        migrationsTable: argv.migrationsTable,
+      },
     };
     return _loadConfig(argv.configPath, overrides)
       .then((config) => runMigrations(config))

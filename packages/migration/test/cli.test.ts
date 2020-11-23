@@ -80,7 +80,7 @@ describe("runCLI", () => {
     it("creates a timestamped migration file", async (done) => {
       expect.assertions(1);
 
-      process.argv = [...createArgs, "foo"];
+      process.argv = [...createArgs];
 
       const config = await getConfig("./test/config.json");
       const createdMigrationFile = await createMigrationFile(
@@ -104,6 +104,8 @@ describe("runCLI", () => {
     it("handles too many arguments", async (done) => {
       expect.assertions(6);
 
+      process.argv = [...createArgs, "foo", "bar", "braz"];
+
       const spyCreate = jest
         .spyOn(migration, "createMigrationFile")
         .mockImplementation((name: string, _migrationPath?: string) =>
@@ -116,9 +118,6 @@ describe("runCLI", () => {
           throw new Error("failed in mock implementation");
         });
       const mockLog = jest.spyOn(console, "log");
-      const mockError = jest.spyOn(console, "error").mockImplementation(() => {
-        return;
-      });
 
       process.argv = [...createArgs, "bar"];
 
@@ -130,7 +129,6 @@ describe("runCLI", () => {
         expect(mockExit).toHaveBeenCalled();
         expect(mockExit).not.toHaveBeenCalledWith(0);
         expect(mockLog).not.toHaveBeenCalled();
-        expect(mockError).toHaveBeenCalledWith("Unknown arguments");
       }
 
       done();
@@ -138,10 +136,12 @@ describe("runCLI", () => {
   });
 
   describe("--dry-run", () => {
-    const migrateArgs = ["", "", "--dry-run", "path/migration/dir"];
+    const migrateArgs = ["", "", "dryRun", "path/migration/dir"];
 
     it("handles too many arguments", async (done) => {
       expect.assertions(6);
+
+      process.argv = [...migrateArgs, "foo", "bar", "braz"]
 
       const spyCreate = jest
         .spyOn(migration, "dryRunPendingMigrations")
@@ -155,9 +155,6 @@ describe("runCLI", () => {
           throw new Error("failed in mock implementation");
         });
       const mockLog = jest.spyOn(console, "log");
-      const mockError = jest.spyOn(console, "error").mockImplementation(() => {
-        return;
-      });
 
       process.argv = [...migrateArgs, "bar"];
 
@@ -169,7 +166,6 @@ describe("runCLI", () => {
         expect(mockExit).toHaveBeenCalled();
         expect(mockExit).not.toHaveBeenCalledWith(0);
         expect(mockLog).not.toHaveBeenCalled();
-        expect(mockError).toHaveBeenCalledWith("Unknown arguments");
       }
 
       done();
