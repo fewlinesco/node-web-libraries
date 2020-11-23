@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.4 - 2020-11-09
+
+- Added function to handle JWE decryption (`decryptJWE`).
+
 ## 0.1.3 - 2020-09-03
 
 - Fixed issue regarding encoding of `redirect_uri` and `state` in query string.
