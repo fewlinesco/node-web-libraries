@@ -74,7 +74,7 @@ describe("runCLI", () => {
     });
   });
 
-  describe("--create", () => {
+  describe("create", () => {
     const createArgs = ["", "", "create", "foo"];
 
     it("creates a timestamped migration file", async (done) => {
@@ -135,7 +135,7 @@ describe("runCLI", () => {
     });
   });
 
-  describe("--dry-run", () => {
+  describe("dryRun", () => {
     const migrateArgs = ["", "", "dryRun", "path/migration/dir"];
 
     it("handles too many arguments", async (done) => {
