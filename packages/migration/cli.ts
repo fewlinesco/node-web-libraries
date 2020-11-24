@@ -131,6 +131,10 @@ const dryRunCommand = {
           "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
         type: "string",
       })
+      .option("migrationsTable", {
+        describe: "override the configured table hosting the migrations",
+        type: "string",
+      })
       .strict(),
   handler: (argv) => {
     const overrides = {
@@ -138,7 +142,8 @@ const dryRunCommand = {
         ? parseDatabaseURL(argv.databaseURL)
         : undefined,
       migration: {
-        dirPath: argv.migrationPath ? argv.migrationPath : undefined,
+        dirPath: argv.migrationsPath,
+        tableName: argv.migrationsTable
       },
     };
     _loadConfig(argv.configPath, overrides)
