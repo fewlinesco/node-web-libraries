@@ -1,56 +1,165 @@
+import { DatabaseConfig } from "@fwl/database";
+import * as yargs from "yargs";
+
+import { RunMigrationsConfig, defaultMigrationConfig } from "./config/config";
 import {
   runMigrations,
   createMigrationFile,
   dryRunPendingMigrations,
 } from "./index";
-import { getConfig } from "./utils/getConfig";
+import { getConfig, parseDatabaseURL } from "./utils/getConfig";
 
-type MigrationErrors = { [key: string]: { [key: string]: string } };
+type Overrides = {
+  database?: DatabaseConfig;
+  migration?: {
+    dirPath?: string;
+    tableName?: string;
+  };
+};
 
-export const ERRORS: MigrationErrors = {
-  migrate: {
-    tooManyArgs:
-      "Too many arguments arguments. To run a migration, please run 'migration --migrate path/to/config.json'",
+function _loadConfig(
+  configPath?: string,
+  overrides?: Overrides,
+): Promise<RunMigrationsConfig> {
+  return getConfig(configPath)
+    .catch((_error) => {
+      console.error(
+        `could not find a config file at ${configPath}, using default config\n`,
+      );
+      return defaultMigrationConfig;
+    })
+    .then((config: RunMigrationsConfig) => {
+      return {
+        database: overrides.database || config.database,
+        migration: {
+          dirPath: overrides.migration.dirPath || config.migration.dirPath,
+          tableName:
+            overrides.migration.tableName || config.migration.tableName,
+        },
+      };
+    });
+}
+
+const migrateCommand = {
+  command: "migrate",
+  desc: "run the migration process.",
+  builder: (yargs) =>
+    yargs
+      .option("configPath", {
+        default: "./config.json",
+        describe: "override the path to the config file",
+        type: "string",
+      })
+      .option("databaseURL", {
+        describe:
+          "override the URL to the database, has a stronger priority than the config file",
+        type: "string",
+      })
+      .option("migrationsPath", {
+        describe:
+          "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
+        type: "string",
+      })
+      .option("migrationsTable", {
+        describe: "override the configured table hosting the migrations",
+        type: "string",
+      })
+      .strict(),
+  handler: (argv) => {
+    const overrides = {
+      database: argv.databaseURL
+        ? parseDatabaseURL(argv.databaseURL)
+        : undefined,
+      migration: {
+        dirPath: argv.migrationsPath,
+        migrationsTable: argv.migrationsTable,
+      },
+    };
+    return _loadConfig(argv.configPath, overrides)
+      .then((config) => runMigrations(config))
+      .then(() => {
+        argv._handled = true;
+        return argv;
+      });
   },
-  dryRun: {
-    tooManyArgs:
-      "Too many arguments arguments. To run a migration dry run, please run 'migration --dry-run path/to/config.json'",
+};
+
+const createCommand = {
+  command: "create [name]",
+  desc:
+    "create a timestamped migration file in the path set up in config.json.",
+  builder: (yargs) =>
+    yargs
+      .option("configPath", {
+        default: "./config.json",
+        describe: "override the path to the config file",
+        type: "string",
+      })
+      .option("migrationsPath", {
+        describe:
+          "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
+        type: "string",
+      })
+      .strict(),
+
+  handler: async (argv) => {
+    const overrides = argv.migrationPath
+      ? { migration: { dirPath: argv.migrationPath } }
+      : {};
+    const config = await _loadConfig(argv.configPath, overrides);
+    return createMigrationFile(name, config.migration.dirPath);
   },
-  create: {
-    tooManyArgs:
-      "Too many arguments arguments. To create a timestamped migration file, please run 'migration --create name_of_the_file'",
-  },
-  default: {
-    list: `Please provide one of the following flags:\n\n  - "migration --migrate path/to/config.json": run the migration process.\n  - "migration --create name_of_the_file": create a timestamped migration file in the path set up in config.json.`,
+};
+
+const dryRunCommand = {
+  command: "dryRun",
+  desc: "run the migration process.",
+  builder: (yargs) =>
+    yargs
+      .option("configPath", {
+        default: "./config.json",
+        describe: "override the path to the config file",
+        type: "string",
+      })
+      .option("databaseURL", {
+        describe:
+          "override the URL to the database, has a stronger priority than the config file",
+        type: "string",
+      })
+      .option("migrationsPath", {
+        describe:
+          "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
+        type: "string",
+      })
+      .option("migrationsTable", {
+        describe: "override the configured table hosting the migrations",
+        type: "string",
+      })
+      .strict(),
+  handler: (argv) => {
+    const overrides = {
+      database: argv.databaseURL
+        ? parseDatabaseURL(argv.databaseURL)
+        : undefined,
+      migration: {
+        dirPath: argv.migrationsPath,
+        tableName: argv.migrationsTable
+      },
+    };
+    _loadConfig(argv.configPath, overrides)
+      .then((config) => dryRunPendingMigrations(config))
+      .then(() => {
+        argv._handled = true;
+        return argv;
+      });
   },
 };
 
 export async function runCLI(): Promise<void> {
-  const [, , ...args] = process.argv;
-
-  if (args.length > 0) {
-    if (args[0] === "--migrate") {
-      if (args.length === 2) {
-        const config = await getConfig(args[1]);
-
-        runMigrations(config);
-      } else {
-        throw new Error(ERRORS.migrate.tooManyArgs);
-      }
-    } else if (args[0] === "--dry-run") {
-      if (args.length === 2) {
-        const config = await getConfig(args[1]);
-        dryRunPendingMigrations(config);
-      }
-      throw new Error(ERRORS.dryRun.tooManyArgs);
-    } else if (args[0] === "--create") {
-      if (args.length === 2) {
-        createMigrationFile(args[1]);
-      } else {
-        throw new Error(ERRORS.create.tooManyArgs);
-      }
-    }
-  } else {
-    throw new Error(ERRORS.default.list);
-  }
+  await yargs
+    .command(migrateCommand)
+    .command(createCommand)
+    .command(dryRunCommand)
+    .demandCommand()
+    .help("help").argv;
 }

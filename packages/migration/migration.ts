@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from "uuid";
 import { RunMigrationsConfig } from "./config/config";
 import { createSchemaMigrationsTable } from "./utils/createSchemaMigrationsTable";
 import { createTimestamp } from "./utils/createTimestamp";
-import { getConfig } from "./utils/getConfig";
 import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
 
@@ -32,14 +31,14 @@ export async function runMigrations(
   );
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
-
+  const tableName = config.migration.tableName || "schema_migrations";
   try {
     const queries = await getQueries(sqlMigrationsFolder);
 
-    await createSchemaMigrationsTable(databaseQueryRunner);
+    await createSchemaMigrationsTable(databaseQueryRunner, tableName);
 
     const { rows } = await databaseQueryRunner.query(
-      "SELECT * FROM schema_migrations ORDER BY created_at DESC",
+      `SELECT * FROM ${tableName} ORDER BY created_at DESC`,
     );
 
     const pendingMigrations = rows
@@ -52,7 +51,7 @@ export async function runMigrations(
           await client.query(query);
 
           await client.query(
-            `INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+            `INSERT INTO ${tableName} (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
             [uuidv4(), timestamp, fileName, query],
           );
         } catch (error) {
@@ -68,13 +67,15 @@ export async function runMigrations(
   databaseQueryRunner.close();
 }
 
-export async function createMigrationFile(name: string): Promise<string> {
-  const config = await getConfig();
+export async function createMigrationFile(
+  name: string,
+  migrationPath?: string,
+): Promise<string> {
+  const configuredPath = migrationPath ? migrationPath : "./migrations";
 
-  const targetDir = path.join(
-    process.cwd(),
-    config ? config.migration.dirPath : "./migrations",
-  );
+  const targetDir = path.isAbsolute(configuredPath)
+    ? configuredPath
+    : path.join(process.cwd(), configuredPath);
 
   const fileName = `${createTimestamp(new Date())}-${name}.sql`;
 
@@ -101,14 +102,15 @@ export async function dryRunPendingMigrations(
   );
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
+  const tableName = config.migration.tableName || "schema_migrations";
 
   try {
     const queries = await getQueries(sqlMigrationsFolder);
 
-    await createSchemaMigrationsTable(databaseQueryRunner);
+    await createSchemaMigrationsTable(databaseQueryRunner, tableName);
 
     const { rows } = await databaseQueryRunner.query(
-      `SELECT * FROM schema_migrations ORDER BY created_at DESC`,
+      `SELECT * FROM ${tableName} ORDER BY created_at DESC`,
     );
 
     const pendingMigrations = rows
@@ -117,23 +119,27 @@ export async function dryRunPendingMigrations(
 
     await databaseQueryRunner.transaction(async (client) => {
       for await (const { timestamp, fileName, query } of pendingMigrations) {
-        await client.query(query);
+        try {
+          await client.query(query);
 
-        await client.query(
-          `
-          INSERT INTO schema_migrations (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
-          [uuidv4(), timestamp, fileName, query],
-        );
-        throw new Error("Rollback");
+          await client.query(
+            `
+            INSERT INTO ${tableName} (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+            [uuidv4(), timestamp, fileName, query],
+          );
+        } catch (error) {
+          client.query("ROLLBACK");
+          throw error;
+        }
       }
+
+      await client.query("ROLLBACK");
+      console.log("Migration dry run success !");
     });
   } catch (error) {
-    if (error.message === "Rollback") {
-      console.log("Migration dry run success !");
-      return;
-    }
+    await databaseQueryRunner.close();
     throw error;
   }
 
-  databaseQueryRunner.close();
+  return databaseQueryRunner.close();
 }
