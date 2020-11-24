@@ -119,23 +119,25 @@ export async function dryRunPendingMigrations(
 
     await databaseQueryRunner.transaction(async (client) => {
       for await (const { timestamp, fileName, query } of pendingMigrations) {
-        await client.query(query);
+        try {
+          await client.query(query);
 
-        await client.query(
-          `
-          INSERT INTO ${tableName} (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
-          [uuidv4(), timestamp, fileName, query],
-        );
+          await client.query(
+            `
+            INSERT INTO ${tableName} (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
+            [uuidv4(), timestamp, fileName, query],
+          );
+        } catch (error) {
+          client.query("ROLLBACK");
+          throw error;
+        }
       }
 
-      throw new Error("Rollback");
+      await client.query("ROLLBACK");
+      console.log("Migration dry run success !");
     });
   } catch (error) {
     await databaseQueryRunner.close();
-    if (error.message === "Rollback") {
-      console.log("Migration dry run success !");
-      return;
-    }
     throw error;
   }
 
