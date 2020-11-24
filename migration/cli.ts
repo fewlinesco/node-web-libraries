@@ -143,7 +143,7 @@ const dryRunCommand = {
         : undefined,
       migration: {
         dirPath: argv.migrationsPath,
-        tableName: argv.migrationsTable
+        tableName: argv.migrationsTable,
       },
     };
     _loadConfig(argv.configPath, overrides)
