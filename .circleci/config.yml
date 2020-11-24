@@ -84,16 +84,17 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-packages-v1-{{ .Branch }}-
-            - yarn-packages-v1-
+            - migrations-yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - migrations-yarn-packages-v1-{{ .Branch }}-
+            - migrations-yarn-packages-v1-
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+          working_directory: migration
       - run:
           name: migrate-tests
           command: yarn --cache-folder ~/.cache/yarn test
-          working_directory: packages/migration
+          working_directory: migration
   test-tracing:
     docker:
       - image: circleci/node:12.16.2
