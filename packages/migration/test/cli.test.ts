@@ -74,7 +74,7 @@ describe("runCLI", () => {
     });
   });
 
-  describe("--create", () => {
+  describe("create", () => {
     const createArgs = ["", "", "create", "foo"];
 
     it("creates a timestamped migration file", async (done) => {
