@@ -135,7 +135,7 @@ describe("runCLI", () => {
     });
   });
 
-  describe("--dry-run", () => {
+  describe("dryRun", () => {
     const migrateArgs = ["", "", "dryRun", "path/migration/dir"];
 
     it("handles too many arguments", async (done) => {
