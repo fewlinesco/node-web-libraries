@@ -27,7 +27,7 @@ releaseName=$(echo ${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/')
 
 environment=$(_appEnvironment $gitBranch)
 dockerTag=${environment}_${gitCommit}
-dockerImage=$(echo "fewlines/${imageName}:${imageName}:${releaseName}-${gitShortCommit}")
+dockerImage=$(echo "fewlines/${imageName}:${releaseName}-${gitShortCommit}")
 dockerImageLatest=$(echo "fewlines/${imageName}:${releaseName}-latest")
 
 docker build \
@@ -37,7 +37,7 @@ docker build \
 		--tag ${imageName}:${releaseName}-latest \
 		.
 
-echo $dockerImage
-echo $dockerImageLatest
+docker push $dockerImage
+docker push $dockerImageLatest
 
 # _updateManifest manifest.txt connect-demo-signup $environment $dockerTag
