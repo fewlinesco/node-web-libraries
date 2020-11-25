@@ -7,17 +7,17 @@ set -o pipefail
 cwd=$(dirname $(realpath $0))
 source ${cwd}/lib/utils.sh
 
-appName=${1:?"app name is required as first argument"}
+imageName=${1:?"app name is required as first argument"}
 gitRepo=${2:?"git repository URL is required as second argument"};
-gitBranch=${3:?"git branch is required as third argument"};
 gitCommit=${4:?"git commit SHA is required as fourth argument"};
+gitBranch=${3:?"git branch is required as third argument"};
 
 releaseName=$(echo ${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/')
 
 environment=$(_appEnvironment $gitBranch)
 dockerTag=${environment}_${gitCommit}
-dockerImage=$(_dockerImage $gitRepo $gitBranch $gitCommit)
-dockerImageLatest=$(_dockerImageLatest $gitRepo $gitBranch)
+dockerImage=$(echo "fewlines/${imageName}: ${appName}:${releaseName}-${GIT_SHORT_SHA}")
+dockerImageLatest=$(echo "fewlines/${imageName}:$(_appEnvironment $branch)_latest")
 
 docker build \
 		--build-arg GIT_REPOSITORY=${gitRepo} \
