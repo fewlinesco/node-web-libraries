@@ -16,15 +16,15 @@ releaseName=$(echo ${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/')
 
 environment=$(_appEnvironment $gitBranch)
 dockerTag=${environment}_${gitCommit}
-dockerImage=$(echo "fewlines/${imageName}: ${appName}:${releaseName}-${GIT_SHORT_SHA}")
+dockerImage=$(echo "fewlines/${imageName}: ${imageName}:${releaseName}-${GIT_SHORT_SHA}")
 dockerImageLatest=$(echo "fewlines/${imageName}:$(_appEnvironment $branch)_latest")
 
 docker build \
 		--build-arg GIT_REPOSITORY=${gitRepo} \
 		--build-arg GIT_SHA=${gitCommit} \
 		--build-arg CREATED_AT=${CREATED_AT} \
-		--tag ${appName}:${releaseName}-${GIT_SHORT_SHA} \
-		--tag ${appName}:${releaseName}-latest \
+		--tag ${imageName}:${releaseName}-${GIT_SHORT_SHA} \
+		--tag ${imageName}:${releaseName}-latest \
 		.
 
 docker push $dockerImage
