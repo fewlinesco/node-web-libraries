@@ -37,7 +37,7 @@ docker build \
 		--tag ${imageName}:${releaseName}-latest \
 		.
 
-docker push ${dockerImage}
-docker push ${dockerImageLatest}
+docker push ${imageName}:${releaseName}-${gitShortCommit}
+docker push ${imageName}:${releaseName}-latest
 
 # _updateManifest manifest.txt connect-demo-signup $environment $dockerTag
