@@ -4,6 +4,17 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+_appEnvironment() {
+  local branch=$1;
+
+  if [ "$branch" = "master" ]; then
+    echo "prod";
+  else
+    echo r$(cut -f 1 -d "-" <<< $branch)
+  fi
+}
+
+
 cwd=$(dirname $(realpath $0))
 source ${cwd}/lib/utils.sh
 
@@ -27,7 +38,7 @@ docker build \
 		--tag ${imageName}:${releaseName}-latest \
 		.
 
-docker push $dockerImage
-docker push $dockerImageLatest
+docker push ${dockerImage}
+docker push ${dockerImageLatest}
 
 # _updateManifest manifest.txt connect-demo-signup $environment $dockerTag
