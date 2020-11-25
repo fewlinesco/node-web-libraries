@@ -12,7 +12,7 @@ gitRepo=${2:?"git repository URL is required as second argument"};
 gitBranch=${3:?"git branch is required as third argument"};
 gitCommit=${4:?"git commit SHA is required as fourth argument"};
 
-releaseName=$(basename $(${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/')
+releaseName=$(basename $(${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/'))
 
 environment=$(_appEnvironment $gitBranch)
 dockerTag=${environment}_${gitCommit}
