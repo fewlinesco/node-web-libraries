@@ -133,6 +133,16 @@ jobs:
           name: web-lint
           command: yarn --cache-folder ~/.cache/yarn lint
           working_directory: packages/web
+  build-migration-image:
+    machine:
+        image: ubuntu-1604:201903-01
+        docker_layer_caching: true
+    steps:
+      - checkout
+      - run:
+          command: ../bin/build-and-push.sh fwl-migration $CIRCLE_REPOSITORY_URL $CIRCLE_BRANCH $CIRCLE_SHA1
+          working_directory: migration
+
 
 
 workflows:
@@ -155,3 +165,6 @@ workflows:
       - test-web:
           requires:
             - setup
+      - build-migration-image:
+          requires:
+            - test-migration
