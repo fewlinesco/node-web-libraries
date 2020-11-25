@@ -20,11 +20,11 @@ dockerImage=$(_dockerImage $gitRepo $gitBranch $gitCommit)
 dockerImageLatest=$(_dockerImageLatest $gitRepo $gitBranch)
 
 docker build \
-		--build-arg GIT_REPOSITORY=$(gitRepo) \
-		--build-arg GIT_SHA=$(gitCommit) \
-		--build-arg CREATED_AT=$(CREATED_AT) \
-		--tag appName:$(releaseName)-$(GIT_SHORT_SHA) \
-		--tag $(appName):$(releaseName)-latest \
+		--build-arg GIT_REPOSITORY=${gitRepo} \
+		--build-arg GIT_SHA=${gitCommit} \
+		--build-arg CREATED_AT=${CREATED_AT} \
+		--tag ${appName}:${releaseName}-${GIT_SHORT_SHA} \
+		--tag ${appName}:${releaseName}-latest \
 		.
 
 docker push $dockerImage
