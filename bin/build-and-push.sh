@@ -34,10 +34,10 @@ docker build \
 		--build-arg GIT_REPOSITORY=${gitRepo} \
 		--build-arg GIT_SHA=${gitCommit} \
 		--tag ${imageName}:${releaseName}-${gitShortCommit} \
-		--tag ${imageName}:${releaseName}-latest
+		--tag ${imageName}:${releaseName}-latest \
 		.
 
-docker push ${dockerImage}
-docker push ${dockerImageLatest}
+docker push $dockerImage
+docker push $dockerImageLatest
 
 # _updateManifest manifest.txt connect-demo-signup $environment $dockerTag
