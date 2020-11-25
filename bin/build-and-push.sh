@@ -16,7 +16,6 @@ _appEnvironment() {
 
 
 cwd=$(dirname $(realpath $0))
-source ${cwd}/lib/utils.sh
 
 imageName=${1:?"app name is required as first argument"}
 gitRepo=${2:?"git repository URL is required as second argument"};
