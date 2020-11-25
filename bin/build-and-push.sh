@@ -33,8 +33,8 @@ dockerImageLatest=$(echo "fewlines/${imageName}:${releaseName}-latest")
 docker build \
 		--build-arg GIT_REPOSITORY=${gitRepo} \
 		--build-arg GIT_SHA=${gitCommit} \
-		--tag ${imageName}:${releaseName}-${gitShortCommit} \
-		--tag ${imageName}:${releaseName}-latest \
+		--tag ${dockerImage} \
+		--tag ${dockerImageLatest} \
 		.
 
 docker push $dockerImage
