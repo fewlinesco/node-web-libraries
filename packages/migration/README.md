@@ -41,9 +41,19 @@ To run `migration` as a cli, you need to create a `config.json` with the followi
 
 To use `migration` as a CLI, simply run one of those command, depending on your needs:
 
-- "migration --migrate path/to/config.json": run the migration process.
-- "migration --dry-run path/to/config.json": run the migration process and rolls it back right away.
-- "migration --create name_of_the_file": create a timestamped migration file in the path set up in `config.json`.
+- `migration migrate`: run the migration process. The following options can be passed to this command:
+  - `configPath`: override the path to the configuration file (default: "./config.json").
+  - `databaseURL`: override the database configuration, should be a valid postgres URL (stronger than the configuration file).
+  - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
+  - `migrationsTable`: override the table name in which ran migrations are registered (stronger than the configuration file).
+- `migration dryRun path/to/config.json`: run the migration process and rolls it back right away. The following options can be passed to this command:
+  - `configPath`: override the path to the configuration file (default: "./config.json").
+  - `databaseURL`: override the database configuration, should be a valid postgres URL (stronger than the configuration file).
+  - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
+  - `migrationsTable`: override the table name in which ran migrations are registered, (stronger than the configuration file).
+- `migration create name_of_the_file`: create a timestamped migration file in the path set up in `config.json`. The following options can be passed to this command:
+  - `configPath`: override the path to the configuration file (default: "./config.json").
+  - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
 
 ### Package
 
