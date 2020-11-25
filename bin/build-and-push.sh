@@ -23,7 +23,6 @@ dockerImageLatest=$(echo "fewlines/${imageName}:$(_appEnvironment $branch)_lates
 docker build \
 		--build-arg GIT_REPOSITORY=${gitRepo} \
 		--build-arg GIT_SHA=${gitCommit} \
-		--build-arg CREATED_AT=${CREATED_AT} \
 		--tag ${imageName}:${releaseName}-${GIT_SHORT_SHA} \
 		--tag ${imageName}:${releaseName}-latest \
 		.
