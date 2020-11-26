@@ -150,7 +150,7 @@ const dryRunCommand = {
         tableName: argv.migrationsTable,
       },
     };
-    _loadConfig(argv.configPath, overrides)
+    return _loadConfig(argv.configPath, overrides)
       .then((config) => dryRunPendingMigrations(config))
       .then(() => {
         argv._handled = true;
@@ -159,18 +159,12 @@ const dryRunCommand = {
   },
 };
 
-export async function runCLI(): Promise<void> {
-  const comm =  yargs
+export async function runCLI(args): Promise<void> {
+   await yargs
     .command(migrateCommand)
     .command(createCommand)
     .command(dryRunCommand)
     .demandCommand()
     .help("help")
-
-  console.log(comm)
-
-  await comm.argv;
-
-  // await Promise.resolve()
-
+    .parse(args)
 }
