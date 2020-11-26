@@ -24,3 +24,4 @@ RUN yarn build
 ENV NODE_ENV=production
 
 ENTRYPOINT ["node", "dist/runCli.js"]
+CMD []
