@@ -70,7 +70,7 @@ describe("migrate", () => {
     done();
   });
 
-  it("can override the database table with a database url passed as an option", async (done) => {
+  it("can override the database config with a database url passed as an option", async (done) => {
     expect.assertions(2)
     const spyMigrate =
       jest
@@ -88,6 +88,33 @@ describe("migrate", () => {
 
     try {
       await runCLI(["migrate", "--databaseURL", "postgres://user:password@host:7777/database"]);
+    } catch (error) {
+      fail(error)
+    }
+    // Don't remove, this is a mysterious magic trick without it, tests do not pass
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    expect(spyMigrate).toHaveBeenCalled()
+    done();
+  })
+
+  it("can override the migrations table with the right option", async (done) => {
+    expect.assertions(2)
+    const mockExit = jest
+      .spyOn(process, "exit")
+      .mockImplementation((code?: number) => {
+        throw new Error("failed in mock implementation");
+      });
+    const spyMigrate =
+      jest
+        .spyOn(migration, "runMigrations")
+        .mockImplementation((config: RunMigrationsConfig) => {
+          expect(config.migration.tableName).toBe("custom_table")
+          return Promise.resolve()
+        })
+
+    try {
+      await runCLI(["migrate", "--migrationsTable", "custom_table"]);
     } catch (error) {
       fail(error)
     }
