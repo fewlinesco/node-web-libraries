@@ -160,14 +160,14 @@ const dryRunCommand = {
 };
 
 export async function runCLI(): Promise<void> {
-  console.log("in cli",process.argv)
   const comm =  yargs
     .command(migrateCommand)
     .command(createCommand)
     .command(dryRunCommand)
     .demandCommand()
     .help("help")
-  // console.log(comm)
+
+  console.log(comm)
 
   await comm.argv;
 

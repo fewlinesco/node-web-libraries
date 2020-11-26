@@ -73,30 +73,30 @@ describe("runCLI", () => {
       done();
     });
 
-    // it("can override the database table with a database url passed as an option", async (done) => {
-    //   expect.assertions(2)
-    //   const spyMigrate =
-    //     jest
-    //     .spyOn(migration, "runMigrations")
-    //     .mockImplementation((config: RunMigrationsConfig) => {
-    //       expect(config.database).toBe({
-    //         database: "database",
-    //         host: "host",
-    //         password: "password",
-    //         port: 7777,
-    //         username: "user",
-    //       })
-    //       return Promise.resolve()
-    //     })
-    //   process.argv = [...migrateArgs, "--databaseURL", "postgres://user:password@host:7777/database"]
-    //   console.log(process.argv)
-    //   try {
-    //     await runCLI();
-    //   } catch(error) {
-    //     fail(error)
-    //   }
-    //   expect(spyMigrate).toHaveBeenCalled()
-    // })
+    it("can override the database table with a database url passed as an option", async (done) => {
+      expect.assertions(2)
+      const spyMigrate =
+        jest
+        .spyOn(migration, "runMigrations")
+        .mockImplementation((config: RunMigrationsConfig) => {
+          expect(config.database).toBe({
+            database: "database",
+            host: "host",
+            password: "password",
+            port: 7777,
+            username: "user",
+          })
+          return Promise.resolve()
+        })
+      process.argv = [...migrateArgs, "--databaseURL", "postgres://user:password@host:7777/database"]
+      console.log(process.argv)
+      try {
+        await runCLI();
+      } catch(error) {
+        fail(error)
+      }
+      expect(spyMigrate).toHaveBeenCalled()
+    })
   });
 
   describe("create", () => {
