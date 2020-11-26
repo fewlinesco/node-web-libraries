@@ -72,10 +72,14 @@ const migrateCommand = {
         : undefined,
       migration: {
         dirPath: argv.migrationsPath,
-        migrationsTable: argv.migrationsTable,
+        tableName: argv.migrationsTable,
       },
     };
+
     return _loadConfig(argv.configPath, overrides)
+      .then(config => {
+        return config
+      })
       .then((config) => runMigrations(config))
       .then(() => {
         argv._handled = true;
@@ -143,10 +147,10 @@ const dryRunCommand = {
         : undefined,
       migration: {
         dirPath: argv.migrationsPath,
-        tableName: argv.migrationsTable
+        tableName: argv.migrationsTable,
       },
     };
-    _loadConfig(argv.configPath, overrides)
+    return _loadConfig(argv.configPath, overrides)
       .then((config) => dryRunPendingMigrations(config))
       .then(() => {
         argv._handled = true;
@@ -155,11 +159,12 @@ const dryRunCommand = {
   },
 };
 
-export async function runCLI(): Promise<void> {
-  await yargs
+export async function runCLI(args): Promise<void> {
+   await yargs
     .command(migrateCommand)
     .command(createCommand)
     .command(dryRunCommand)
     .demandCommand()
-    .help("help").argv;
+    .help("help")
+    .parse(args)
 }
