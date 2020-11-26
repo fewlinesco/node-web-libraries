@@ -20,7 +20,7 @@ export async function getConfig(
 export function parseDatabaseURL(databaseURL: string): DatabaseConfig {
   const parsedDatabaseURL = new url.URL(databaseURL);
   return {
-    database: parsedDatabaseURL.pathname,
+    database: parsedDatabaseURL.pathname.replace(/^\/+/g, ''),
     host: parsedDatabaseURL.hostname,
     port: parseInt(parsedDatabaseURL.port),
     username: parsedDatabaseURL.username,

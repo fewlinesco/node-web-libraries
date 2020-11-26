@@ -76,6 +76,10 @@ const migrateCommand = {
       },
     };
     return _loadConfig(argv.configPath, overrides)
+      .then(config => {
+        console.log("migrate config", config);
+        return config
+      })
       .then((config) => runMigrations(config))
       .then(() => {
         argv._handled = true;
@@ -156,10 +160,17 @@ const dryRunCommand = {
 };
 
 export async function runCLI(): Promise<void> {
-  await yargs
+  console.log("in cli",process.argv)
+  const comm =  yargs
     .command(migrateCommand)
     .command(createCommand)
     .command(dryRunCommand)
     .demandCommand()
-    .help("help").argv;
+    .help("help")
+  // console.log(comm)
+
+  await comm.argv;
+
+  // await Promise.resolve()
+
 }
