@@ -49,4 +49,6 @@ vwIDAQAB
 -----END PUBLIC KEY-----`,
 };
 
-export { defaultPayload, asymmetricAlgoKeyPair };
+const defaultSecret = "c9ab0fdc-b2dc-47ad-933b-87cf1b180ab5";
+
+export { defaultPayload, asymmetricAlgoKeyPair, defaultSecret };

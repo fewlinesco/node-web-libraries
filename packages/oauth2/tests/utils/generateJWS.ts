@@ -1,26 +1,21 @@
-import { AsymmetricAlgoKeyPair, JWTPayload, SupportedAlgo } from "@src/types";
+import { JWTPayload, SupportedAlgo } from "@src/types";
 import jwt from "jsonwebtoken";
 
-import { asymmetricAlgoKeyPair, defaultPayload } from ".";
+import { asymmetricAlgoKeyPair, defaultPayload, defaultSecret } from ".";
 
 export function generateJWS(
-  customPayload: Partial<JWTPayload>,
-  customAsymmetricAlgoKeyPair: AsymmetricAlgoKeyPair,
   algorithm: SupportedAlgo,
+  customPayload?: Partial<JWTPayload>,
+  secretOrPrivateKey = algorithm === "RS256"
+    ? asymmetricAlgoKeyPair.privateKey
+    : defaultSecret,
 ): string {
   const JWSPayload = {
     ...defaultPayload,
     ...customPayload,
   };
 
-  const asyncKeyPair = {
-    ...asymmetricAlgoKeyPair,
-    ...customAsymmetricAlgoKeyPair,
-  };
-
-  const { privateKey } = asyncKeyPair;
-
-  return jwt.sign(JWSPayload, privateKey, {
+  return jwt.sign(JWSPayload, secretOrPrivateKey, {
     algorithm,
   });
 }
