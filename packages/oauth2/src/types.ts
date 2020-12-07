@@ -44,3 +44,18 @@ export type OAuth2Tokens = {
   access_token: string;
   id_token?: string;
 };
+
+export type JWTPayload = {
+  aud: string[];
+  exp: number;
+  iss: string;
+  scope: string;
+  sub: string;
+};
+
+export type AsymmetricAlgoKeyPair = {
+  privateKey: string;
+  publicKey: string;
+};
+
+export type SupportedAlgo = "RS256" | "HS256";

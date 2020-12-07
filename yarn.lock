@@ -321,14 +321,6 @@
   dependencies:
     logfmt "1.3.2"
 
-"@fwl/database@0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@fwl/database/-/database-0.1.3.tgz#a77965ff1696f3df13838b20eb83e21ac7fed3e8"
-  integrity sha512-dZYVoI6Ev0K7pjoZDoNBjB0uwfmh/mcsAqpsairsvMKAMfRcv2KbgWe6hSofyvR0RKqXagXi94GQ6eolMgbPDg==
-  dependencies:
-    "@fwl/tracing" "0.3.3"
-    pg "8.3.0"
-
 "@fwl/tracing@0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.2.1.tgz#23d135d7cb1394807c40fcff1355045c63723198"
@@ -980,11 +972,6 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
   integrity sha512-l42BggppR6zLmpfU6fq9HEa2oGPEI8yrSPL3GITjfRInppYFahObbIQOQK3UGxEnyQpltZLaPe75046NOZQikw==
-
-"@types/uuid@8.0.0":
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.0.0.tgz#165aae4819ad2174a17476dbe66feebd549556c0"
-  integrity sha512-xSQfNcvOiE5f9dyd4Kzxbof1aTrLobL278pGLKOZI6esGfZ7ts9Ka16CzIN6Y8hFHE1C7jIBZokULhK1bOgjRw==
 
 "@types/yargs-parser@*":
   version "15.0.0"
@@ -5365,11 +5352,6 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
-
-uuid@8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.2.0.tgz#cb10dd6b118e2dada7d0cd9730ba7417c93d920e"
-  integrity sha512-CYpGiFTUrmI6OBMkAdjSDM0k5h8SkkiTP4WAjQgDgNB1S3Ou9VBEvr6q0Kv2H1mMk7IWfxYGpMH5sd5AvcIV2Q==
 
 uuid@^3.3.2, uuid@^3.3.3:
   version "3.4.0"
