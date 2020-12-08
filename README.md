@@ -30,7 +30,7 @@ Provides a migration tool using SQL files.
 
 ## Tracing
 
-Provides an interface other OpenTelemetry.
+Provides an interface over OpenTelemetry.
 
 [Tracing documentation](./packages/tracing/README.md)
 
