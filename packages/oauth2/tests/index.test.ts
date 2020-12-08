@@ -1,3 +1,4 @@
+import { OAuth2ClientConstructor, OpenIDConfiguration } from "@src/types";
 import crypto from "crypto";
 import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
@@ -11,7 +12,6 @@ import OAuth2Client, {
   AlgoNotSupported,
   ScopesNotSupported,
 } from "../index";
-import { OAuth2ClientConstructor, OpenIDConfiguration } from "../src/types";
 
 enableFetchMocks();
 

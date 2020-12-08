@@ -53,9 +53,12 @@ export type JWTPayload = {
   sub: string;
 };
 
-export type AsymmetricAlgoKeyPair = {
-  privateKey: string;
-  publicKey: string;
-};
+export enum SupportedAlgo {
+  RS256 = "RS256",
+  HS256 = "HS256",
+}
 
-export type SupportedAlgo = "RS256" | "HS256";
+export type CustomGenerateJWSOptions = {
+  customPayload?: Partial<JWTPayload>;
+  secretOrPrivateKey?: string;
+};

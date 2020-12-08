@@ -1,6 +1,5 @@
+import { decodeJWTPart } from "@src/utils/decodeJWTPart";
 import jwt from "jsonwebtoken";
-
-import { decodeJWTPart } from "../src/utils/decodeJWTPart";
 
 describe("decodeJWTPart", () => {
   const mockedClientSecret = "bar";
