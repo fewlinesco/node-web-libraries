@@ -1,7 +1,10 @@
-import { JWTPayload, SupportedAlgo } from "@src/types";
+import type { JWTPayload, SupportedAlgo } from "@src/types";
+import {
+  asymmetricAlgoKeyPair,
+  defaultPayload,
+  defaultSecret,
+} from "@tests/utils";
 import jwt from "jsonwebtoken";
-
-import { asymmetricAlgoKeyPair, defaultPayload, defaultSecret } from ".";
 
 export function generateJWS(
   algorithm: SupportedAlgo,

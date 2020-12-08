@@ -1,6 +1,5 @@
 import { JWTPayload } from "@src/types";
-
-export { generateJWS } from "./generateJWS";
+export { generateJWS } from "@tests/utils/generateJWS";
 
 const defaultPayload: JWTPayload = {
   aud: ["oauth2"],
