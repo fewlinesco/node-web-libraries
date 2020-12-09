@@ -1,11 +1,11 @@
-import { JWTPayload, CustomPayload } from "@src/types";
+import type { JWTPayload, CustomPayload } from "@src/types";
 export { generateHS256JWS, generateRS256JWS } from "@tests/utils/generateJWS";
 
 const defaultPayload: JWTPayload = {
   aud: ["oauth2"],
   exp: Date.now() + 3600,
-  iss: "fwl",
-  scope: "phone email",
+  iss: "https://fwl.test",
+  scope: "email",
   sub: "2a14bdd2-3628-4912-a76e-fd514b5c27a8",
 };
 
