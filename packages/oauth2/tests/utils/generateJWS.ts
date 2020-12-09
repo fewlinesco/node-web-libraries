@@ -1,5 +1,4 @@
-import { AlgoNotSupported } from "@src/errors";
-import { CustomGenerateJWSOptions, SupportedAlgo } from "@src/types";
+import type { CustomPayload } from "@src/types";
 import {
   defaultAsymmetricAlgoKeyPair,
   defaultPayload,
@@ -7,49 +6,33 @@ import {
 } from "@tests/utils";
 import jwt from "jsonwebtoken";
 
-export function generateDefaultHS256JWS(): string {
-  return jwt.sign(defaultPayload, defaultSecret, {
-    algorithm: SupportedAlgo.HS256,
-  });
-}
-
-export function generateDefaultRS256JWS(): string {
-  return jwt.sign(defaultPayload, defaultAsymmetricAlgoKeyPair.privateKey, {
-    algorithm: SupportedAlgo.RS256,
-  });
-}
-
-export function generateCustomJWS(
-  algorithm: SupportedAlgo,
-  customOption: CustomGenerateJWSOptions,
+export function generateHS256JWS(
+  customPayload?: CustomPayload,
+  secret?: string,
 ): string {
-  const { customPayload, secretOrPrivateKey } = customOption;
-
-  const JWSPayload = {
+  const composedJWTPayload = {
     ...defaultPayload,
     ...customPayload,
   };
 
-  switch (algorithm) {
-    case "HS256":
-      return jwt.sign(
-        JWSPayload,
-        secretOrPrivateKey ? secretOrPrivateKey : defaultSecret,
-        {
-          algorithm,
-        },
-      );
-    case "RS256":
-      return jwt.sign(
-        JWSPayload,
-        secretOrPrivateKey
-          ? secretOrPrivateKey
-          : defaultAsymmetricAlgoKeyPair.privateKey,
-        {
-          algorithm,
-        },
-      );
-    default:
-      throw new AlgoNotSupported();
-  }
+  return jwt.sign(composedJWTPayload, secret ? secret : defaultSecret, {
+    algorithm: "HS256",
+  });
+}
+
+export function generateRS256JWS(
+  customPayload?: CustomPayload,
+  privateKey?: string,
+): string {
+  const composedJWTPayload = {
+    ...defaultPayload,
+    ...customPayload,
+  };
+  return jwt.sign(
+    composedJWTPayload,
+    privateKey ? privateKey : defaultAsymmetricAlgoKeyPair.privateKey,
+    {
+      algorithm: "RS256",
+    },
+  );
 }

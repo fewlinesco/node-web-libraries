@@ -53,12 +53,4 @@ export type JWTPayload = {
   sub: string;
 };
 
-export enum SupportedAlgo {
-  RS256 = "RS256",
-  HS256 = "HS256",
-}
-
-export type CustomGenerateJWSOptions = {
-  customPayload?: Partial<JWTPayload>;
-  secretOrPrivateKey?: string;
-};
+export type CustomPayload = Partial<JWTPayload>;

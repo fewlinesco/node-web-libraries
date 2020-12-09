@@ -6,10 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changes
 
-- Added function to generate JWS (`generateJWS`).
+- Added two new functions to generate JWS:
+  - generateHS256JWS
+  - generateRS256JWS
 - The package now export the following default object to help tests writing:
-  - `defaultPayload` - A default JWT payload.
-  - `asymmetricAlgoKeyPair` - A default pair of private and public key.
+  - `defaultPayload` - Default JWT payload.
+  - `asymmetricAlgoKeyPair` - Default pair of private and public key used for **RS256**.
+  - `defaultSecret` - Default secret used for **HS256**
 
 ### Bumps
 

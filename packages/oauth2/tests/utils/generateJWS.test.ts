@@ -1,18 +1,23 @@
-import { SupportedAlgo } from "@src/types";
 import { decodeJWTPart } from "@src/utils/decodeJWTPart";
 import {
   defaultPayload,
-  generateCustomJWS,
-  generateDefaultHS256JWS,
-  generateDefaultRS256JWS,
+  generateHS256JWS,
+  generateRS256JWS,
 } from "@tests/utils";
 
 describe("generateJWS", () => {
-  describe("generateDefaultJWS", () => {
-    test("should generate an HS256 signed JWS", () => {
+  const exp = Date.now() - 3600;
+
+  const customPayload = {
+    exp,
+    scope: "profile",
+  };
+
+  describe("HS256", () => {
+    test("should generate an HS256 signed JWS if no arguments are provided", () => {
       expect.assertions(3);
 
-      const HS256JWS = generateDefaultHS256JWS();
+      const HS256JWS = generateHS256JWS();
       expect(HS256JWS.split(".").length).toEqual(3);
 
       const [JWA, payload] = HS256JWS.split(".");
@@ -26,41 +31,12 @@ describe("generateJWS", () => {
       );
     });
 
-    test("should generate an RS256 signed JWS", () => {
-      expect.assertions(3);
-
-      const RS256JWS = generateDefaultRS256JWS();
-      expect(RS256JWS.split(".").length).toEqual(3);
-
-      const [JWA, payload] = RS256JWS.split(".");
-
-      const decodedPayload = decodeJWTPart(payload);
-      expect(decodedPayload).toEqual(expect.objectContaining(defaultPayload));
-
-      const decodedJWA = decodeJWTPart(JWA);
-      expect(decodedJWA).toEqual(
-        expect.objectContaining({ alg: "RS256", typ: "JWT" }),
-      );
-    });
-  });
-
-  describe("generateCustomJWS", () => {
-    const exp = Date.now() - 3600;
-
-    const customPayload = {
-      exp,
-      scope: "profile",
-    };
-
-    test("should generate a JWS when passing a custom payload and custom secret for HS256", () => {
+    test("should generate an HS256 signed JWS when passing a custom payload and custom secret", () => {
       expect.assertions(2);
 
       const customSecret = "1e5e7658-49de-4581-b8ee-fa14202d0e2a";
 
-      const HS256JWS = generateCustomJWS(SupportedAlgo.HS256, {
-        customPayload,
-        secretOrPrivateKey: customSecret,
-      });
+      const HS256JWS = generateHS256JWS(customPayload, customSecret);
 
       const [JWA, payload] = HS256JWS.split(".");
 
@@ -74,8 +50,27 @@ describe("generateJWS", () => {
         expect.objectContaining({ alg: "HS256", typ: "JWT" }),
       );
     });
+  });
 
-    test("should generate a JWS when passing a custom payload and custom private key for RS256", () => {
+  describe("generateRS256JWS", () => {
+    test("should generate an RS256 signed JWS if no arguments are provided", () => {
+      expect.assertions(3);
+
+      const RS256JWS = generateRS256JWS();
+      expect(RS256JWS.split(".").length).toEqual(3);
+
+      const [JWA, payload] = RS256JWS.split(".");
+
+      const decodedPayload = decodeJWTPart(payload);
+      expect(decodedPayload).toEqual(expect.objectContaining(defaultPayload));
+
+      const decodedJWA = decodeJWTPart(JWA);
+      expect(decodedJWA).toEqual(
+        expect.objectContaining({ alg: "RS256", typ: "JWT" }),
+      );
+    });
+
+    test("should generate an RS256 signed JWS when passing a custom payload and custom privateKey", () => {
       expect.assertions(2);
 
       const customPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -106,10 +101,7 @@ V6JGeHdSp+rHxMpmDMBTph+/gcLbxp2hQr/pjo8sidoewkp3sT5CoHNS/dvYEFon
 DuPT/XKDVlCokjlGegyaAEKQJuitiDuLFYHw33bnl2qyADl2/Z9c
 -----END RSA PRIVATE KEY-----`;
 
-      const RS256JWS = generateCustomJWS(SupportedAlgo.RS256, {
-        customPayload,
-        secretOrPrivateKey: customPrivateKey,
-      });
+      const RS256JWS = generateRS256JWS(customPayload, customPrivateKey);
 
       const [JWA, payload] = RS256JWS.split(".");
 

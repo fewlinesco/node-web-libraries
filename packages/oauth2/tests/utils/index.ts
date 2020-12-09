@@ -1,9 +1,5 @@
-import { JWTPayload } from "@src/types";
-export {
-  generateDefaultHS256JWS,
-  generateDefaultRS256JWS,
-  generateCustomJWS,
-} from "@tests/utils/generateJWS";
+import { JWTPayload, CustomPayload } from "@src/types";
+export { generateHS256JWS, generateRS256JWS } from "@tests/utils/generateJWS";
 
 const defaultPayload: JWTPayload = {
   aud: ["oauth2"],
@@ -54,4 +50,10 @@ vwIDAQAB
 
 const defaultSecret = "c9ab0fdc-b2dc-47ad-933b-87cf1b180ab5";
 
-export { defaultPayload, defaultAsymmetricAlgoKeyPair, defaultSecret };
+export {
+  defaultPayload,
+  defaultAsymmetricAlgoKeyPair,
+  defaultSecret,
+  JWTPayload,
+  CustomPayload,
+};
