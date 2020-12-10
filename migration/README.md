@@ -1,4 +1,4 @@
-# FWL Database
+# FWL Migration
 
 **Disclaimer**: this package is made for our internal usage and is only open source for convenience so we might not consider Pull Requests or Issues. Feel free to fork though.
 
@@ -65,14 +65,13 @@ You will have to give a config of `runMigrationsConfig` type as argument but you
 
 ```ts
 import * as migration from "@fwl/migration";
-import {defaultConfig as databaseDefaultConfig} from "@fwl/database";
+import { defaultConfig as databaseDefaultConfig } from "@fwl/database";
 
 migration.runMigrations({
   database: databaseDefaultConfig,
   migration: migration.defaultConfig,
 });
 ```
-
 
 #### createMigrationFile
 
