@@ -165,6 +165,8 @@ const defaultSecret = "c9ab0fdc-b2dc-47ad-933b-87cf1b180ab5";
 ### generateHS256JWS
 
 ```typescript
+import { generateHS256JWS } from "@fwl/oauth2/tests/utils"
+
 generateHS256JWS(customPayload?: CustomPayload, secret?: string): string {};
 ```
 
@@ -175,6 +177,8 @@ You can give a custom **secret** for signature, and/or a custom payload to custo
 ### generateRS256JWS
 
 ```typescript
+import { generateRS256JWS } from "@fwl/oauth2/tests/utils"
+
 generateRS256JWS(customPayload?: CustomPayload, secret?: string): string {};
 ```
 
