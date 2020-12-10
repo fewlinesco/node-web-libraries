@@ -53,4 +53,4 @@ export type JWTPayload = {
   sub: string;
 };
 
-export type CustomPayload = Partial<JWTPayload>;
+export type CustomPayload = Record<string, unknown>;
