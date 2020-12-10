@@ -10,26 +10,21 @@ export function generateHS256JWS(
   customPayload?: CustomPayload,
   secret?: string,
 ): string {
-  const composedJWTPayload = {
-    ...defaultPayload,
-    ...customPayload,
-  };
-
-  return jwt.sign(composedJWTPayload, secret ? secret : defaultSecret, {
-    algorithm: "HS256",
-  });
+  return jwt.sign(
+    customPayload ? customPayload : defaultPayload,
+    secret ? secret : defaultSecret,
+    {
+      algorithm: "HS256",
+    },
+  );
 }
 
 export function generateRS256JWS(
   customPayload?: CustomPayload,
   privateKey?: string,
 ): string {
-  const composedJWTPayload = {
-    ...defaultPayload,
-    ...customPayload,
-  };
   return jwt.sign(
-    composedJWTPayload,
+    customPayload ? customPayload : defaultPayload,
     privateKey ? privateKey : defaultAsymmetricAlgoKeyPair.privateKey,
     {
       algorithm: "RS256",
