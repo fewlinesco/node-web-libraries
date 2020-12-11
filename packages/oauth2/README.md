@@ -103,6 +103,30 @@ const decrypted = oauthClient.decryptJWE<{ [key: string]: string }>(
 
 `@fwl/oauth2` also provides utils functions and default objects that we are using in the package flow.
 
+### generateHS256JWS
+
+```typescript
+import { generateHS256JWS } from "@fwl/oauth2/tests/utils"
+
+generateHS256JWS(customPayload?: CustomPayload, secret?: string): string {};
+```
+
+If used without any argument, the function will return a default **HS256 JWS** composed of the default objects found below.
+
+You can give a custom **secret** for signature, and/or a custom payload to customize your **HS256 JWS**.
+
+### generateRS256JWS
+
+```typescript
+import { generateRS256JWS } from "@fwl/oauth2/tests/utils"
+
+generateRS256JWS(customPayload?: CustomPayload, secret?: string): string {};
+```
+
+If used without any argument, the function will return a default **RS256 JWS** composed of the default objects found below.
+
+You can give a custom **secret** for signature, and/or a custom payload to customize your **RS256 JWS**.
+
 ### default JWS composition objects
 
 The following exported objects are used when generating a **JWS** using `generateHS256JWS` and `generateHS256JWS`, while no arguments are passed:
@@ -162,38 +186,14 @@ vwIDAQAB
 const defaultSecret = "c9ab0fdc-b2dc-47ad-933b-87cf1b180ab5";
 ```
 
-### generateHS256JWS
-
-```typescript
-import { generateHS256JWS } from "@fwl/oauth2/tests/utils"
-
-generateHS256JWS(customPayload?: CustomPayload, secret?: string): string {};
-```
-
-If used without any argument, the function will return a default **HS256 JWS** of the above objects.
-
-You can give a custom **secret** for signature, and/or a custom payload to customize your **HS256 JWS**.
-
-### generateRS256JWS
-
-```typescript
-import { generateRS256JWS } from "@fwl/oauth2/tests/utils"
-
-generateRS256JWS(customPayload?: CustomPayload, secret?: string): string {};
-```
-
-If used without any argument, the function will return a default **RS256 JWS** of the above objects.
-
-You can give a custom **secret** for signature, and/or a custom payload to customize your **RS256 JWS**.
-
 ### decodeJWTPart
 
-Takes a part from a JWT (e.g. the header, or the payload), and decode it.
+Takes a part from a JWT (e.g. the JWA, or the payload), and decode it.
 
 ```typescript
-const [header, payload] = JWT.split(".");
+const [JWA, payload] = JWT.split(".");
 
-const decodedHeader = decodeJWTPart(header);
+const decodedJWA = decodeJWTPart(JWA);
 const decodedPayload = decodeJWTPart(payload);
 ```
 
