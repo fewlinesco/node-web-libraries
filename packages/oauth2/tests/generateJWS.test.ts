@@ -1,6 +1,6 @@
 import { decodeJWTPart } from "@src/utils/decodeJWTPart";
-import { defaultPayload } from "@tests/utils";
-import { generateHS256JWS, generateRS256JWS } from "@tests/utils/generateJWS";
+import { defaultPayload } from "@src/utils/defaultObjects";
+import { generateHS256JWS, generateRS256JWS } from "@src/utils/generateJWS";
 
 describe("generateJWS", () => {
   const exp = Date.now() - 3600;

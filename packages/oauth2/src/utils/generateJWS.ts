@@ -3,7 +3,7 @@ import {
   defaultAsymmetricAlgoKeyPair,
   defaultPayload,
   defaultSecret,
-} from "@tests/utils";
+} from "@src/utils/defaultObjects";
 import jwt from "jsonwebtoken";
 
 export function generateHS256JWS(

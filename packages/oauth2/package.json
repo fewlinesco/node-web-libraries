@@ -61,7 +61,7 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "repository": {
     "type": "git",
     "url": "https://github.com/fewlinesco/node-web-libraries/tree/master/packages/oauth2"
