@@ -1,4 +1,6 @@
-const defaultPayload = {
+import { JWTPayload } from "@src/types";
+
+const defaultPayload: JWTPayload = {
   aud: ["oauth2"],
   exp: Date.now() + 3600,
   iss: "https://fwl.test",

@@ -134,7 +134,7 @@ You can give a custom **secret** for signature, and/or a custom payload to custo
 The following exported objects are used when generating a **JWS** using `generateHS256JWS` and `generateHS256JWS`, while no arguments are passed:
 
 ```typescript
-const defaultPayload = {
+const defaultPayload: JWTPayload = {
   aud: ["oauth2"],
   exp: Date.now() + 3600,
   iss: "https://fwl.test",
