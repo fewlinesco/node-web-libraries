@@ -2,9 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.7] - 2020-12-14
+
+- Changed export of all objects from version `[0.1.5]` to the default `"@fwl/oauth2"`.
+
 ## [0.1.6] - 2020-12-14
 
-- Changed export of all functions and objects from version `[0.1.5]` to the default `"@fwl/oauth2"`.
+- Changed export of all functions from version `[0.1.5]` to the default `"@fwl/oauth2"`.
 - Improved documentation
 
 ## [0.1.5] - 2020-12-08
