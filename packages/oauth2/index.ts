@@ -20,6 +20,11 @@ import {
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
+import {
+  defaultAsymmetricAlgoKeyPair,
+  defaultPayload,
+  defaultSecret,
+} from "./tests/utils";
 import { generateHS256JWS, generateRS256JWS } from "./tests/utils/generateJWS";
 
 class OAuth2Client {
@@ -261,4 +266,7 @@ export {
   CustomPayload,
   generateHS256JWS,
   generateRS256JWS,
+  defaultPayload,
+  defaultAsymmetricAlgoKeyPair,
+  defaultSecret,
 };
