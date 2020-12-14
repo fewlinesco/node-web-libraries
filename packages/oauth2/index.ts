@@ -19,13 +19,13 @@ import {
   CustomPayload,
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
-import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
 import {
   defaultAsymmetricAlgoKeyPair,
   defaultPayload,
   defaultSecret,
-} from "./tests/utils";
-import { generateHS256JWS, generateRS256JWS } from "./tests/utils/generateJWS";
+} from "./src/utils/defaultObjects";
+import { generateHS256JWS, generateRS256JWS } from "./src/utils/generateJWS";
+import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
 
 class OAuth2Client {
   readonly openIDConfigurationURL: string;

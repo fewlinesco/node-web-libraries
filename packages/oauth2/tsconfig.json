@@ -10,12 +10,7 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "incremental": true,
-    "baseUrl": "./",
-    "paths": {
-      "@src/*": ["src/*"],
-      "@tests/*": ["tests/*"]
-    }
+    "incremental": true
   },
   "include": ["."],
   "exclude": ["node_modules", "dist"]

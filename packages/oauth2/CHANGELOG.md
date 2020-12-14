@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.8] - 2020-12-14
+
+- Moved all exported objects and functions to `src` to prevent import issues.
+- Removed TS path aliases.
+
 ## [0.1.7] - 2020-12-14
 
 - Changed export of all objects from version `[0.1.5]` to the default `"@fwl/oauth2"`.

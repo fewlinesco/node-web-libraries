@@ -1,10 +1,11 @@
-import type { CustomPayload } from "@src/types";
+import jwt from "jsonwebtoken";
+
+import { CustomPayload } from "../types";
 import {
   defaultAsymmetricAlgoKeyPair,
   defaultPayload,
   defaultSecret,
-} from "@tests/utils";
-import jwt from "jsonwebtoken";
+} from "./defaultObjects";
 
 export function generateHS256JWS(
   customPayload?: CustomPayload,

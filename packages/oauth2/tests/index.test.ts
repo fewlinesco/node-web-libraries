@@ -1,6 +1,3 @@
-import { OAuth2ClientConstructor, OpenIDConfiguration } from "@src/types";
-import { defaultPayload, defaultSecret } from "@tests/utils";
-import { generateHS256JWS } from "@tests/utils/generateJWS";
 import crypto from "crypto";
 import fetch from "jest-fetch-mock";
 import { enableFetchMocks } from "jest-fetch-mock";
@@ -13,6 +10,11 @@ import OAuth2Client, {
   MissingKeyIDHS256,
   AlgoNotSupported,
   ScopesNotSupported,
+  defaultSecret,
+  OAuth2ClientConstructor,
+  defaultPayload,
+  OpenIDConfiguration,
+  generateHS256JWS,
 } from "../index";
 
 enableFetchMocks();

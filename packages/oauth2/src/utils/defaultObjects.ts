@@ -1,4 +1,4 @@
-import { JWTPayload } from "@src/types";
+import { JWTPayload } from "../types";
 
 const defaultPayload: JWTPayload = {
   aud: ["oauth2"],

@@ -1,6 +1,6 @@
-import { decodeJWTPart } from "@src/utils/decodeJWTPart";
-import { defaultPayload } from "@tests/utils";
-import { generateHS256JWS, generateRS256JWS } from "@tests/utils/generateJWS";
+import { decodeJWTPart } from "../src/utils/decodeJWTPart";
+import { defaultPayload } from "../src/utils/defaultObjects";
+import { generateHS256JWS, generateRS256JWS } from "../src/utils/generateJWS";
 
 describe("generateJWS", () => {
   const exp = Date.now() - 3600;
@@ -33,7 +33,10 @@ describe("generateJWS", () => {
 
       const customSecret = "1e5e7658-49de-4581-b8ee-fa14202d0e2a";
 
-      const HS256JWS = generateHS256JWS(customPayload, customSecret);
+      const HS256JWS = generateHS256JWS(
+        { ...defaultPayload, ...customPayload },
+        customSecret,
+      );
 
       const [JWA, payload] = HS256JWS.split(".");
 
@@ -98,7 +101,10 @@ V6JGeHdSp+rHxMpmDMBTph+/gcLbxp2hQr/pjo8sidoewkp3sT5CoHNS/dvYEFon
 DuPT/XKDVlCokjlGegyaAEKQJuitiDuLFYHw33bnl2qyADl2/Z9c
 -----END RSA PRIVATE KEY-----`;
 
-      const RS256JWS = generateRS256JWS(customPayload, customPrivateKey);
+      const RS256JWS = generateRS256JWS(
+        { ...defaultPayload, ...customPayload },
+        customPrivateKey,
+      );
 
       const [JWA, payload] = RS256JWS.split(".");
 
