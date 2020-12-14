@@ -23,6 +23,8 @@ You first need to initialize the client instance, called `OAuth2Client`. This cl
 - `scopes`: It represents the kind of information and actions that an Application is able to access on another Application. Every scope has to be authorized by the User during sign in operation.
 
 ```typescript
+import OAuth2Client, { OAuth2ClientConstructor } from "@fwl/oauth2";
+
 const oauthClientConstructorProps: OAuth2ClientConstructor = {
   openIDConfigurationURL: "***",
   clientID: "***",
@@ -106,7 +108,7 @@ const decrypted = oauthClient.decryptJWE<{ [key: string]: string }>(
 ### generateHS256JWS
 
 ```typescript
-import { generateHS256JWS } from "@fwl/oauth2/tests/utils"
+import { generateHS256JWS } from "@fwl/oauth2"
 
 generateHS256JWS(customPayload?: CustomPayload, secret?: string): string {};
 ```
@@ -118,7 +120,7 @@ You can give a custom **secret** for signature, and/or a custom payload to custo
 ### generateRS256JWS
 
 ```typescript
-import { generateRS256JWS } from "@fwl/oauth2/tests/utils"
+import { generateRS256JWS } from "@fwl/oauth2"
 
 generateRS256JWS(customPayload?: CustomPayload, secret?: string): string {};
 ```
@@ -186,11 +188,23 @@ vwIDAQAB
 const defaultSecret = "c9ab0fdc-b2dc-47ad-933b-87cf1b180ab5";
 ```
 
+They are all imported like so:
+
+```typescript
+import {
+  defaultAsymmetricAlgoKeyPair,
+  defaultPayload,
+  defaultSecret,
+} from "@fwl/oauth2";
+```
+
 ### decodeJWTPart
 
 Takes a part from a JWT (e.g. the JWA, or the payload), and decode it.
 
 ```typescript
+import { decodeJWTPart } from "@fwl/oauth2";
+
 const [JWA, payload] = JWT.split(".");
 
 const decodedJWA = decodeJWTPart(JWA);
@@ -202,6 +216,8 @@ const decodedPayload = decodeJWTPart(payload);
 Takes a modulus and an exponent (found in the `JWKS`), and recreate a public key.
 
 ```typescript
+import { rsaPublicKeyToPEM } from "@fwl/oauth2";
+
 const key = {
   e: "AQAB",
   kty: "RSA",

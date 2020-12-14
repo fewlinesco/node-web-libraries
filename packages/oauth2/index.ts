@@ -15,9 +15,12 @@ import {
   OAuth2ClientConstructor,
   JWKSDT,
   OAuth2Tokens,
+  JWTPayload,
+  CustomPayload,
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
+import { generateHS256JWS, generateRS256JWS } from "./tests/utils/generateJWS";
 
 class OAuth2Client {
   readonly openIDConfigurationURL: string;
@@ -254,4 +257,8 @@ export {
   InvalidAudience,
   ScopesNotSupported,
   OAuth2Tokens,
+  JWTPayload,
+  CustomPayload,
+  generateHS256JWS,
+  generateRS256JWS,
 };
