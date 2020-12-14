@@ -1,5 +1,6 @@
 import { decodeJWTPart } from "@src/utils/decodeJWTPart";
-import { defaultPayload, generateRS256JWS } from "@tests/utils";
+import { defaultPayload } from "@tests/utils";
+import { generateRS256JWS } from "@tests/utils/generateJWS";
 
 describe("decodeJWTPart", () => {
   const JWS = generateRS256JWS();
