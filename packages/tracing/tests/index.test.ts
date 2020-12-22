@@ -9,6 +9,27 @@ describe("InMemoryTracer:", () => {
     tracer = new InMemoryTracer();
   });
 
+  describe("rootSpan function:", () => {
+    test("it should create basic `InMemorySpan`", async (done) => {
+      expect.assertions(2);
+
+      spanNames.forEach((spanName) => {
+        const span = tracer.createRootSpan(spanName);
+        span.end();
+      });
+
+      const spans = tracer.searchSpanByName("first-span");
+
+      expect(spans.length).toEqual(1);
+
+      spans.forEach((span) => {
+        expect(span.name).toBe("first-span");
+      });
+
+      done();
+    });
+  });
+
   describe("span function:", () => {
     test("it should create `InMemorySpan`", async (done) => {
       expect.assertions(8);

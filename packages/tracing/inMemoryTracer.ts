@@ -34,14 +34,17 @@ class InMemorySpan implements Span {
   }
 
   context(): types.SpanContext {
+    const traceStateData: Record<string, string> = {};
     const traceState: types.TraceState = {
-      get: () => undefined,
-      set: () => {
-        return;
+      get: (key: string) => traceStateData[key],
+      set: (key: string, value: string) => {
+        traceStateData[key] = value;
+        return traceState;
       },
       serialize: () => "",
-      unset: () => {
-        return;
+      unset: (key: string) => {
+        delete traceStateData[key];
+        return traceState;
       },
     };
 
@@ -54,12 +57,12 @@ class InMemorySpan implements Span {
     };
   }
 
-  setAttribute(key: string, _value: unknown): this {
+  setAttribute(key: string, _value: types.AttributeValue): this {
     this.attributes[key] = "[REDACTED]";
     return this;
   }
 
-  setDisclosedAttribute(key: string, value: unknown): this {
+  setDisclosedAttribute(key: string, value: types.AttributeValue): this {
     this.attributes[key] = value;
     return this;
   }
@@ -91,11 +94,16 @@ type SpanCallback<T> = (span: InMemorySpan) => Promise<T>;
 
 export class InMemoryTracer {
   public spans: InMemorySpan[];
+  private rootSpan?: InMemorySpan;
   private currentSpan?: InMemorySpan;
   private currentSpanId = 0;
 
   constructor() {
     this.spans = [];
+  }
+
+  createRootSpan(name: string): InMemorySpan {
+    return this.createSpan(name);
   }
 
   createSpan(name: string): InMemorySpan {

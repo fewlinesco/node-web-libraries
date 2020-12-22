@@ -1,11 +1,17 @@
 # CHANGELOG
 
+## 0.5.0 - 20200-12-22
+
+- Add a `createRootSpan` function that will start a trace when the plugins can't be loaded (for instance, for a Next application).
+- OpenTelemetry dependencies bumped to `0.14.0`.
+- Removed OpenTelemetry Plugins to keep only `http` and `https` (loaded by default by OpenTelemetry).
+- Added an `examples` directory.
+
 ## 0.4.0 - 2020-08-20
 
 - The exported `Span` interface is now different from the one provided by `@opentelemetry/api` and only exposees `setAttribute`, `setDisclosedAttribute` and `end`.
 
 - When using `setAttribute` on a `Span`, it will obfuscate values by default. Use `setDisclosedAttribute` to explicitely do so for a value.
-
 
 ## 0.3.3 - 2020-08-19
 
