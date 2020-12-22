@@ -44,3 +44,13 @@ export type OAuth2Tokens = {
   access_token: string;
   id_token?: string;
 };
+
+export type JWTPayload = {
+  aud: string | string[];
+  exp: number;
+  iss: string;
+  scope: string;
+  sub: string;
+};
+
+export type CustomPayload = Record<string, unknown>;

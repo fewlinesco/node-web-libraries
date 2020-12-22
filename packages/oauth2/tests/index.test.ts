@@ -10,8 +10,12 @@ import OAuth2Client, {
   MissingKeyIDHS256,
   AlgoNotSupported,
   ScopesNotSupported,
+  defaultSecret,
+  OAuth2ClientConstructor,
+  defaultPayload,
+  OpenIDConfiguration,
+  generateHS256JWS,
 } from "../index";
-import { OAuth2ClientConstructor, OpenIDConfiguration } from "../src/types";
 
 enableFetchMocks();
 
@@ -22,10 +26,10 @@ describe("OAuth2Client", () => {
 
   const oauthClientConstructorProps: OAuth2ClientConstructor = {
     openIDConfigurationURL: "http://mocked-openid-url.test",
-    clientID: "mockedClientID",
-    clientSecret: "mockedClientSecret",
+    clientID: "7dc44ab1-177a-459f-8be5-e485f16c8e87",
+    clientSecret: defaultSecret,
     redirectURI: "http://mocked-redirect-url.test",
-    audience: "connect-account",
+    audience: defaultPayload.aud[0],
     scopes: ["email", "phone"],
     fetch: fetch,
   };
@@ -63,14 +67,6 @@ describe("OAuth2Client", () => {
     ],
   };
 
-  const mockedJWTPayload = {
-    aud: ["connect-account"],
-    exp: Date.now() + 300,
-    iss: "foo",
-    scope: "phone email",
-    sub: "2a14bdd2-3628-4912-a76e-fd514b5c27a8",
-  };
-
   describe("getAuthorizationURL", () => {
     test("should initialize the openIDConfiguration", async () => {
       expect.assertions(2);
@@ -96,8 +92,7 @@ describe("OAuth2Client", () => {
 
       const authURL = await oauthClient.getAuthorizationURL();
 
-      const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone";
+      const expectedAuthURL = `http://mocked-auth-endpoint.test/?client_id=${oauthClientConstructorProps.clientID}&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone`;
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -111,8 +106,7 @@ describe("OAuth2Client", () => {
 
       const authURL = await oauthClient.getAuthorizationURL("http://foo.bar");
 
-      const expectedAuthURL =
-        "http://mocked-auth-endpoint.test/?client_id=mockedClientID&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone&state=http%3A%2F%2Ffoo.bar";
+      const expectedAuthURL = `http://mocked-auth-endpoint.test/?client_id=${oauthClientConstructorProps.clientID}&response_type=code&redirect_uri=http%3A%2F%2Fmocked-redirect-url.test&scope=email+phone&state=http%3A%2F%2Ffoo.bar`;
 
       expect(authURL.href).toMatch(expectedAuthURL);
     });
@@ -187,13 +181,7 @@ describe("OAuth2Client", () => {
   });
 
   describe("verifyJWT", () => {
-    const { clientSecret } = oauthClientConstructorProps;
-
-    const RS256 = "RS256";
-    const HS256 = "HS256";
-    const HS256JWT = jwt.sign(mockedJWTPayload, clientSecret, {
-      algorithm: HS256,
-    });
+    const HS256JWT = generateHS256JWS();
 
     test("should initialize the openIDConfiguration", async () => {
       expect.assertions(2);
@@ -204,7 +192,7 @@ describe("OAuth2Client", () => {
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      await oauthClient.verifyJWT(HS256JWT, HS256);
+      await oauthClient.verifyJWT(HS256JWT, "HS256");
 
       expect(oauthClient.openIDConfiguration).not.toBe(undefined);
       expect(oauthClient.openIDConfiguration).toEqual(
@@ -221,16 +209,13 @@ describe("OAuth2Client", () => {
 
       const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-      const wrongAudienceHS256JWT = jwt.sign(
-        { ...mockedJWTPayload, aud: "foo" },
-        clientSecret,
-        {
-          algorithm: HS256,
-        },
+      const wrongAudienceHS256JWT = generateHS256JWS(
+        { ...defaultPayload, aud: ["foo"] },
+        defaultSecret,
       );
 
       await oauthClient
-        .verifyJWT(wrongAudienceHS256JWT, HS256)
+        .verifyJWT(wrongAudienceHS256JWT, "HS256")
         .catch((error) => {
           expect(error).toBeInstanceOf(InvalidAudience);
           expect(error.message).toBe("Invalid audience");
@@ -247,10 +232,10 @@ describe("OAuth2Client", () => {
 
         const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-        const decoded = await oauthClient.verifyJWT(HS256JWT, HS256);
+        const decoded = await oauthClient.verifyJWT(HS256JWT, "HS256");
 
         expect(decoded).not.toBe(undefined);
-        expect(decoded).toEqual(expect.objectContaining(mockedJWTPayload));
+        expect(decoded).toEqual(expect.objectContaining(defaultPayload));
       });
 
       test("it should throw an error if using the wrong client secret", async () => {
@@ -262,10 +247,13 @@ describe("OAuth2Client", () => {
 
         const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
-        const wrongClientSecretHS256JWT = jwt.sign(mockedJWTPayload, "foo");
+        const wrongClientSecretHS256JWT = generateHS256JWS(
+          defaultPayload,
+          "wrong-client-secret",
+        );
 
         await oauthClient
-          .verifyJWT(wrongClientSecretHS256JWT, HS256)
+          .verifyJWT(wrongClientSecretHS256JWT, "HS256")
           .catch((error) => expect(error).toBeInstanceOf(JsonWebTokenError));
       });
 
@@ -279,7 +267,7 @@ describe("OAuth2Client", () => {
         const oauthClient = new OAuth2Client(oauthClientConstructorProps);
 
         await oauthClient
-          .verifyJWT("foo", HS256)
+          .verifyJWT("foo", "HS256")
           .catch((error) => expect(error).toBeInstanceOf(SyntaxError));
       });
     });
@@ -287,6 +275,11 @@ describe("OAuth2Client", () => {
     describe("RS256 signed JWT", () => {
       const RS256JWT =
         "eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ2NTEyZjUzLTk3NzQtNGE1OC04MzBjLTk4MTg4NmM4YmI0MyIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiY29ubmVjdC1hY2NvdW50Il0sImV4cCI6MjUyNDY1MTIwMCwiaXNzIjoiaHR0cHM6Ly9icy1wcm92aWRlci5wcm9kLmNvbm5lY3QuY29ubmVjdC5hd3MuZXUtd2VzdC0yLms4cy5mZXdsaW5lcy5uZXQiLCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzdWIiOiJjNGIxY2I1OS0xYzUwLTQ5NGEtODdlNS0zMmE1ZmU2ZTdjYWEifQ.dRw3QknDU9KOQR44tKLYkkasQvUenN3dbBai2f7omSpf1NCYSorisVpKUhS6luyhtZhL5H8q8oY95WlfU7XEdMk4iW9-VGlrWCVhD-NDdFC2nc_drz9aJm_tZDY-NL5l63PJuRchFmPuKEoehAQ6ZJfK63o_0VsutCQAOpqSocI";
+
+      const oauthClient = new OAuth2Client({
+        ...oauthClientConstructorProps,
+        audience: "connect-account",
+      });
 
       test("It should return a decoded jwt if valid", async () => {
         expect.assertions(2);
@@ -304,9 +297,7 @@ describe("OAuth2Client", () => {
           .once(JSON.stringify(mockedOpenIdConf))
           .once(JSON.stringify(mockedJWKS));
 
-        const oauthClient = new OAuth2Client(oauthClientConstructorProps);
-
-        const decodedJWT = await oauthClient.verifyJWT(RS256JWT, RS256);
+        const decodedJWT = await oauthClient.verifyJWT(RS256JWT, "RS256");
 
         expect(decodedJWT).not.toBe(undefined);
         expect(decodedJWT).toEqual(expect.objectContaining(mockedDecodedJWT));
@@ -328,13 +319,16 @@ describe("OAuth2Client", () => {
           ],
         };
 
+        const oauthClient = new OAuth2Client({
+          ...oauthClientConstructorProps,
+          audience: "connect-account",
+        });
+
         fetch
           .once(JSON.stringify(mockedOpenIdConf))
           .once(JSON.stringify(wrongKidJWKS));
 
-        const oauthClient = new OAuth2Client(oauthClientConstructorProps);
-
-        await oauthClient.verifyJWT(RS256JWT, RS256).catch((error) => {
+        await oauthClient.verifyJWT(RS256JWT, "RS256").catch((error) => {
           expect(error).toBeInstanceOf(InvalidKeyIDRS256);
           expect(error.message).toBe(
             "Invalid key ID (kid) for RS256 encoded JWT",
@@ -364,17 +358,15 @@ describe("OAuth2Client", () => {
           .once(JSON.stringify(mockedOpenIdConf))
           .once(JSON.stringify(mockedJWKS));
 
-        const oauthClient = new OAuth2Client(oauthClientConstructorProps);
-
         const missingKidJWT = jwt.sign(
           { audience: "fooBar" },
           { key: privateKey, passphrase },
           {
-            algorithm: RS256,
+            algorithm: "RS256",
           },
         );
 
-        await oauthClient.verifyJWT(missingKidJWT, RS256).catch((error) => {
+        await oauthClient.verifyJWT(missingKidJWT, "RS256").catch((error) => {
           expect(error).toBeInstanceOf(MissingKeyIDHS256);
           expect(error.message).toBe(
             "Missing key ID (kid) for RS256 encoded JWT",
@@ -389,13 +381,11 @@ describe("OAuth2Client", () => {
           .once(JSON.stringify(mockedOpenIdConf))
           .once(JSON.stringify(mockedJWKS));
 
-        const oauthClient = new OAuth2Client(oauthClientConstructorProps);
-
         const noAlgoJWT = jwt.sign({ audience: "fooBar" }, "fooBar", {
           algorithm: "none",
         });
 
-        await oauthClient.verifyJWT(noAlgoJWT, RS256).catch((error) => {
+        await oauthClient.verifyJWT(noAlgoJWT, "RS256").catch((error) => {
           expect(error).toBeInstanceOf(AlgoNotSupported);
           expect(error.message).toBe("Encoding algo not supported");
         });
@@ -442,10 +432,7 @@ describe("OAuth2Client", () => {
         },
       });
 
-      const mockedSignedJWT = jwt.sign(
-        mockedJWTPayload,
-        privateKeyForSignature,
-      );
+      const mockedSignedJWT = jwt.sign(defaultPayload, privateKeyForSignature);
 
       const josePublicKeyForEncryption = await jose.JWK.asKey(
         publicKeyForEncryption,

@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## 0.1.0 - 2020-08-19
+All notable changes to this project will be documented in this file.
+
+## [0.1.0] - 2020-08-19
 
 - Renamed `@fwl/migration` from `@fewlines/fwl-migration`
 
@@ -10,23 +12,23 @@
 
 - Bump `@fwl/database` to `0.1.3`
 
-## 0.1.6 - 2020-08-13
+## [0.1.6] - 2020-08-13
 
 - added `--dry-run` option to run pending migrations without commiting them to quickly check for errors
 
 - Dependencies bump:
   - `@fewlines/fwl-database`: `1.1.0` => `@fwl/database`: `0.1.1` (Package was renamed)
 
-## 0.1.5 - 2020-07-27
+## [0.1.5] - 2020-07-27
 
 - Dependencies bump:
   - `uuid`: `8.0.0` => `8.2.0`
 
-## 0.1.4 - 2020-06-15
+## [0.1.4] - 2020-06-15
 
 - Fixed the CLI call.
 
-## 0.1.3 - 2020-06-09
+## [0.1.3] - 2020-06-09
 
 - Fixed a bug related to unran migration from merged git branches timeline.
 
@@ -36,14 +38,14 @@
 
 - Added export of `SchemaMigrationsRow` type.
 
-## 0.1.2 - 2020-05-29
+## [0.1.2] - 2020-05-29
 
 - Added separate file to call migration as a CLI.
 
-## 0.1.1 - 2020-05-26
+## [0.1.1] - 2020-05-26
 
 - Fixed CLI script path call in package.json.
 
-## 0.1.0 - 2020-05-26
+## [0.1.0] - 2020-05-26
 
 - Created the package @fewlines/fwl-migration.

@@ -15,8 +15,16 @@ import {
   OAuth2ClientConstructor,
   JWKSDT,
   OAuth2Tokens,
+  JWTPayload,
+  CustomPayload,
 } from "./src/types";
 import { decodeJWTPart } from "./src/utils/decodeJWTPart";
+import {
+  defaultAsymmetricAlgoKeyPair,
+  defaultPayload,
+  defaultSecret,
+} from "./src/utils/defaultObjects";
+import { generateHS256JWS, generateRS256JWS } from "./src/utils/generateJWS";
 import { rsaPublicKeyToPEM } from "./src/utils/rsaPublicKeyToPEM";
 
 class OAuth2Client {
@@ -254,4 +262,11 @@ export {
   InvalidAudience,
   ScopesNotSupported,
   OAuth2Tokens,
+  JWTPayload,
+  CustomPayload,
+  generateHS256JWS,
+  generateRS256JWS,
+  defaultPayload,
+  defaultAsymmetricAlgoKeyPair,
+  defaultSecret,
 };

@@ -1,27 +1,17 @@
-import jwt from "jsonwebtoken";
-
 import { decodeJWTPart } from "../src/utils/decodeJWTPart";
+import { defaultPayload } from "../src/utils/defaultObjects";
+import { generateRS256JWS } from "../src/utils/generateJWS";
 
 describe("decodeJWTPart", () => {
-  const mockedClientSecret = "bar";
-
-  const mockedJWTPayload = {
-    aud: ["connect-account"],
-    exp: Date.now() + 300,
-    iss: "foo",
-    scope: "phone email",
-    sub: "2a14bdd2-3628-4912-a76e-fd514b5c27a8",
-  };
-
-  const JWT = jwt.sign(mockedJWTPayload, mockedClientSecret);
+  const JWS = generateRS256JWS();
 
   test("should should decode parts of a JWT", () => {
     expect.assertions(1);
 
-    const [, payload] = JWT.split(".");
+    const [, payload] = JWS.split(".");
 
     const decodedPayload = decodeJWTPart(payload);
 
-    expect(decodedPayload).toEqual(expect.objectContaining(mockedJWTPayload));
+    expect(decodedPayload).toEqual(expect.objectContaining(defaultPayload));
   });
 });

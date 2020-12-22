@@ -4,15 +4,9 @@ FWL (pronounced "fuel") are Fewlines Web Libraries.
 
 They are an ensemble of packages that allow us to build backend services in Typescript.
 
-## Config
-
-Provides the basic types for a file based config file.
-
-[Config documentation](./packages/config/README.md)
-
 ## Database
 
-Provides a interface for a Postgres database.
+Provides an interface for a Postgres database.
 
 [Database documentation](./packages/database/README.md)
 
@@ -24,9 +18,9 @@ Provides an interface for a simple logger.
 
 ## Migration
 
-Provides a migration tool using SQL files.
+Provides a migration tool using SQL files and a CLI.
 
-[Migration documentation](./packages/migration/README.md)
+[Migration documentation](./migration/README.md)
 
 ## Tracing
 
@@ -43,4 +37,5 @@ Provides a way of creating an Express application with custom Router and Handler
 ## OAuth2
 
 Provides a client that abstract Connect OAuth2 implementation, and gives tools to decrypt and verify JWS/JWE.
+
 [Web documentation](./packages/oauth2/README.md)
