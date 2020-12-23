@@ -22,7 +22,7 @@ describe("InMemoryTracer:", () => {
 
       expect(spans.length).toEqual(1);
 
-      expect(span[0].name).toBe("first-span");
+      expect(spans[0].name).toBe("first-span");
 
       done();
     });
