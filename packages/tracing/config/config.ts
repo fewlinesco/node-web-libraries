@@ -3,16 +3,6 @@ export type TracingConfig = {
   url: string;
 };
 
-// type LightsepConfig = {
-//   collector: "lightstep";
-//   serviceName: string;
-//   url: string;
-//   headers: {
-//     "Lightstep-Access-Token": string;
-//     [key: string]: string;
-//   };
-// };
-
 export const defaultConfig = (serviceName: string): TracingConfig => {
   return {
     serviceName,

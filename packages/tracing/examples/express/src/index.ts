@@ -5,7 +5,7 @@ import express from "express";
 const app = express();
 
 const tracer = getTracer();
-function tracerMiddleware(request, response, next) {
+function tracerMiddleware(request, response, next): void {
   const span = tracer.createSpan("middleware tracing");
   response.on("finish", () => {
     console.log("end createSpan");

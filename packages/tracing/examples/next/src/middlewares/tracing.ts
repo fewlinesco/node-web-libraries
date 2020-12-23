@@ -15,11 +15,16 @@ startTracer(
   logger,
 );
 
-export function withTracing(handler) {
+export function withTracing<T = unknown>(
+  handler: (request: IncomingMessage, response: ServerResponse) => Promise<T>,
+): (request: IncomingMessage, response: ServerResponse) => Promise<T> {
   const tracer = getTracer();
   let rootSpan;
 
-  return async (request: IncomingMessage, response: ServerResponse) => {
+  return async (
+    request: IncomingMessage,
+    response: ServerResponse,
+  ): Promise<T> => {
     try {
       const method = request.method;
       rootSpan = await tracer.createRootSpan(`${method} ${request.url}`);
