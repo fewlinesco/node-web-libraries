@@ -6,6 +6,7 @@
 - OpenTelemetry dependencies bumped to `0.14.0`.
 - Removed OpenTelemetry Plugins to keep only `http` and `https` (loaded by default by OpenTelemetry).
 - Added an `examples` directory.
+- Updated `startTracer` to accept a second optional parameter `logger`.
 
 ## 0.4.0 - 2020-08-20
 
