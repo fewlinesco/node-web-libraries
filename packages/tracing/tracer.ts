@@ -1,18 +1,27 @@
-import { Span as OpenTelemetrySpan, TimeInput } from "@opentelemetry/api";
+import { Logger } from "@fwl/logging";
+import type {
+  Span as OpenTelemetrySpan,
+  Tracer as OpenTelemetryTracer,
+  TimeInput,
+  AttributeValue,
+  SpanOptions,
+} from "@opentelemetry/api";
+import { SpanKind } from "@opentelemetry/api";
+import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 import { LogLevel } from "@opentelemetry/core";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
-import { SimpleSpanProcessor } from "@opentelemetry/tracing";
+import {
+  BasicTracerProvider,
+  SimpleSpanProcessor,
+} from "@opentelemetry/tracing";
 
-import { TracingConfig } from "./config/config";
+import type { TracingConfig } from "./config/config";
 
-const provider: NodeTracerProvider = new NodeTracerProvider({
+const provider: BasicTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.INFO,
   plugins: {
-    express: {
-      enabled: true,
-      path: "@opentelemetry/plugin-express",
-    },
+    express: { enabled: false },
     http: {
       enabled: true,
       path: "@opentelemetry/plugin-http",
@@ -24,38 +33,88 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
   },
 });
 
-export function startTracer(options: TracingConfig): void {
-  provider.addSpanProcessor(
-    new SimpleSpanProcessor(
-      new ZipkinExporter({
-        serviceName: options.serviceName,
-        url: options.url,
-      }),
-    ),
-  );
+export function startTracer(options: TracingConfig, logger?: Logger): void {
+  const collector = new ZipkinExporter({
+    serviceName: options.serviceName,
+    url: options.url,
+  });
 
-  provider.register();
+  const spanProcessor = new SimpleSpanProcessor(collector);
 
-  console.log("tracing initialized");
+  provider.addSpanProcessor(spanProcessor);
+
+  const contextManager = new AsyncHooksContextManager();
+  contextManager.enable();
+
+  provider.register({ contextManager });
+
+  if (logger) {
+    logger.log("tracing initialized", {
+      tracingServiceName: options.serviceName,
+      tracingUrl: options.url,
+    });
+  }
 }
 
 type SpanCallback<T> = (span: Span) => Promise<T>;
 
-export interface Tracer {
-  createSpan: (name: string) => Span;
-  span: <T>(name: string, callback: SpanCallback<T>) => Promise<T>;
+class Tracer {
+  private static instance: Tracer;
+  private tracer: OpenTelemetryTracer;
+  private constructor() {
+    this.tracer = provider.getTracer("default");
+  }
+  private rootSpan?: OpenTelemetrySpan;
+
+  static getInstance(): Tracer {
+    if (!Tracer.instance) {
+      Tracer.instance = new Tracer();
+    }
+
+    return Tracer.instance;
+  }
+
+  createRootSpan(name: string): Span {
+    const spanOptions: SpanOptions = {
+      kind: SpanKind.SERVER,
+    };
+    const span = this.tracer.startSpan(name, spanOptions);
+    this.rootSpan = span;
+
+    return spanFactory(span);
+  }
+
+  createSpan(name: string): Span {
+    if (this.rootSpan) {
+      return this.tracer.withSpan(this.rootSpan, () => {
+        const span = spanFactory(this.tracer.startSpan(name));
+        return span;
+      });
+    } else {
+      const span = spanFactory(this.tracer.startSpan(name));
+      return span;
+    }
+  }
+
+  span<T>(name: string, callback: SpanCallback<T>): Promise<T> {
+    if (this.rootSpan) {
+      return this.tracer.withSpan(this.rootSpan, () => {
+        const span = spanFactory(this.tracer.startSpan(name));
+        return callback(span).finally(() => {
+          span.end();
+        });
+      });
+    } else {
+      const span = spanFactory(this.tracer.startSpan(name));
+      return callback(span).finally(() => {
+        span.end();
+      });
+    }
+  }
 }
 
 export function getTracer(): Tracer {
-  return {
-    createSpan: (name: string): Span => {
-      return spanFactory(provider.getTracer("default").startSpan(name));
-    },
-    span: <T>(name: string, callback: SpanCallback<T>): Promise<T> => {
-      const span = spanFactory(provider.getTracer("default").startSpan(name));
-      return callback(span).finally(() => span.end());
-    },
-  };
+  return Tracer.getInstance();
 }
 
 function spanFactory(otSpan: OpenTelemetrySpan): Span {
@@ -63,15 +122,17 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
     otSpan.setAttribute(key, "[REDACTED]");
     return this;
   };
-  const setDisclosedAttribute = (key: string, value: unknown): Span => {
+  const setDisclosedAttribute = (key: string, value: AttributeValue): Span => {
     otSpan.setAttribute(key, value);
     return this;
   };
 
+  const end = otSpan.end.bind(otSpan);
+
   return {
     setAttribute,
     setDisclosedAttribute,
-    end: otSpan.end,
+    end,
   };
 }
 
