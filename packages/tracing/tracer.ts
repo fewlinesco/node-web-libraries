@@ -14,7 +14,6 @@ import { NodeTracerProvider } from "@opentelemetry/node";
 import {
   BasicTracerProvider,
   SimpleSpanProcessor,
-  BatchSpanProcessor,
 } from "@opentelemetry/tracing";
 
 import type { TracingConfig } from "./config/config";
@@ -40,10 +39,7 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
     url: options.url,
   });
 
-  const spanProcessor =
-    process.env.NODE_ENV === "production"
-      ? new BatchSpanProcessor(collector)
-      : new SimpleSpanProcessor(collector);
+  const spanProcessor = new SimpleSpanProcessor(collector);
 
   provider.addSpanProcessor(spanProcessor);
 
