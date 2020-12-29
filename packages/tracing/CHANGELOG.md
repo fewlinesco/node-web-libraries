@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.5.1 - 2020-12-29
+
+- Added back a `Tracer` type.
+
 ## 0.5.0 - 20200-12-22
 
 - Add a `createRootSpan` function that will start a trace when the plugins can't be loaded (for instance, for a Next application).
