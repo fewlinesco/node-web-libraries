@@ -1,11 +1,8 @@
-import { getTracer } from "@fwl/tracing";
+import { Tracer } from "@fwl/tracing";
+import { HttpStatus, Handler } from "@fwl/web";
 import { Request, Response } from "express";
 
-import { HttpStatus } from "../../index";
-
-export function getCsv() {
-  const tracer = getTracer();
-
+export function getCsv(tracer: Tracer): Handler<Request, Response> {
   return (request: Request, response: Response) => {
     return tracer.span("csv-handler", async () => {
       const csvData = "1,Frieda,Ewlines";

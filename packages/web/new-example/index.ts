@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { createLogger } from "@fewlines/fwl-logging";
 import { InMemoryTracer } from "@fwl/tracing";
-import { monitoringServer } from "@fwl/web";
+// import { monitoringServer } from "@fwl/web";
 
 import * as server from "./server";
 

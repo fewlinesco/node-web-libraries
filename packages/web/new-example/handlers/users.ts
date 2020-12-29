@@ -1,8 +1,7 @@
-import { getTracer } from "@fwl/tracing";
-import { sendJSON } from "@src/utils";
+import { Tracer } from "@fwl/tracing";
+import { HttpStatus, sendJSON, parseBodyAsJson } from "@fwl/web";
+import { WebError } from "@fwl/web/errors";
 import { Request, Response } from "express";
-
-import { HttpStatus, WebError } from "../../index";
 
 export type GetUsersByIdParams = { id: string };
 
@@ -13,9 +12,8 @@ const users = [
 
 export class UserNotFoundError extends WebError {}
 
-export function getUserById() {
+export function getUserById(tracer: Tracer) {
   return (request: Request, response: Response): Promise<void> => {
-    const tracer = getTracer();
     return tracer.span("get-user-by-id", async (span) => {
       span.setAttribute("user-id", request.params.id);
       request.query;
@@ -45,14 +43,14 @@ export interface CreateUserBody {
 
 export class ParameterError extends WebError {}
 
-export function createUser() {
+export function createUser(tracer: Tracer) {
   return (request: Request, response: Response): Promise<void> => {
-    const tracer = getTracer();
     return tracer.span("create-user", async () => {
-      if (request.body.name) {
+      const body = await parseBodyAsJson<{ name: string }>(request);
+      if (body.name) {
         const user = {
           id: "86f57c73-4e2a-47aa-a050-d8b3c10705cf",
-          name: request.body.name,
+          name: body.name,
         };
         users.push(user);
 

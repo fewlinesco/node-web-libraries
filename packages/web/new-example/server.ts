@@ -1,9 +1,10 @@
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
-import { createApp } from "@fwl/web/express";
-import express, { Application } from "express";
+import { Router } from "@fwl/web";
+import { createApp } from "@fwl/web/express-converter";
+import { withLogging } from "@fwl/web/middlewares";
+import express, { Application, Request, Response } from "express";
 
-import { loggingMiddleware, Router } from "../index";
 import * as csvHandler from "./handlers/csv";
 import * as imageHandler from "./handlers/image";
 import { pingHandler } from "./handlers/ping";
@@ -11,30 +12,23 @@ import * as userHandler from "./handlers/users";
 import { authMiddleware } from "./middlewares/auth";
 
 export function start(tracer: Tracer, logger: Logger): Application {
-  const router = new Router(tracer, logger);
+  const router = new Router<Request, Response>([withLogging(tracer, logger)]);
 
-  router.get("/ping", pingHandler());
-  router.get<userHandler.GetUsersByIdParams>(
-    "/users/:id",
-    userHandler.getUserById(),
-  );
+  router.get("/ping", pingHandler(tracer));
+  router.get("/users/:id", userHandler.getUserById(tracer));
 
-  router.post<userHandler.CreateUserParams, userHandler.CreateUserBody>(
-    "/users",
-    userHandler.createUser(),
-  );
+  router.post("/users", userHandler.createUser(tracer));
 
-  router.get("/logo-image", imageHandler.getLogo());
+  router.get("/logo-image", imageHandler.getLogo(tracer));
 
-  router.get("/csv", csvHandler.getCsv());
+  router.get("/csv", csvHandler.getCsv(tracer));
 
-  const authRouter = new Router(tracer, logger, [authMiddleware(tracer)]);
+  const authRouter = new Router<Request, Response>([
+    withLogging(tracer, logger),
+    authMiddleware(tracer),
+  ]);
 
-  authRouter.get("/auth-ping", pingHandler());
+  authRouter.get("/auth-ping", pingHandler(tracer));
 
-  return createApp(
-    express,
-    [authRouter, router],
-    [loggingMiddleware(tracer, logger)],
-  );
+  return createApp(express(), [authRouter, router]);
 }
