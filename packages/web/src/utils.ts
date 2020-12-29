@@ -31,6 +31,13 @@ export function readBody(request: IncomingMessage): Promise<string> {
   });
 }
 
+export async function parseBodyAsJson<T extends Record<string, unknown>>(
+  request: IncomingMessage,
+): Promise<T> {
+  const stringifiedBody = await readBody(request);
+  return JSON.parse(stringifiedBody) as T;
+}
+
 export function redirect(
   response: ServerResponse,
   status: number,

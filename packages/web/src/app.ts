@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 
 import { extendRequestMiddleware } from "./middlewares/extend-request";
-import { Router } from "./router";
+import { Router } from "./router.legacy";
 
 export function createApp(
   routers: Router[],
