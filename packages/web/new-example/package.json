@@ -2,7 +2,8 @@
   "author": "Fewlines",
   "description": "@fwl/web Express usage example",
   "dependencies": {
-    "express": "4.17.1"
+    "express": "4.17.1",
+    "@fwl/web": "file:.."
   },
   "devDependencies": {
     "@fewlines/eslint-config": "3.0.0",

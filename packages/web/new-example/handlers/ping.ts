@@ -1,7 +1,6 @@
 import { Tracer } from "@fwl/tracing";
+import { HttpStatus } from "@fwl/web";
 import { Request, Response } from "express";
-
-import { HttpStatus } from "../../index";
 
 export function pingHandler(tracer: Tracer) {
   return (request: Request, response: Response): Promise<void> => {
