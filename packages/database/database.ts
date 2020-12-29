@@ -9,7 +9,10 @@ function close(pool: Pool): Promise<void> {
 }
 
 type TransactionFunction = (
-  client: DatabaseQueryRunner | DatabaseQueryRunnerWithoutTracing,
+  client:
+    | DatabaseQueryRunner
+    | DatabaseQueryRunnerWithoutTracing
+    | DatabaseQueryRunnerSandbox,
 ) => Promise<any>;
 
 interface DatabaseBaseQueryRunner {
@@ -25,6 +28,10 @@ export interface DatabaseQueryRunner extends DatabaseBaseQueryRunner {
 export interface DatabaseQueryRunnerWithoutTracing
   extends DatabaseBaseQueryRunner {
   _type?: "DatabaseQueryRunnerWithoutTracing";
+}
+
+export interface DatabaseQueryRunnerSandbox extends DatabaseBaseQueryRunner {
+  _type?: "DatabaseQueryRunnerSandbox";
 }
 
 export class TransactionError extends Error {
@@ -81,7 +88,7 @@ function queryRunner(
     },
     query: (query, values = []): Promise<QueryArrayResult<any>> => {
       return tracer.span("db-query", async (span: Span) => {
-        span.setAttribute("db.statement", query);
+        span.setDisclosedAttribute("db.statement", query);
         return withoutTracing.query(query, values);
       });
     },
@@ -160,6 +167,46 @@ function queryRunnerWithoutTracing(
   };
 }
 
+function queryRunnerSandbox(
+  pool: Pool,
+  txClient: PoolClient,
+  insideTransaction = false,
+): DatabaseQueryRunnerSandbox {
+  return {
+    close: async (): Promise<void> => {
+      await txClient.query("ROLLBACK");
+      close(pool);
+    },
+    query: async (query, values = []): Promise<QueryArrayResult<any>> => {
+      try {
+        return await txClient.query(query, values);
+      } catch (error) {
+        checkDatabaseError(error);
+      }
+    },
+    transaction: async (transactionFunction): Promise<any> => {
+      if (insideTransaction) {
+        throw new TransactionError(
+          new Error("Can't run a transaction inside another transaction"),
+        );
+      }
+      try {
+        await txClient.query("SAVEPOINT fwl_database_sandbox_savepoint;");
+        return transactionFunction(queryRunnerSandbox(pool, txClient, true));
+      } catch (error) {
+        await txClient.query(
+          "ROLLBACK TO SAVEPOINT fwl_database_sandbox_savepoint;",
+        );
+        throw new TransactionError(error);
+      } finally {
+        await txClient.query(
+          "RELEASE SAVEPOINT fwl_database_sandbox_savepoint;",
+        );
+      }
+    },
+  };
+}
+
 function checkDatabaseError(error: any): void {
   if (
     error.code === "23505" &&
@@ -206,4 +253,19 @@ export function connectWithoutTracing(
     port: config.port,
   });
   return queryRunnerWithoutTracing(pool);
+}
+
+export async function connectInSandbox(
+  config: DatabaseConfig,
+): Promise<DatabaseQueryRunnerSandbox> {
+  const pool = new Pool({
+    user: config.username,
+    password: config.password,
+    host: config.host,
+    database: config.database,
+    port: config.port,
+  });
+  const client: PoolClient = await pool.connect();
+  await client.query("BEGIN");
+  return queryRunnerSandbox(pool, client);
 }
