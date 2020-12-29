@@ -4,15 +4,13 @@ export interface WebErrorDetails {
   [key: string]: string;
 }
 
-export type ApplicationStatus = number;
-
 export type ApplicationError = {
-  code: ApplicationStatus;
+  code: string;
   message: string;
 };
 
 export type WebErrorMessage = {
-  code: ApplicationStatus;
+  code: string;
   message: string;
   details?: WebErrorDetails;
 };
@@ -22,7 +20,7 @@ export interface WebErrorMessages {
 }
 
 export class WebError {
-  public applicationStatus: ApplicationStatus;
+  public applicationStatus: string;
   public errorDetails?: WebErrorDetails;
   public message: string;
   public httpStatus: HttpStatus;
@@ -63,7 +61,7 @@ export class WebError {
 }
 
 export function NotFoundError(
-  applicationStatus: ApplicationStatus,
+  applicationStatus: string,
   error?: Error,
 ): WebError {
   return new WebError({
@@ -77,11 +75,11 @@ export function NotFoundError(
 }
 
 export function BadRequestError(
-  applicationStatus: ApplicationStatus,
+  applicationStatus: string,
   error?: Error,
 ): WebError {
   return new WebError({
-    error: { code: 400000, message: `[${applicationStatus}] Bad Request` },
+    error: { code: "400000", message: `[${applicationStatus}] Bad Request` },
     httpStatus: HttpStatus.BAD_REQUEST,
     parentError: error,
   });
@@ -89,7 +87,7 @@ export function BadRequestError(
 
 export function UnmanagedError(error: Error): WebError {
   return new WebError({
-    error: { code: 500000, message: "Unexpected Error" },
+    error: { code: "500000", message: "Unexpected Error" },
     httpStatus: HttpStatus.INTERNAL_SERVER_ERROR,
     parentError: error,
   });
@@ -97,7 +95,7 @@ export function UnmanagedError(error: Error): WebError {
 
 export function UnauthorizedError(error: Error): WebError {
   return new WebError({
-    error: { code: 401000, message: "Unauthorized" },
+    error: { code: "401000", message: "Unauthorized" },
     httpStatus: HttpStatus.UNAUTHORIZED,
     parentError: error,
   });

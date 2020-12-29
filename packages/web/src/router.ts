@@ -1,24 +1,21 @@
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { json as jsonParser } from "body-parser";
-import {
-  Router as expressRouter,
-  Request,
-  Response,
-  NextFunction,
-} from "express";
+import { Router as expressRouter, Request, NextFunction } from "express";
 import * as Express from "express-serve-static-core";
+import { IncomingMessage, ServerResponse } from "http";
 
 import { UnmanagedError, WebError } from "./errors";
 import { HttpStatus } from "./http-statuses";
+import { query, readBody, redirect, sendFile, setHeaders } from "./utils";
 
 export type EmptyParams = Record<string, unknown>;
 
 export type EmptyBody = Record<string, unknown>;
 
 export type Middleware = (
-  req: Request,
-  res: Response,
+  req: IncomingMessage,
+  res: ServerResponse,
   next: NextFunction,
 ) => void;
 
@@ -42,7 +39,7 @@ export type HandlerWithoutBody<T extends Record<string, unknown>> = (
   resolve: ResolveFunction,
   reject: RejectFunction,
   params: T,
-  request: Request,
+  request: IncomingMessage,
 ) => HandlerPromise;
 
 export type HandlerWithBody<T, U> = (
@@ -51,25 +48,32 @@ export type HandlerWithBody<T, U> = (
   reject: RejectFunction,
   params: T,
   body: U,
-  request: Request,
+  request: IncomingMessage,
 ) => HandlerPromise;
 
 export type HandlerPromise = Promise<ResolveOrReject>;
 
 export type RejectFunction = (error: WebError) => HandlerPromise;
 
-export function rejectFactory(response: Response): RejectFunction {
+export function rejectFactory(
+  request: IncomingMessage & { private: { error?: Error } },
+  response: ServerResponse,
+): RejectFunction {
   return function reject(error: WebError): HandlerPromise {
     if (error.parentError) {
-      response.req.private.error = error.parentError;
+      request.private.error = error.parentError;
     }
-    response.status(error.httpStatus).json(error.getMessage());
+    response.statusCode = error.httpStatus;
+    response.end(JSON.stringify(error.getMessage()));
     return Promise.resolve(ResolveOrReject.REJECT);
   };
 }
 
-function resolveFactory(response: Response): ResolveFunction {
-  return function (
+function resolveFactory(
+  request: IncomingMessage,
+  response: ServerResponse,
+): ResolveFunction {
+  return async function (
     status: HttpStatus,
     value?: unknown,
     headers?: Record<string, string>,
@@ -89,30 +93,32 @@ function resolveFactory(response: Response): ResolveFunction {
         );
       }
       if (headers) {
-        response.set(headers);
+        setHeaders(response, headers);
       }
-      response.redirect(status, value);
+      redirect(response, status, value);
     } else if (options.file) {
       if (typeof value !== "string") {
-        throw new Error(
-          `Unsupported type for image path, excepted string got ${typeof value}`,
-        );
+        throw new TypeError("file should be a string");
       }
-      response.status(status);
-      response.sendFile(value, { headers });
+
+      response.statusCode = status;
+      await sendFile(request, response, value, headers);
     } else {
-      response.status(status);
+      response.statusCode = status;
 
       if (headers) {
-        response.set(headers);
+        setHeaders(response, headers);
       }
       if (value) {
-        response.json(value);
+        if (!response.getHeader("Content-Type")) {
+          response.setHeader("Content-Type", "application/json");
+        }
+        response.end(JSON.stringify(value));
       } else {
         response.end();
       }
     }
-    return Promise.resolve(ResolveOrReject.RESOLVE);
+    return ResolveOrReject.RESOLVE;
   };
 }
 
@@ -132,19 +138,16 @@ export class Router {
   private withBodyResponse<T extends Record<string, unknown>, U>(
     handler: HandlerWithBody<T, U>,
   ) {
-    return async (request: Request, response: Response): Promise<void> => {
-      const resolve = resolveFactory(response);
-      const reject = rejectFactory(response);
-      const params = { ...request.query, ...request.params } as T;
+    return async (
+      request: Request,
+      response: ServerResponse,
+    ): Promise<void> => {
+      const resolve = resolveFactory(request, response);
+      const reject = rejectFactory(request, response);
+      const params = { ...query(request), ...request.params } as T;
+      const body = JSON.parse(await readBody(request)) as U;
       try {
-        await handler(
-          this.tracer,
-          resolve,
-          reject,
-          params,
-          request.body,
-          request,
-        );
+        await handler(this.tracer, resolve, reject, params, body, request);
       } catch (exception) {
         if (exception instanceof WebError) {
           reject(exception);
@@ -198,9 +201,9 @@ export class Router {
     this.router.get(
       path,
       ...this.middlewares,
-      async (request: Request, response: Response) => {
-        const resolve = resolveFactory(response);
-        const reject = rejectFactory(response);
+      async (request: Request, response: ServerResponse) => {
+        const resolve = resolveFactory(request, response);
+        const reject = rejectFactory(request, response);
         const params = { ...request.query, ...request.params } as T;
         try {
           await handler(this.tracer, resolve, reject, params, request);

@@ -53,12 +53,13 @@ export function createUser() {
   ): HandlerPromise => {
     return tracer.span("create-user", async () => {
       if (body.name) {
-        users.push({
+        const user = {
           id: "86f57c73-4e2a-47aa-a050-d8b3c10705cf",
           name: body.name,
-        });
+        };
+        users.push(user);
 
-        return resolve(HttpStatus.CREATED);
+        return resolve(HttpStatus.CREATED, user);
       } else {
         return reject(UnmanagedError(new Error("No name provided")));
       }

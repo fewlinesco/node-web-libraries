@@ -1,6 +1,7 @@
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer, Span } from "@fwl/tracing";
 import { NextFunction, Request, Response, RequestHandler } from "express";
+import { IncomingMessage } from "http";
 
 export function loggingMiddleware(
   tracer: Tracer,
@@ -9,7 +10,7 @@ export function loggingMiddleware(
   function onFinishFactory(
     span: Span,
     startTime: bigint,
-    request: Request,
+    request: IncomingMessage & { private: { error?: Error } },
   ): () => void {
     return function onFinish(): void {
       const response = this as Response;
