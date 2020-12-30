@@ -53,8 +53,9 @@
     "prepare": "yarn build",
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
+    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.0.0-experimental-a36c666"
+  "version": "0.0.0-experimental-cf1a8d3"
 }
