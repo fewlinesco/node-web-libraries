@@ -1,9 +1,10 @@
 import * as types from "@opentelemetry/api";
+import { Attributes, TimeInput } from "@opentelemetry/api";
 
 import { Span as FwlSpan } from "./tracer";
 
 interface Span extends FwlSpan {
-  id: number;
+  id: string;
   name: string;
   attributes: types.Attributes;
   parent?: InMemorySpan;
@@ -11,13 +12,14 @@ interface Span extends FwlSpan {
 
 class InMemorySpan implements Span {
   private tracer: InMemoryTracer;
-  public id: number;
+  public id: string;
   public name: string;
   public parent?: InMemorySpan;
   public attributes: types.Attributes;
+  public events: types.Event[];
 
   constructor(
-    id: number,
+    id: string,
     name: string,
     tracer: InMemoryTracer,
     parent?: InMemorySpan,
@@ -26,35 +28,40 @@ class InMemorySpan implements Span {
     this.tracer = tracer;
     this.name = name;
     this.attributes = {};
+    this.events = [];
     this.parent = parent;
+  }
+
+  addEvent(
+    name: string,
+    attributesOrStartTime?: TimeInput | Attributes,
+    startTime?: TimeInput,
+  ): this {
+    const event: types.Event = { name, attributes: {} };
+    if (startTime) {
+      event.attributes.startTime = startTime.toString();
+    } else if (
+      typeof attributesOrStartTime === "number" ||
+      attributesOrStartTime instanceof Date ||
+      attributesOrStartTime instanceof Array
+    ) {
+      event.attributes.startTime = attributesOrStartTime.toString();
+    } else if (attributesOrStartTime) {
+      event.attributes = attributesOrStartTime;
+    } else {
+      event.attributes.startTime = new Date().toString();
+    }
+
+    this.events.push(event);
+    return this;
   }
 
   end(): void {
     this.tracer._saveSpan(this);
   }
 
-  context(): types.SpanContext {
-    const traceStateData: Record<string, string> = {};
-    const traceState: types.TraceState = {
-      get: (key: string) => traceStateData[key],
-      set: (key: string, value: string) => {
-        traceStateData[key] = value;
-        return traceState;
-      },
-      serialize: () => "",
-      unset: (key: string) => {
-        delete traceStateData[key];
-        return traceState;
-      },
-    };
-
-    return {
-      isRemote: undefined,
-      spanId: this.id.toString(),
-      traceFlags: 0,
-      traceId: "",
-      traceState,
-    };
+  getTraceId(): string {
+    return this.parent ? this.parent.getTraceId() : this.id;
   }
 
   setAttribute(key: string, _value: types.AttributeValue): this {
@@ -65,28 +72,6 @@ class InMemorySpan implements Span {
   setDisclosedAttribute(key: string, value: types.AttributeValue): this {
     this.attributes[key] = value;
     return this;
-  }
-
-  setAttributes(attributes: types.Attributes): this {
-    this.attributes = { ...this.attributes, ...attributes };
-    return this;
-  }
-
-  addEvent(): this {
-    return this;
-  }
-
-  setStatus(): this {
-    return this;
-  }
-
-  updateName(name: string): this {
-    this.name = name;
-    return this;
-  }
-
-  isRecording(): boolean {
-    return true;
   }
 }
 
@@ -110,7 +95,7 @@ export class InMemoryTracer {
     this.currentSpanId++;
 
     const span = new InMemorySpan(
-      this.currentSpanId,
+      this.currentSpanId.toString(),
       name,
       this,
       this.currentSpan,
@@ -125,7 +110,7 @@ export class InMemoryTracer {
     this.currentSpanId++;
 
     const span = new InMemorySpan(
-      this.currentSpanId,
+      this.currentSpanId.toString(),
       name,
       this,
       this.currentSpan,
@@ -146,16 +131,7 @@ export class InMemoryTracer {
   }
 
   _saveSpan(span: InMemorySpan): void {
-    const currentInMemorySpan = new InMemorySpan(
-      span.id,
-      span.name,
-      this,
-      span?.parent,
-    );
-
-    currentInMemorySpan.setAttributes(span.attributes);
-
-    this.spans.unshift(currentInMemorySpan);
+    this.spans.unshift(span);
 
     if (span.parent) {
       this.currentSpan = span.parent;

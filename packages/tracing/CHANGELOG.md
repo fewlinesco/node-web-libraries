@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.5.2 - 2020-12-31
+
+- The exported `Span` interface now exposes `addEvent` to add events to spans.
+- The exported `Span` interface now exposes `getTraceId` to get the id of the current trace.
+
 ## 0.5.1 - 2020-12-29
 
 - Added back a `Tracer` type.
