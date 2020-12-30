@@ -58,7 +58,13 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
 
 type SpanCallback<T> = (span: Span) => Promise<T>;
 
-class Tracer {
+export interface Tracer {
+  createRootSpan: (name: string) => Span;
+  createSpan: (name: string) => Span;
+  span: <T>(name: string, callback: SpanCallback<T>) => Promise<T>;
+}
+
+class TracerImpl implements Tracer {
   private static instance: Tracer;
   private tracer: OpenTelemetryTracer;
   private constructor() {
@@ -67,11 +73,11 @@ class Tracer {
   private rootSpan?: OpenTelemetrySpan;
 
   static getInstance(): Tracer {
-    if (!Tracer.instance) {
-      Tracer.instance = new Tracer();
+    if (!TracerImpl.instance) {
+      TracerImpl.instance = new TracerImpl();
     }
 
-    return Tracer.instance;
+    return TracerImpl.instance;
   }
 
   createRootSpan(name: string): Span {
@@ -114,7 +120,7 @@ class Tracer {
 }
 
 export function getTracer(): Tracer {
-  return Tracer.getInstance();
+  return TracerImpl.getInstance();
 }
 
 function spanFactory(otSpan: OpenTelemetrySpan): Span {
