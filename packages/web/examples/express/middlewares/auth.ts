@@ -1,6 +1,6 @@
 import { Tracer } from "@fwl/tracing";
-import { UnauthorizedError } from "@fwl/web/errors";
-import { Middleware } from "@fwl/web/middlewares";
+import { UnauthorizedError } from "@fwl/web/dist/errors";
+import { Middleware } from "@fwl/web/dist/middlewares";
 import { Request, Response } from "express";
 
 export function authMiddleware(tracer: Tracer): Middleware<Request, Response> {

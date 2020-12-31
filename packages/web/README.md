@@ -4,7 +4,7 @@
 
 This is part of the Fewlines Web Libraries packages.
 
-It provides a typed interface on top of Express with a way of defining errors, a Router and a function to bootstrap an application.
+It provides a framework on top of `http` to be used with Express and Next.JS.
 
 ## Installation
 
@@ -14,201 +14,97 @@ yarn add @fwl/web
 
 ## Usage
 
-### Router
+### Definitions
 
-The `Router` of this package is an abstraction on top of the basic Express Router, it is charged with sending the response and displaying the errors.
+For the purpose of this package, here are the definitions we will use:
 
-It takes a `tracer` and a `logger` in its constructor and its API looks a bit like what Express is expecting but we need to pass the types of data the handler will receive.
-
-There are differences between `.get` and the other methods:
-
-- `.get` will need to type the `params` that it will receive.
-- `.post`, `.patch`, `.delete` will need to type both the `params` and the `body` they will receive.
-
-`params` is a merge of Query Strings (`?offset=10`) and Named Parameters (e.g. the `id` in `/path/:id`).
-Please beware, Named Parameters will have precedence over Query Strings, meaning that for the path `/user/:id`, the URL `/user/1?id=2` will have a `params.id` equal to `1`.
-
-```typescript
-const router = new Router(tracer, logger);
-
-router.get<{}>("/", handler);
-router.get<{ id: string }>("/path/:id", anotherHandler);
-router.post<{}, { name: string; description: string }>("/path", postHandler);
-router.patch<{ id: string }, { name?: string; description?: string }>(
-  "/path/:id",
-  patchHandler,
-);
-router.delete<{ id: string }, {}>("/path/:id", deleteHandler);
-```
-
-For more information, please look at the [example](./example/).
+- **path**: a string, the path for which a _handler_ will be invoked.
+- **handler**: a function that will be invoked for a request. It takes a request and a response as input and returns anything.
+- **route**: the combination of a _path_, a _handler_ and an HTTP method (e.g: the _handler_ that will respond to `GET /resource`)
+- **router**: a collection of _routes_
+- **endpoint**: the combination of _handlers_ that will respond for a given request for all HTTP methods (a sort of _route_ for all methods).
 
 ### Handler
 
-Contrary to Express where the handler takes the `request` and the `response` as argument, this router gives the handler 5 parameters in that order:
-
-- The `tracer` instance: we want to trace as much as possible so this is the first thing that we receive.
-- A `resolve` function, continue reading for more information.
-- A `reject` function, continue reading for more information.
-- The `params` of this request with the URL Params, the Query Params in `GET` and the Body Params (parsed from JSON) in other HTTP verbs requests.
-- If needed, the full `request` object.
-
-Let's see an example:
+At its simplest, a handler would look like that:
 
 ```typescript
-// First we define the route wit an URL Parameter
-router.get<{ name: string }>("/my/:name", myHandler(database));
+import { IncomingMessage, ServerResponse } from "http";
+import { HttpStatus } from "@fwl/web";
+
+export function pingHandler(
+  request: IncomingMessage,
+  response: ServerResponse
+): void {
+  response.statusCode = HttpStatus.OK;
+  response.end("OK");
+}
 ```
 
+However, we recommend to use tracing, for easier debugging and it should look like this:
+
 ```typescript
-import { Request } from "express";
+import { IncomingMessage, ServerResponse } from "http";
 import { Tracer } from "@fwl/tracing";
-import {
-  HandlerPromise,
-  HttpStatus,
-  RejectFunction,
-  ResolveFunction,
-} from "@fwl/web";
+import { HttpStatus } from "@fwl/web";
 
-// We create a handler that accept dependencies and return the real handler
-export function myHandler(database) {
+export function pingHandler(tracer: Tracer) {
   return (
-    tracer: Tracer,
-    resolve: ResolveFunction,
-    reject: RejectFunction,
-    params: { name: string },
-    request: Request,
-  ): HandlerPromise => {
-    //  Most of the time, we will want to create a span around our handler
-    return tracer.span("my-resource-handler", async (span) => {
-      // We can add atributes to our Trace Span
-      span.setAttribute("my_resource_name", params.name);
-
-      const {
-        rows,
-      } = await database.query(
-        "SELECT id, name FROM my_resource_table WHERE name = $1",
-        [params.name],
-      );
-
-      if (rows.length === 0) {
-        // If we have an error, we return a factory for it (see Dealing With Errors)
-        return reject(MyResourceNotFoundError());
-      }
-
-      const myData = rows.map((row) => ({ id: row.id, name: row.name }));
-
-      // If all goes well, we can return the resolve with an HTTP 200 OK and `myData`
-      return resolve(HttpStatus.OK, myData);
+    request: IncomingMessage,
+    response: ServerResponse
+  ): Promise<void> => {
+    return tracer.span("ping-handler", async () => {
+      response.statusCode = HttpStatus.OK;
+      response.end("OK");
     });
   };
 }
 ```
 
-If you don't have any Query parameters, these are functionnaly equivalent:
+This is basic dependency injection via a function.
+We're exporting a function that takes a dependency (`tracer`) that returns a Handler.
+You could then use it with a Router `router.get("/ping", pingHandler(tracer))` or with an Endpoint `new Endpoint().get(pingHandler(tracer))`.
+
+### Router
+
+A Router is a class that takes a list of middlewares for its constructor.
+You can then add routes to it by giving it a path and a handler
 
 ```typescript
-router.get<Record<string, unknown>>("/ping", pingHandler());
-router.get<Router.EmptyParams>("/ping", pingHandler());
-router.get("/ping", pingHandler());
+import { Router } from "@fwl/web";
+
+const router = new Router([
+  withLogging(tracer, logger),
+  errorMiddleware(tracer),
+]);
+
+router.get("/ping", pingHandler(tracer));
+router.get("/users/:id", userHandler.getUserById(tracer));
+router.post("/users", userHandler.createUser(tracer));
 ```
 
-For more information, please look at the [example](./example/).
-
-#### Redirects
-
-To redirect a request, you can use one of the redirection HTTP Status:
-
-- `HttpStatus.MOVED_PERMANENTLY`: 301
-- `HttpStatus.MOVED_TEMPORARILY`: 302
-- `HttpStatus.TEMPORARY_REDIRECT`: 307
-- `HttpStatus.PERMANENT_REDIRECT`: 308
-
-The redirection URI will be the second argument and must be a string.
+If you need to add a middleware to one route in particular, you can use:
 
 ```typescript
-export function myHandler(database) {
-  return (tracer: Tracer, resolve: ResolveFunction): HandlerPromise => {
-    return tracer.span("my-redirect-handler", async () => {
-      return resolve(HttpStatus.MOVED_PERMANENTLY, "http://anotherurl.com");
-    }
-  }
-}
+import { Router } from "@fwl/web";
+import { wrapMiddlewares } from "@fwl/web/dist/middlewares";
+
+const router = new Router([
+  withLogging(tracer, logger),
+  errorMiddleware(tracer),
+]);
+
+router.get("/ping", pingHandler(tracer));
+router.get("/users/:id", userHandler.getUserById(tracer));
+router.post("/users", userHandler.createUser(tracer));
 ```
 
-#### Sending additional headers
-
-The `resolve` function accepts a third option argument which is a `Record<string, string>` that contain headers that will be added to the request.
-
-```typescript
-export function myHandler(database) {
-  return (tracer: Tracer, resolve: ResolveFunction): HandlerPromise => {
-    return tracer.span("my-resource-handler", async () => {
-      const csvData = "1,Frieda,Ewlines";
-      return resolve(HttpStatus.OK, csvData, {"Content-Type": "text/csv"})
-    }
-  }
-}
-```
+### Endpoint
 
 ### Dealing With Errors
 
-We want to unify the way we deal with errors so we have a recommended way.
-The global idea is to have only one place where the errors of a Service are defined.
-Each of these is a `WebError` with an HTTP status, a unique code and a message.
+### Middlewares
 
-Here is how to define our `MyNotFoundError` in the previous example:
+### Usage for Express
 
-```typescript
-// src/errors.ts
-import { HttpStatus, WebError, WebErrorMessages } from "@fwl/web";
-
-const Errors: WebErrorMessages = {
-  MY_RESOURCE_NOT_FOUND: { code: 400001, message: "My Resource not found" },
-};
-
-export function MyResourceNotFoundError() {
-  return new WebError({
-    error: Errors.MY_RESOURCE_NOT_FOUND,
-    httpStatus: HttpStatus.NOT_FOUND,
-  });
-}
-```
-
-⚠️ Don't make two errors the same if they occur in different places in the Service even if they look similar.
-
-### Logging middleware
-
-This package exposes a `loggingMiddleware` that takes a `tracer` and a `logger` as parameter, returns an express middleware, and that will make one log per request.
-
-This log will contain:
-
-- the duration of the request in microseconds,
-- the path that was hit on the server,
-- the method that was used,
-- the status code returned for this request,
-- and the remote address that made the call.
-
-It can be used in the second argument of `createApp`:
-
-```typescript
-createApp(router, [loggingMiddleware(tracer, logger)]);
-```
-
-### Create the application
-
-```typescript
-import { Application } from "express";
-import { Logger } from "@fewlines/fwl-logging";
-import { Tracer } from "@fwl/tracing";
-import { createApp, loggingMiddleware, Router } from "@fwl/web";
-import { handler } from "./handlers";
-
-export function bootstrap(tracer: Tracer, logger: Logger): Application {
-  const router = new Router(tracer, logger);
-
-  router.get("/", handler(spartaApiClient));
-
-  return createApp(router, [loggingMiddleware(tracer, logger)]);
-}
-```
+### Usage for Next.Js

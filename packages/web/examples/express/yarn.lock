@@ -322,8 +322,10 @@
     "@opentelemetry/plugin-pg-pool" "^0.8.0"
     "@opentelemetry/tracing" "^0.9.0"
 
-"@fwl/web@file:..":
-  version "0.5.0"
+"@fwl/web@0.0.0-experimental-cf1a8d3":
+  version "0.0.0-experimental-cf1a8d3"
+  resolved "https://registry.yarnpkg.com/@fwl/web/-/web-0.0.0-experimental-cf1a8d3.tgz#6198564ddeed2996994315fe1d8592529a4a79af"
+  integrity sha512-Yq6uQNP9q8eEi+9YuwbYw7zfv4kwURAqKaUpYyNzQ4h7MeJcuGVULpY9j/wD9O7Gjvz+pFih/roC1kxkHPGmWw==
   dependencies:
     "@fewlines/fwl-logging" "1.0.1"
     "@fwl/tracing" "0.2.1"

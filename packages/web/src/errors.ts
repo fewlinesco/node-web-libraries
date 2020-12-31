@@ -19,7 +19,7 @@ export interface WebErrorMessages {
   [key: string]: WebErrorMessage;
 }
 
-export class WebError {
+export class WebError extends Error {
   public applicationStatus: string;
   public errorDetails?: WebErrorDetails;
   public message: string;
@@ -37,6 +37,7 @@ export class WebError {
     httpStatus: HttpStatus;
     parentError?: Error;
   }) {
+    super(error.message);
     this.applicationStatus = error.code;
     this.message = error.message;
     this.httpStatus = httpStatus;
@@ -46,6 +47,8 @@ export class WebError {
     if (parentError) {
       this.parentError = parentError;
     }
+
+    Object.setPrototypeOf(this, WebError.prototype);
   }
 
   getMessage(): WebErrorMessage {

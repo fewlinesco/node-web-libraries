@@ -2,45 +2,62 @@ import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { IncomingMessage, ServerResponse } from "http";
 
+import { HttpStatus } from "../http-statuses";
 import { Middleware } from "../typings/middleware";
 
-const logAttributes = (
+function getAddr(request: IncomingMessage): string {
+  if (request.headers["x-forwarded-for"]) {
+    return request.headers["x-forwarded-for"].toString();
+  } else if (request.connection.remoteAddress) {
+    return request.connection.remoteAddress.toString();
+  }
+  return "";
+}
+
+function logAttributes(
   startTime: bigint,
   request: IncomingMessage,
-  response: ServerResponse,
+  statusCode: HttpStatus,
   traceId: string,
-): Record<string, string | number> => {
+): Record<string, string | number> {
   const endTime = process.hrtime.bigint();
   return {
     duration: ((endTime - startTime) / BigInt(1000)).toString(),
     method: request.method ? request.method : "Undefined method",
     path: request.url ? request.url : "Undefined request URL",
-    remoteaddr: request.headers["x-forwarded-for"]
-      ? request.headers["x-forwarded-for"].toString()
-      : "",
-    statusCode: response.statusCode || 500,
+    remoteaddr: getAddr(request),
+    statusCode: statusCode || 500,
     traceid: traceId,
   };
-};
+}
 
-export function withLogging<
+export function loggingMiddleware<
   T extends IncomingMessage,
   U extends ServerResponse
 >(tracer: Tracer, logger: Logger): Middleware<T, U> {
   return (handler) => async (request: T, response: U) => {
     const startTime = process.hrtime.bigint();
-    tracer.span("logging middleware", async (span) => {
+    return tracer.span("logging middleware", async (span) => {
       try {
         const result = await handler(request, response);
         logger.log(
           "",
-          logAttributes(startTime, request, response, span.context().traceId),
+          logAttributes(
+            startTime,
+            request,
+            response.statusCode,
+            span.context().traceId,
+          ),
         );
         return result;
       } catch (error) {
+        const statusCode =
+          error.httpStatus ||
+          response.statusCode ||
+          HttpStatus.INTERNAL_SERVER_ERROR;
         logger.log(
           error.toString(),
-          logAttributes(startTime, request, response, span.context().traceId),
+          logAttributes(startTime, request, statusCode, span.context().traceId),
         );
         throw error;
       }

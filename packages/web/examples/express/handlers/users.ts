@@ -1,6 +1,6 @@
 import { Tracer } from "@fwl/tracing";
 import { HttpStatus, sendJSON, parseBodyAsJson } from "@fwl/web";
-import { WebError } from "@fwl/web/errors";
+import { WebError } from "@fwl/web/dist/errors";
 import { Request, Response } from "express";
 
 export type GetUsersByIdParams = { id: string };

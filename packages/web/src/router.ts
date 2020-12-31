@@ -20,6 +20,7 @@ export class Router<
 
   constructor(middlewares: Middleware<T, U>[]) {
     this.middlewares = middlewares;
+    this.paths = {};
   }
 
   private addRoute(
