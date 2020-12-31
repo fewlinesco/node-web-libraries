@@ -5,6 +5,7 @@ import type {
   TimeInput,
   AttributeValue,
   SpanOptions,
+  Attributes,
 } from "@opentelemetry/api";
 import { SpanKind } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
@@ -112,9 +113,16 @@ class TracerImpl implements Tracer {
       });
     } else {
       const span = spanFactory(this.tracer.startSpan(name));
-      return callback(span).finally(() => {
-        span.end();
-      });
+      return callback(span).then(
+        (result) => {
+          span.end();
+          return result;
+        },
+        (error) => {
+          span.end();
+          throw error;
+        },
+      );
     }
   }
 }
@@ -133,9 +141,22 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
     return this;
   };
 
+  const getTraceId = (): string => otSpan.context().traceId;
+
+  const addEvent = (
+    name: string,
+    attributesOrStartTime?: TimeInput | Attributes,
+    startTime?: TimeInput,
+  ): Span => {
+    otSpan.addEvent(name, attributesOrStartTime, startTime);
+    return this;
+  };
+
   const end = otSpan.end.bind(otSpan);
 
   return {
+    addEvent,
+    getTraceId,
     setAttribute,
     setDisclosedAttribute,
     end,
@@ -143,6 +164,12 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
 }
 
 export interface Span {
+  addEvent(
+    name: string,
+    attributesOrStartTime?: TimeInput | Attributes,
+    startTime?: TimeInput,
+  ): Span;
+  getTraceId(): string;
   setAttribute(key: string, value: unknown): this;
   setDisclosedAttribute(key: string, value: unknown): this;
   end(endTime?: TimeInput): void;

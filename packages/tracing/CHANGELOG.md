@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.6.0 - 2020-12-31
+
+- The exported `Span` interface now exposes `addEvent` to add events to spans.
+- The exported `Span` interface now exposes `getTraceId` to get the id of the current trace.
+- InMemoryTracer Span ID is now of type `string`.
+
 ## 0.5.1 - 2020-12-29
 
 - Added back a `Tracer` type.
