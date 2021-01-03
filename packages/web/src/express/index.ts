@@ -1,6 +1,9 @@
-import { Application, Response, Request } from "express";
+import { Application, Response, Request, NextFunction } from "express";
+import { IncomingMessage, ServerResponse } from "http";
 
+import { Middleware } from "../middlewares";
 import { Router } from "../router";
+import { Handler } from "../typings/handler";
 
 export function createApp(
   newApplication: Application,
@@ -15,4 +18,20 @@ export function createApp(
     });
   });
   return newApplication;
+}
+
+type ExpressMidleware = (
+  request: IncomingMessage,
+  response: ServerResponse,
+  next: NextFunction,
+) => void;
+
+export function convertMiddleware(middleware: ExpressMidleware): Middleware {
+  return (handler: Handler) => {
+    return (request: IncomingMessage, response: ServerResponse) => {
+      middleware(request, response, () => {
+        handler(request, response);
+      });
+    };
+  };
 }

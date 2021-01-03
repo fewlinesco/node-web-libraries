@@ -46,7 +46,7 @@ export function loggingMiddleware<
             startTime,
             request,
             response.statusCode,
-            span.context().traceId,
+            span.getTraceId(),
           ),
         );
         return result;
@@ -57,7 +57,7 @@ export function loggingMiddleware<
           HttpStatus.INTERNAL_SERVER_ERROR;
         logger.log(
           error.toString(),
-          logAttributes(startTime, request, statusCode, span.context().traceId),
+          logAttributes(startTime, request, statusCode, span.getTraceId()),
         );
         throw error;
       }
