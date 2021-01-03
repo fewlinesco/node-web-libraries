@@ -3,7 +3,7 @@ import { InMemoryTracer } from "@fwl/tracing";
 
 import * as server from "./server";
 
-const logger = createLogger("fwl-sparta-api");
+const logger = createLogger("fwl-sparta-api", "json");
 const tracer = new InMemoryTracer();
 
 const applicationServer = server.start(tracer, logger);

@@ -2,7 +2,7 @@ import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { Router } from "@fwl/web";
 import { createApp } from "@fwl/web/dist/express-converter";
-import { withLogging } from "@fwl/web/dist/middlewares";
+import { loggingMiddleware } from "@fwl/web/dist/middlewares";
 import express, { Application, Request, Response } from "express";
 
 import * as csvHandler from "./handlers/csv";
@@ -14,7 +14,7 @@ import { errorMiddleware } from "./middlewares/error";
 
 export function start(tracer: Tracer, logger: Logger): Application {
   const router = new Router<Request, Response>([
-    withLogging(tracer, logger),
+    loggingMiddleware(tracer, logger),
     errorMiddleware(tracer),
   ]);
 
@@ -28,7 +28,7 @@ export function start(tracer: Tracer, logger: Logger): Application {
   router.get("/csv", csvHandler.getCsv(tracer));
 
   const authRouter = new Router<Request, Response>([
-    withLogging(tracer, logger),
+    loggingMiddleware(tracer, logger),
     errorMiddleware(tracer),
     authMiddleware(tracer),
   ]);

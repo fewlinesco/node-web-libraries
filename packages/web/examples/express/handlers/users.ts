@@ -15,8 +15,7 @@ export class UserNotFoundError extends WebError {}
 export function getUserById(tracer: Tracer) {
   return (request: Request, response: Response): Promise<void> => {
     return tracer.span("get-user-by-id", async (span) => {
-      span.setAttribute("user-id", request.params.id);
-      request.query;
+      span.setDisclosedAttribute("user-id", request.params.id);
 
       const user = users.find((user) => user.id === request.params.id);
 
