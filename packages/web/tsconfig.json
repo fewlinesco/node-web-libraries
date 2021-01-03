@@ -16,9 +16,8 @@
     "paths": {
       "@src/*": ["src/*"],
     },
-    "typeRoots": ["src/typings/", "./node_modules/@types/"],
     "skipLibCheck": true
   },
-  "include": [".", "src"],
+  "include": [".", "src", "tests"],
   "exclude": ["node_modules", "dist", "example", "new-example"]
 }
