@@ -5,7 +5,7 @@ import { HttpStatus } from "../http-statuses";
 import { Middleware } from "../typings/middleware";
 
 export function recoveryMiddleware(tracer: Tracer): Middleware {
-  return (handler) => {
+  return function withFwlRecoveryErrorHandler(handler) {
     return function (request: IncomingMessage, response: ServerResponse) {
       return tracer.span("recovery middleware", async (span) => {
         try {

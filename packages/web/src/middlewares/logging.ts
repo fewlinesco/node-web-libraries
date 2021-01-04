@@ -35,32 +35,34 @@ export function loggingMiddleware<
   T extends IncomingMessage,
   U extends ServerResponse
 >(tracer: Tracer, logger: Logger): Middleware<T, U> {
-  return (handler) => async (request: T, response: U) => {
-    const startTime = process.hrtime.bigint();
-    return tracer.span("logging middleware", async (span) => {
-      try {
-        const result = await handler(request, response);
-        logger.log(
-          "",
-          logAttributes(
-            startTime,
-            request,
-            response.statusCode,
-            span.getTraceId(),
-          ),
-        );
-        return result;
-      } catch (error) {
-        const statusCode =
-          error.httpStatus ||
-          response.statusCode ||
-          HttpStatus.INTERNAL_SERVER_ERROR;
-        logger.log(
-          error.toString(),
-          logAttributes(startTime, request, statusCode, span.getTraceId()),
-        );
-        throw error;
-      }
-    });
+  return function withFwlLoggingHandler(handler) {
+    return async (request: T, response: U) => {
+      const startTime = process.hrtime.bigint();
+      return tracer.span("logging middleware", async (span) => {
+        try {
+          const result = await handler(request, response);
+          logger.log(
+            "",
+            logAttributes(
+              startTime,
+              request,
+              response.statusCode,
+              span.getTraceId(),
+            ),
+          );
+          return result;
+        } catch (error) {
+          const statusCode =
+            error.httpStatus ||
+            response.statusCode ||
+            HttpStatus.INTERNAL_SERVER_ERROR;
+          logger.log(
+            error.toString(),
+            logAttributes(startTime, request, statusCode, span.getTraceId()),
+          );
+          throw error;
+        }
+      });
+    };
   };
 }

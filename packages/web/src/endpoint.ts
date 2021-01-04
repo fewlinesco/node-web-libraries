@@ -12,6 +12,10 @@ export class Endpoint {
     delete?: Handler;
   };
 
+  constructor() {
+    this.handlers = {};
+  }
+
   get(handler: Handler): this {
     this.handlers.get = handler;
     return this;

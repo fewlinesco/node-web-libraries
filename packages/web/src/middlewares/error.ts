@@ -5,7 +5,7 @@ import { WebError } from "../errors";
 import { Middleware } from "../typings/middleware";
 
 export function errorMiddleware(tracer: Tracer): Middleware {
-  return (handler) => {
+  return function withFwlErrorHandler(handler) {
     return function (request: IncomingMessage, response: ServerResponse) {
       return tracer.span("error middleware", async () => {
         try {

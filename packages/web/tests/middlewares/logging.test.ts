@@ -1,43 +1,17 @@
-import { Logger } from "@fwl/logging";
 import { InMemoryTracer } from "@fwl/tracing";
 import { IncomingMessage, ServerResponse } from "http";
 import httpMock from "mock-http";
 
+import { HttpStatus } from "../../index";
 import { WebError } from "../../src/errors";
-import { HttpStatus } from "../../src/http-statuses";
 import { wrapMiddlewares, loggingMiddleware } from "../../src/middlewares";
-
-type Metadata = Record<string, string | number>;
-type Log = Metadata & { message: string };
-class inMemoryLogger implements Logger {
-  private logs: Log[];
-  private metadata?: Metadata;
-
-  constructor(metadata?: Metadata) {
-    this.metadata = metadata;
-    this.logs = [];
-  }
-
-  log(message: string, metadata?: Metadata): this {
-    const log = { ...metadata, message };
-    this.logs.push(log);
-    return this;
-  }
-
-  withMeta(metadata: Metadata): inMemoryLogger {
-    return new inMemoryLogger(metadata);
-  }
-
-  getLog(index: number): Log {
-    return this.logs[index];
-  }
-}
+import { InMemoryLogger } from "../utils";
 
 test("logs a good result", async () => {
   expect.assertions(1);
 
   const tracer = new InMemoryTracer();
-  const logger = new inMemoryLogger();
+  const logger = new InMemoryLogger();
   const middleware = loggingMiddleware(tracer, logger);
   const handler = (
     request: IncomingMessage,
@@ -67,7 +41,7 @@ test("logs the error message with the right statusCode when a WebError is thrown
   expect.assertions(2);
 
   const tracer = new InMemoryTracer();
-  const logger = new inMemoryLogger();
+  const logger = new InMemoryLogger();
   const middleware = loggingMiddleware(tracer, logger);
   const handler = (): void => {
     throw new WebError({
@@ -104,7 +78,7 @@ test("should log a 500 when an unknown error is thrown", async () => {
   expect.assertions(2);
 
   const tracer = new InMemoryTracer();
-  const logger = new inMemoryLogger();
+  const logger = new InMemoryLogger();
   const middleware = loggingMiddleware(tracer, logger);
   const handler = (): void => {
     throw new Error("something wrong happened");
