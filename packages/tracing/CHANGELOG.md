@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.1 - 2021-01-04
+
+- Calling `startTracer` several times will not register several tracers anymore.
+
 ## 0.6.0 - 2020-12-31
 
 - The exported `Span` interface now exposes `addEvent` to add events to spans.

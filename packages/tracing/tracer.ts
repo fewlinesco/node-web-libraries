@@ -34,7 +34,12 @@ const provider: BasicTracerProvider = new NodeTracerProvider({
   },
 });
 
+let isTracerStarted = false;
+
 export function startTracer(options: TracingConfig, logger?: Logger): void {
+  if (isTracerStarted) {
+    return;
+  }
   const collector = new ZipkinExporter({
     serviceName: options.serviceName,
     url: options.url,
@@ -48,6 +53,8 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
   contextManager.enable();
 
   provider.register({ contextManager });
+
+  isTracerStarted = true;
 
   if (logger) {
     logger.log("tracing initialized", {
