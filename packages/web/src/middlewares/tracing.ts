@@ -9,6 +9,7 @@ export function tracingMiddleware(tracer: Tracer): Middleware {
       const spanName = `${request.method || "GET"} ${request.url}`;
       const span = tracer.createRootSpan(spanName);
       const result = await handler(request, response);
+      span.setDisclosedAttribute("http.status_code", response.statusCode);
       span.end();
       return result;
     };

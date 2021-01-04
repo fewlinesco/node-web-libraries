@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.5.0 - 2020-01-04
+
+- Complete rework of the framework, this version is a total breaking change.
+
 ## 0.4.1 - 2020-08-11
 
 - Headers are now sent with redirects
