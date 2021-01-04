@@ -1,8 +1,8 @@
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { Router } from "@fwl/web";
-import { createApp } from "@fwl/web/dist/express-converter";
-import { loggingMiddleware } from "@fwl/web/dist/middlewares";
+import { createApp } from "@fwl/web/dist/express";
+import { loggingMiddleware } from "@fwl/web/middlewares";
 import express, { Application, Request, Response } from "express";
 
 import * as csvHandler from "./handlers/csv";

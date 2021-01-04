@@ -251,6 +251,9 @@ For instance, that's how the logging middleware is constructed: calling the hand
 
 To be able to use those middleware, you can use `wrapMiddlewares` to create a handler with its associated middlewares:
 
+> ⚠️ Middlewares are set in the order of their execution, meaning that the first middleware you put in the array will be the closest to the Handler.
+> Said differently, if `middlewareX` did something that needed to be done before we could use `middlewareY`, the order should be `[middlewareX, middlewareY]`.
+
 ```typescript
 import { wrappMiddlewares } from "@fwl/web/dist/middlewares";
 
@@ -306,6 +309,54 @@ It's not the case with Next.JS though and this middleware only task is to create
 
 ### Usage for Express
 
+This package provides a `createApp` function that create an Express Application from an empty Express app and a list of Routers.
+You also can parametize the Router with Express' `Request` and `Response` type to allow your handlers to use these types without any TypeScript problem.
+
+Here's a basic application creation:
+
+```typescript
+import { Logger } from "@fewlines/fwl-logging";
+import { Tracer } from "@fwl/tracing";
+import { Router } from "@fwl/web";
+import { createApp } from "@fwl/web/dist/express";
+import {
+  loggingMiddleware,
+  errorMiddleware,
+  recoveryMiddleware,
+} from "@fwl/web/dist/middlewares";
+import express, { Application, Request, Response } from "express";
+
+export function start(tracer: Tracer, logger: Logger): Application {
+  const router = new Router<Request, Response>([
+    loggingMiddleware(tracer, logger),
+    errorMiddleware(tracer),
+    recoveryMiddleware(tracer),
+  ]);
+
+  router.get("/ping", pingHandler(tracer));
+
+  return createApp(express(), [router]);
+}
+```
+
+Typing the Router like so allows the Handler to look like this:
+
+```typescript
+import { Tracer } from "@fwl/tracing";
+import { HttpStatus } from "@fwl/web";
+import { Request, Response } from "express";
+
+export function pingHandler(tracer: Tracer) {
+  return (request: Request, response: Response): Promise<void> => {
+    return tracer.span("ping-handler", async () => {
+      response.status(HttpStatus.OK).end("OK");
+    });
+  };
+}
+```
+
+> Notice we couldn't have use `response.status` with a `ServerResponse` type, this function is from Express.
+
 We also provide a conversion function for Express middlewares:
 
 ```typescript
@@ -316,3 +367,60 @@ const fwlCors = convertMiddleware(cors);
 ```
 
 ### Usage for Next.Js
+
+Next.JS does not allow our tracing library to patch the underlying node packages: that means that we need to have a middleware that create the first span.
+
+Here's an example of the `hello` API page with an added error:
+
+```typescript
+import { Endpoint, HttpStatus } from "@fwl/web";
+import { WebError } from "@fwl/web/dist/errors";
+import {
+  loggingMiddleware,
+  wrapMiddlewares,
+  tracingMiddleware,
+  errorMiddleware,
+  recoveryMiddleware,
+} from "@fwl/web/dist/middlewares";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import logger from "../../logger";
+import getTracer from "../../tracer";
+
+const tracer = getTracer();
+
+const handler = (
+  request: NextApiRequest,
+  response: NextApiResponse
+): Promise<void> => {
+  return tracer.span("hello handler", async (span) => {
+    if (request.query.someQueryParam) {
+      span.setDisclosedAttribute(
+        "someQueryParam",
+        request.query.someQueryParam
+      );
+      throw new WebError({
+        error: {
+          code: "1",
+          message: "oups",
+        },
+        httpStatus: HttpStatus.NOT_ACCEPTABLE,
+      });
+    }
+
+    response.statusCode = 200;
+    response.json({ name: "John Doe" });
+  });
+};
+
+const wrappedHandler = wrapMiddlewares(
+  [
+    tracingMiddleware(tracer),
+    recoveryMiddleware(tracer),
+    errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
+  ],
+  handler
+);
+export default new Endpoint().get(wrappedHandler).getHandler();
+```

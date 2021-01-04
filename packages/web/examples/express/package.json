@@ -4,7 +4,7 @@
   "dependencies": {
     "@fwl/logging": "0.1.1",
     "@fwl/tracing": "0.6.0",
-    "@fwl/web": "0.0.0-experimental-e797b88",
+    "@fwl/web": "0.0.0-experimental-82a1438",
     "express": "4.17.1"
   },
   "devDependencies": {
