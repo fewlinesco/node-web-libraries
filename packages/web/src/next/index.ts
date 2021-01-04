@@ -1,8 +1,8 @@
-import { Middleware } from "@src/typings/middleware";
 import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 
 import { wrapMiddlewares } from "../middlewares/wrapper";
 import { Handler } from "../typings/handler";
+import { Middleware } from "../typings/middleware";
 
 export async function getServerSidePropsWithMiddlewares<P>(
   context: GetServerSidePropsContext,

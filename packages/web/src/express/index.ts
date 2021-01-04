@@ -1,8 +1,8 @@
 import { Application, Response, Request, NextFunction } from "express";
 import { IncomingMessage, ServerResponse } from "http";
 
-import { Middleware } from "../middlewares";
-import { Router } from "../router";
+import { Router } from "../../index";
+import { Middleware } from "../../middlewares";
 import { Handler } from "../typings/handler";
 
 export function createApp(

@@ -12,12 +12,7 @@
     "noErrorTruncation": true,
     "outDir": "./dist",
     "incremental": true,
-    "baseUrl": "./",
-    "paths": {
-      "@src/*": ["src/*"],
-    },
     "skipLibCheck": true
   },
-  "include": [".", "src", "tests"],
   "exclude": ["node_modules", "dist", "examples"]
 }

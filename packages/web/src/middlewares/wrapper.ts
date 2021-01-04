@@ -1,7 +1,7 @@
-import { Middleware } from "@src/typings/middleware";
 import { IncomingMessage, ServerResponse } from "http";
 
 import { Handler } from "../typings/handler";
+import { Middleware } from "../typings/middleware";
 
 export const wrapMiddlewares = <
   T extends IncomingMessage,
