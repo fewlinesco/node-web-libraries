@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 0.6.1 - 2021-01-04
+
+- Calling `startTracer` several times will not register several tracers anymore.
+
+## 0.6.0 - 2020-12-31
+
+- The exported `Span` interface now exposes `addEvent` to add events to spans.
+- The exported `Span` interface now exposes `getTraceId` to get the id of the current trace.
+- InMemoryTracer Span ID is now of type `string`.
+
+## 0.5.1 - 2020-12-29
+
+- Added back a `Tracer` type.
+
 ## 0.5.0 - 20200-12-22
 
 - Add a `createRootSpan` function that will start a trace when the plugins can't be loaded (for instance, for a Next application).
