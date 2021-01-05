@@ -4,7 +4,7 @@
 
 This is part of the Fewlines Web Libraries packages.
 
-It provides a framework on top of `http` to be used with Express and Next.JS.
+It provides a framework on top of `http` to be used with Express or Next.JS.
 
 ## Installation
 
@@ -19,7 +19,7 @@ yarn add @fwl/web
 For the purpose of this package, here are the definitions we will use:
 
 - **path**: a string, the path for which a _handler_ will be invoked.
-- **handler**: a function that will be invoked for a request. It takes a request and a response as input and returns anything.
+- **handler**: a function that will be invoked for a request. It takes a request and a response as parameters and returns `any`.
 - **route**: the combination of a _path_, a _handler_ and an HTTP method (e.g: the _handler_ that will respond to `GET /resource`)
 - **router**: a collection of _routes_
 - **endpoint**: the combination of _handlers_ that will respond for a given request for all HTTP methods (a sort of _route_ for all methods).
@@ -70,8 +70,8 @@ You could then use it with a Router `router.get("/ping", pingHandler(tracer))` o
 A Router is a class that takes a list of middlewares for its constructor.
 You can then add routes to it by giving it a path and a handler.
 
-`Router` can be parametized with request and response types, that allows your handlers to use these and not have typing problems.
-This can let us use Express' `Request` and `Response` and use all of their methods.
+`Router` can be parametized with request and response types, allowing your handlers to use these and not have typing problems.
+This can let us use Express' `Request` and `Response` types and use all of their methods.
 
 ```typescript
 import express, { Application, Request, Response } from "express";
@@ -148,7 +148,7 @@ export function createApp(tracer, logger): Application {
 
 ### Endpoint
 
-Endpoints is thought for Next.JS as its main goal is to deal with file based routing.
+`Endpoint` is thought for Next.JS as its main goal is to deal with file based routing.
 Creating an Endpoint lets you set Handlers to HTTP verbs:
 
 ```typescript
@@ -205,7 +205,7 @@ export default new Endpoint().get(wrappedHandler);
 
 ### Dealing With Errors
 
-This package provides one way to deal with errors by combining a WebError Error type and a middleware.
+This package provides one way to deal with errors by combining a `WebError` error type and a middleware.
 Here's an example:
 
 ```typescript
@@ -249,7 +249,7 @@ Instead of receiving the Request, Response and a function to go to the next midd
 The main advantage is that a middleware like that can do operations before the handler, after or both.
 For instance, that's how the logging middleware is constructed: calling the handler, setting the result aside, logging and returning the result.
 
-To be able to use those middleware, you can use `wrapMiddlewares` to create a handler with its associated middlewares:
+To be able to use those middlewares, you can use `wrapMiddlewares` to create a handler with its associated middlewares:
 
 > ⚠️ Middlewares are set in the order of their execution, meaning that the first middleware you put in the array will be the closest to the Handler.
 > Said differently, if `middlewareX` did something that needed to be done before we could use `middlewareY`, the order should be `[middlewareX, middlewareY]`.
@@ -368,7 +368,7 @@ const fwlCors = convertMiddleware(cors);
 
 ### Usage for Next.Js
 
-Next.JS does not allow our tracing library to patch the underlying node packages: that means that we need to have a middleware that create the first span.
+Next.JS does not allow our tracing library to patch the underlying node packages: that means that we need to have a middleware which creates the first span.
 
 Here's an example of the `hello` API page with an added error:
 
