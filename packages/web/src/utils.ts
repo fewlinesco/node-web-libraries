@@ -116,7 +116,9 @@ function _sendfile(
 
   // request aborted
   function onaborted(): void {
-    if (done) return;
+    if (done) {
+      return;
+    }
     done = true;
 
     const err = new WithCodeError("Request aborted");
@@ -126,7 +128,9 @@ function _sendfile(
 
   // directory
   function ondirectory(): void {
-    if (done) return;
+    if (done) {
+      return;
+    }
     done = true;
 
     const err = new WithCodeError("EISDIR, read");
@@ -136,14 +140,18 @@ function _sendfile(
 
   // errors
   function onerror(err): void {
-    if (done) return;
+    if (done) {
+      return;
+    }
     done = true;
     callback(err);
   }
 
   // ended
   function onend(): void {
-    if (done) return;
+    if (done) {
+      return;
+    }
     done = true;
     callback();
   }
@@ -155,9 +163,15 @@ function _sendfile(
 
   // finished
   function onfinish(err): void {
-    if (err && err.code === "ECONNRESET") return onaborted();
-    if (err) return onerror(err);
-    if (done) return;
+    if (err && err.code === "ECONNRESET") {
+      return onaborted();
+    }
+    if (err) {
+      return onerror(err);
+    }
+    if (done) {
+      return;
+    }
 
     setImmediate(function () {
       if (streaming !== false && !done) {
@@ -165,7 +179,9 @@ function _sendfile(
         return;
       }
 
-      if (done) return;
+      if (done) {
+        return;
+      }
       done = true;
       callback();
     });
