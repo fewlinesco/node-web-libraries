@@ -424,3 +424,35 @@ const wrappedHandler = wrapMiddlewares(
 );
 export default new Endpoint().get(wrappedHandler).getHandler();
 ```
+
+Usage in a React Page is a bit different because we always need to be returning something and you may need to access `context.params`.
+You can use the `getServerSidePropsWithMiddlewares` function that takes the context, a list of middlewares and a handler.
+Here's an example with the same middlewares as the API Page:
+
+```typescript
+import {
+  loggingMiddleware,
+  tracingMiddleware,
+  errorMiddleware,
+  recoveryMiddleware,
+} from "@fwl/web/dist/middlewares";
+import { getServerSidePropsWithMiddlewares } from "@fwl/web/dist/next";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return getServerSidePropsWithMiddlewares(
+    context,
+    [
+      tracingMiddleware(tracer),
+      recoveryMiddleware(tracer),
+      errorMiddleware(tracer),
+      loggingMiddleware(tracer, logger),
+    ],
+    () => {
+      // do something with `context.params` here
+      return {
+        props: {},
+      };
+    }
+  );
+};
+```
