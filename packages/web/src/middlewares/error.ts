@@ -4,9 +4,12 @@ import { IncomingMessage, ServerResponse } from "http";
 import { WebError } from "../errors";
 import { Middleware } from "../typings/middleware";
 
-export function errorMiddleware(tracer: Tracer): Middleware {
+export function errorMiddleware<
+  T extends IncomingMessage,
+  U extends ServerResponse
+>(tracer: Tracer): Middleware<T, U> {
   return function withFwlErrorHandler(handler) {
-    return function (request: IncomingMessage, response: ServerResponse) {
+    return function (request: T, response: U) {
       return tracer.span("error middleware", async (span) => {
         try {
           return await handler(request, response);
