@@ -326,10 +326,10 @@
     "@opentelemetry/node" "0.14.0"
     "@opentelemetry/tracing" "0.14.0"
 
-"@fwl/web@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@fwl/web/-/web-0.5.0.tgz#7b089fa1f8f3f75af1fdfd7ad162a33a3e2de413"
-  integrity sha512-UEg4xZhAHz3aHyYw9mw9d/jqQzXeUkVjjFwkdD+Atsrmrqqg8zbP62d0fnhAtSfnxQPHGo5X2KTk0R6TRunubA==
+"@fwl/web@0.0.0-experimental-a81e88d":
+  version "0.0.0-experimental-a81e88d"
+  resolved "https://registry.yarnpkg.com/@fwl/web/-/web-0.0.0-experimental-a81e88d.tgz#f98c10b2541d0b3f182c018122b13d4c4535f9f2"
+  integrity sha512-sBAeW2gn4r7QnM1vSOCZfkU2H2NXQx6vXDf5qEKWaUHJutgjhQqL203b9N3bmbshbqvJPin4JDBJrWrE3n4ZaA==
   dependencies:
     "@fewlines/fwl-logging" "1.0.1"
     "@fwl/tracing" "0.6.1"

@@ -53,9 +53,7 @@ export function loggingMiddleware<
           return result;
         } catch (error) {
           const statusCode =
-            error.httpStatus ||
-            response.statusCode ||
-            HttpStatus.INTERNAL_SERVER_ERROR;
+            error.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
           logger.log(
             error.toString(),
             logAttributes(startTime, request, statusCode, span.getTraceId()),
