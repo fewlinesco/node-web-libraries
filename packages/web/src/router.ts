@@ -1,221 +1,61 @@
-import { Logger } from "@fewlines/fwl-logging";
-import { Tracer } from "@fwl/tracing";
-import { json as jsonParser } from "body-parser";
-import {
-  Router as expressRouter,
-  Request,
-  Response,
-  NextFunction,
-} from "express";
-import * as Express from "express-serve-static-core";
+import { IncomingMessage, ServerResponse } from "http";
 
-import { UnmanagedError, WebError } from "./errors";
-import { HttpStatus } from "./http-statuses";
+import { wrapMiddlewares } from "./middlewares/wrapper";
+import { Handler } from "./typings/handler";
+import { Middleware } from "./typings/middleware";
 
-export type EmptyParams = Record<string, unknown>;
+type pathHandlers<T extends IncomingMessage, U extends ServerResponse> = {
+  get?: Handler<T, U>;
+  post?: Handler<T, U>;
+  patch?: Handler<T, U>;
+  put?: Handler<T, U>;
+  delete?: Handler<T, U>;
+};
+export class Router<
+  T extends IncomingMessage = IncomingMessage,
+  U extends ServerResponse = ServerResponse
+> {
+  private middlewares: Middleware<T, U>[];
+  private paths: Record<string, pathHandlers<T, U>>;
 
-export type EmptyBody = Record<string, unknown>;
-
-export type Middleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => void;
-
-export enum ResolveOrReject {
-  RESOLVE,
-  REJECT,
-}
-interface ResolveOptions {
-  file?: boolean;
-}
-
-export type ResolveFunction = (
-  status: HttpStatus,
-  returnValue?: unknown,
-  headers?: Record<string, string>,
-  options?: ResolveOptions,
-) => HandlerPromise;
-
-export type HandlerWithoutBody<T extends Record<string, unknown>> = (
-  tracer: Tracer,
-  resolve: ResolveFunction,
-  reject: RejectFunction,
-  params: T,
-  request: Request,
-) => HandlerPromise;
-
-export type HandlerWithBody<T, U> = (
-  tracer: Tracer,
-  resolve: ResolveFunction,
-  reject: RejectFunction,
-  params: T,
-  body: U,
-  request: Request,
-) => HandlerPromise;
-
-export type HandlerPromise = Promise<ResolveOrReject>;
-
-export type RejectFunction = (error: WebError) => HandlerPromise;
-
-export function rejectFactory(response: Response): RejectFunction {
-  return function reject(error: WebError): HandlerPromise {
-    if (error.parentError) {
-      response.req.private.error = error.parentError;
-    }
-    response.status(error.httpStatus).json(error.getMessage());
-    return Promise.resolve(ResolveOrReject.REJECT);
-  };
-}
-
-function resolveFactory(response: Response): ResolveFunction {
-  return function (
-    status: HttpStatus,
-    value?: unknown,
-    headers?: Record<string, string>,
-    options: ResolveOptions = {},
-  ): HandlerPromise {
-    if (
-      [
-        HttpStatus.MOVED_PERMANENTLY,
-        HttpStatus.MOVED_TEMPORARILY,
-        HttpStatus.TEMPORARY_REDIRECT,
-        HttpStatus.PERMANENT_REDIRECT,
-      ].includes(status)
-    ) {
-      if (typeof value !== "string") {
-        throw new Error(
-          `Unsupported type for redirection value, excepted string got ${typeof value}`,
-        );
-      }
-      if (headers) {
-        response.set(headers);
-      }
-      response.redirect(status, value);
-    } else if (options.file) {
-      if (typeof value !== "string") {
-        throw new Error(
-          `Unsupported type for image path, excepted string got ${typeof value}`,
-        );
-      }
-      response.status(status);
-      response.sendFile(value, { headers });
-    } else {
-      response.status(status);
-
-      if (headers) {
-        response.set(headers);
-      }
-      if (value) {
-        response.json(value);
-      } else {
-        response.end();
-      }
-    }
-    return Promise.resolve(ResolveOrReject.RESOLVE);
-  };
-}
-
-export class Router {
-  private tracer: Tracer;
-  private logger: Logger;
-  private router: Express.Router;
-  private middlewares: Middleware[];
-
-  constructor(tracer: Tracer, logger: Logger, middlewares: Middleware[] = []) {
-    this.tracer = tracer;
-    this.logger = logger;
-    this.router = expressRouter();
+  constructor(middlewares: Middleware<T, U>[]) {
     this.middlewares = middlewares;
+    this.paths = {};
   }
 
-  private withBodyResponse<T extends Record<string, unknown>, U>(
-    handler: HandlerWithBody<T, U>,
-  ) {
-    return async (request: Request, response: Response): Promise<void> => {
-      const resolve = resolveFactory(response);
-      const reject = rejectFactory(response);
-      const params = { ...request.query, ...request.params } as T;
-      try {
-        await handler(
-          this.tracer,
-          resolve,
-          reject,
-          params,
-          request.body,
-          request,
-        );
-      } catch (exception) {
-        if (exception instanceof WebError) {
-          reject(exception);
-        } else {
-          reject(UnmanagedError(exception));
-        }
-      }
-    };
-  }
-
-  post<T extends Record<string, unknown>, U>(
+  private addRoute(
     path: string,
-    handler: HandlerWithBody<T, U>,
-  ): void {
-    this.router.post(
-      path,
-      jsonParser(),
-      ...this.middlewares,
-      this.withBodyResponse(handler),
-    );
+    method: "get" | "post" | "patch" | "put" | "delete",
+    handler: Handler<T, U>,
+  ): this {
+    if (!this.paths[path]) {
+      this.paths[path] = {};
+    }
+    this.paths[path][method] = wrapMiddlewares<T, U>(this.middlewares, handler);
+    return this;
   }
 
-  patch<T extends Record<string, unknown>, U>(
-    path: string,
-    handler: HandlerWithBody<T, U>,
-  ): void {
-    this.router.patch(
-      path,
-      jsonParser(),
-      ...this.middlewares,
-      this.withBodyResponse(handler),
-    );
+  get(path: string, handler: Handler<T, U>): this {
+    return this.addRoute(path, "get", handler);
   }
 
-  delete<T extends Record<string, unknown>, U>(
-    path: string,
-    handler: HandlerWithBody<T, U>,
-  ): void {
-    this.router.delete(
-      path,
-      jsonParser(),
-      ...this.middlewares,
-      this.withBodyResponse(handler),
-    );
+  post(path: string, handler: Handler<T, U>): this {
+    return this.addRoute(path, "post", handler);
   }
 
-  get<T extends Record<string, unknown> = EmptyParams>(
-    path: string,
-    handler: HandlerWithoutBody<T>,
-  ): void {
-    this.router.get(
-      path,
-      ...this.middlewares,
-      async (request: Request, response: Response) => {
-        const resolve = resolveFactory(response);
-        const reject = rejectFactory(response);
-        const params = { ...request.query, ...request.params } as T;
-        try {
-          await handler(this.tracer, resolve, reject, params, request);
-        } catch (exception) {
-          if (exception instanceof WebError) {
-            reject(exception);
-          } else {
-            reject(UnmanagedError(exception));
-          }
-        }
-      },
-    );
+  patch(path: string, handler: Handler<T, U>): this {
+    return this.addRoute(path, "patch", handler);
   }
 
-  getRouter(): Express.Router {
-    return this.router;
+  delete(path: string, handler: Handler<T, U>): this {
+    return this.addRoute(path, "delete", handler);
+  }
+
+  put(path: string, handler: Handler<T, U>): this {
+    return this.addRoute(path, "put", handler);
+  }
+
+  getRoutes(): Record<string, pathHandlers<T, U>> {
+    return this.paths;
   }
 }

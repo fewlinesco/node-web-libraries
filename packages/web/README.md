@@ -4,7 +4,7 @@
 
 This is part of the Fewlines Web Libraries packages.
 
-It provides a typed interface on top of Express with a way of defining errors, a Router and a function to bootstrap an application.
+It provides a framework on top of `http` to be used with Express or Next.JS.
 
 ## Installation
 
@@ -14,201 +14,445 @@ yarn add @fwl/web
 
 ## Usage
 
-### Router
+### Definitions
 
-The `Router` of this package is an abstraction on top of the basic Express Router, it is charged with sending the response and displaying the errors.
+For the purpose of this package, here are the definitions we will use:
 
-It takes a `tracer` and a `logger` in its constructor and its API looks a bit like what Express is expecting but we need to pass the types of data the handler will receive.
-
-There are differences between `.get` and the other methods:
-
-- `.get` will need to type the `params` that it will receive.
-- `.post`, `.patch`, `.delete` will need to type both the `params` and the `body` they will receive.
-
-`params` is a merge of Query Strings (`?offset=10`) and Named Parameters (e.g. the `id` in `/path/:id`).
-Please beware, Named Parameters will have precedence over Query Strings, meaning that for the path `/user/:id`, the URL `/user/1?id=2` will have a `params.id` equal to `1`.
-
-```typescript
-const router = new Router(tracer, logger);
-
-router.get<{}>("/", handler);
-router.get<{ id: string }>("/path/:id", anotherHandler);
-router.post<{}, { name: string; description: string }>("/path", postHandler);
-router.patch<{ id: string }, { name?: string; description?: string }>(
-  "/path/:id",
-  patchHandler,
-);
-router.delete<{ id: string }, {}>("/path/:id", deleteHandler);
-```
-
-For more information, please look at the [example](./example/).
+- **path**: a string, the path for which a _handler_ will be invoked.
+- **handler**: a function that will be invoked for a request. It takes a request and a response as parameters and returns `any`.
+- **route**: the combination of a _path_, a _handler_ and an HTTP method (e.g: the _handler_ that will respond to `GET /resource`)
+- **router**: a collection of _routes_
+- **endpoint**: the combination of _handlers_ that will respond for a given request for all HTTP methods (a sort of _route_ for all methods).
 
 ### Handler
 
-Contrary to Express where the handler takes the `request` and the `response` as argument, this router gives the handler 5 parameters in that order:
-
-- The `tracer` instance: we want to trace as much as possible so this is the first thing that we receive.
-- A `resolve` function, continue reading for more information.
-- A `reject` function, continue reading for more information.
-- The `params` of this request with the URL Params, the Query Params in `GET` and the Body Params (parsed from JSON) in other HTTP verbs requests.
-- If needed, the full `request` object.
-
-Let's see an example:
+At its simplest, a handler would look like that:
 
 ```typescript
-// First we define the route wit an URL Parameter
-router.get<{ name: string }>("/my/:name", myHandler(database));
+import { IncomingMessage, ServerResponse } from "http";
+import { HttpStatus } from "@fwl/web";
+
+export function pingHandler(
+  request: IncomingMessage,
+  response: ServerResponse
+): void {
+  response.statusCode = HttpStatus.OK;
+  response.end("OK");
+}
 ```
 
+However, we recommend to use tracing, for easier debugging and it should look like this:
+
 ```typescript
-import { Request } from "express";
+import { IncomingMessage, ServerResponse } from "http";
 import { Tracer } from "@fwl/tracing";
-import {
-  HandlerPromise,
-  HttpStatus,
-  RejectFunction,
-  ResolveFunction,
-} from "@fwl/web";
+import { HttpStatus } from "@fwl/web";
 
-// We create a handler that accept dependencies and return the real handler
-export function myHandler(database) {
+export function pingHandler(tracer: Tracer) {
   return (
-    tracer: Tracer,
-    resolve: ResolveFunction,
-    reject: RejectFunction,
-    params: { name: string },
-    request: Request,
-  ): HandlerPromise => {
-    //  Most of the time, we will want to create a span around our handler
-    return tracer.span("my-resource-handler", async (span) => {
-      // We can add atributes to our Trace Span
-      span.setAttribute("my_resource_name", params.name);
-
-      const {
-        rows,
-      } = await database.query(
-        "SELECT id, name FROM my_resource_table WHERE name = $1",
-        [params.name],
-      );
-
-      if (rows.length === 0) {
-        // If we have an error, we return a factory for it (see Dealing With Errors)
-        return reject(MyResourceNotFoundError());
-      }
-
-      const myData = rows.map((row) => ({ id: row.id, name: row.name }));
-
-      // If all goes well, we can return the resolve with an HTTP 200 OK and `myData`
-      return resolve(HttpStatus.OK, myData);
+    request: IncomingMessage,
+    response: ServerResponse
+  ): Promise<void> => {
+    return tracer.span("ping-handler", async () => {
+      response.statusCode = HttpStatus.OK;
+      response.end("OK");
     });
   };
 }
 ```
 
-If you don't have any Query parameters, these are functionnaly equivalent:
+This is basic dependency injection via a function.
+We're exporting a function that takes a dependency (`tracer`) that returns a Handler.
+You could then use it with a Router `router.get("/ping", pingHandler(tracer))` or with an Endpoint `new Endpoint().get(pingHandler(tracer))`.
+
+### Router
+
+A Router is a class that takes a list of middlewares for its constructor.
+You can then add routes to it by giving it a path and a handler.
+
+`Router` can be parametized with request and response types, allowing your handlers to use these and not have typing problems.
+This can let us use Express' `Request` and `Response` types and use all of their methods.
 
 ```typescript
-router.get<Record<string, unknown>>("/ping", pingHandler());
-router.get<Router.EmptyParams>("/ping", pingHandler());
-router.get("/ping", pingHandler());
-```
+import express, { Application, Request, Response } from "express";
+import { Router } from "@fwl/web";
 
-For more information, please look at the [example](./example/).
+export function createApp(tracer, logger): Application {
+  const router = new Router<Request, Response>([
+    loggingMiddleware(tracer, logger),
+    errorMiddleware(tracer),
+  ]);
 
-#### Redirects
+  router.get("/ping", pingHandler(tracer));
+  router.get("/users/:id", userHandler.getUserById(tracer));
+  router.post("/users", userHandler.createUser(tracer));
 
-To redirect a request, you can use one of the redirection HTTP Status:
-
-- `HttpStatus.MOVED_PERMANENTLY`: 301
-- `HttpStatus.MOVED_TEMPORARILY`: 302
-- `HttpStatus.TEMPORARY_REDIRECT`: 307
-- `HttpStatus.PERMANENT_REDIRECT`: 308
-
-The redirection URI will be the second argument and must be a string.
-
-```typescript
-export function myHandler(database) {
-  return (tracer: Tracer, resolve: ResolveFunction): HandlerPromise => {
-    return tracer.span("my-redirect-handler", async () => {
-      return resolve(HttpStatus.MOVED_PERMANENTLY, "http://anotherurl.com");
-    }
-  }
+  return createApp(express(), [withAuthRouter, router]);
 }
 ```
 
-#### Sending additional headers
-
-The `resolve` function accepts a third option argument which is a `Record<string, string>` that contain headers that will be added to the request.
+If you need to add a middleware to one route in particular, you can use `wrapMiddlewares`:
 
 ```typescript
-export function myHandler(database) {
-  return (tracer: Tracer, resolve: ResolveFunction): HandlerPromise => {
-    return tracer.span("my-resource-handler", async () => {
-      const csvData = "1,Frieda,Ewlines";
-      return resolve(HttpStatus.OK, csvData, {"Content-Type": "text/csv"})
-    }
-  }
+import express, { Application, Request, Response } from "express";
+import { Router } from "@fwl/web";
+import {
+  errorMiddleware,
+  loggingMiddleware,
+  wrapMiddlewares,
+} from "@fwl/web/dist/middlewares";
+
+export function createApp(tracer, logger): Application {
+  const router = new Router<Request, Response>([
+    loggingMiddleware(tracer, logger),
+    errorMiddleware(tracer),
+  ]);
+
+  router.get("/ping", pingHandler(tracer));
+  router.get("/users/:id", userHandler.getUserById(tracer));
+  router.post(
+    "/users",
+    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer))
+  );
+
+  return createApp(express(), [withAuthRouter, router]);
 }
+```
+
+You can also create several routers (take care to add the basic middlewares too though):
+
+```typescript
+import express, { Application, Request, Response } from "express";
+import { errorMiddleware, loggingMiddleware } from "@fwl/web/dist/middlewares";
+import { Router } from "@fwl/web";
+
+export function createApp(tracer, logger): Application {
+  const router = new Router<Request, Response>([
+    loggingMiddleware(tracer, logger),
+    errorMiddleware(tracer),
+  ]);
+
+  router.get("/ping", pingHandler(tracer));
+  router.get("/users/:id", userHandler.getUserById(tracer));
+
+  const withAuthRouter = new Router([
+    loggingMiddleware(tracer, logger),
+    errorMiddleware(tracer),
+    someAuthMiddleware,
+  ]);
+  withAuthRouter.post("/users", userHandler.createUser(tracer));
+
+  return createApp(express(), [withAuthRouter, router]);
+}
+```
+
+### Endpoint
+
+`Endpoint` is thought for Next.JS as its main goal is to deal with file based routing.
+Creating an Endpoint lets you set Handlers to HTTP verbs:
+
+```typescript
+import { Endpoint } from "@fwl/web";
+
+function handler(request, response) {
+  // ...
+}
+
+export default new Endpoint().get(handler);
+```
+
+By doing that, all requests on this endpoint that are not `GET` will not call the Handler and returns a `403 Method Not Allowed`.
+
+You can also chain it to allow several verbs:
+
+```typescript
+import { Endpoint } from "@fwl/web";
+
+function handler(request, response) {
+  // ...
+}
+
+export default new Endpoint().put(handler).patch(handler);
+```
+
+Applying middlewares can be done like so:
+
+```typescript
+import { Endpoint } from "@fwl/web";
+import {
+  errorMiddleware,
+  loggingMiddleware,
+  recoveryMiddleware,
+  tracingMiddleware,
+  wrapMiddlewares,
+} from "@fwl/web/dist/middlewares";
+
+function handler(request, response) {
+  // ...
+}
+
+const wrappedHandler = wrapMiddlewares(
+  [
+    tracingMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
+    errorMiddleware(tracer),
+    recoveryMiddleware(tracer),
+  ],
+  handler
+);
+export default new Endpoint().get(wrappedHandler);
 ```
 
 ### Dealing With Errors
 
-We want to unify the way we deal with errors so we have a recommended way.
-The global idea is to have only one place where the errors of a Service are defined.
-Each of these is a `WebError` with an HTTP status, a unique code and a message.
-
-Here is how to define our `MyNotFoundError` in the previous example:
+This package provides one way to deal with errors by combining a `WebError` error type and a middleware.
+Here's an example:
 
 ```typescript
-// src/errors.ts
-import { HttpStatus, WebError, WebErrorMessages } from "@fwl/web";
+export class UserNotFoundError extends WebError {}
 
-const Errors: WebErrorMessages = {
-  MY_RESOURCE_NOT_FOUND: { code: 400001, message: "My Resource not found" },
-};
+export function getUserById(tracer: Tracer) {
+  return (request, response): Promise<void> => {
+    return tracer.span("get-user-by-id", async (span) => {
+      span.setDisclosedAttribute("user-id", request.params.id);
 
-export function MyResourceNotFoundError() {
-  return new WebError({
-    error: Errors.MY_RESOURCE_NOT_FOUND,
-    httpStatus: HttpStatus.NOT_FOUND,
-  });
+      const user = users.find((user) => user.id === request.params.id);
+
+      if (!user) {
+        throw new UserNotFoundError({
+          error: {
+            code: "TST_201229_YNXL",
+            message: "No user found",
+          },
+          httpStatus: HttpStatus.NOT_FOUND,
+        });
+      }
+
+      response.statusCode = HttpStatus.OK;
+      sendJSON(response, user);
+    });
+  };
 }
 ```
 
-⚠️ Don't make two errors the same if they occur in different places in the Service even if they look similar.
+Throwing this error will result in a `404 Not Found` with a JSON body with `code` and `message`.
+This is done by catching the error in the `errorMiddleware` and setting the response if it's an instance of `WebError`.
 
-### Logging middleware
+> ⚠️ If you use both `loggingMiddleware` and `errorMiddleware` the order must be logging, then error.
+> Otherwise, the error message will not be logged.
 
-This package exposes a `loggingMiddleware` that takes a `tracer` and a `logger` as parameter, returns an express middleware, and that will make one log per request.
+### Middlewares
 
-This log will contain:
+This package provides a middleware API different from Express.
+Instead of receiving the Request, Response and a function to go to the next middleware (the last middleware being the handler), we choose to have middlewares receive a handler and gives back a handler.
 
-- the duration of the request in microseconds,
-- the path that was hit on the server,
-- the method that was used,
-- the status code returned for this request,
-- and the remote address that made the call.
+The main advantage is that a middleware like that can do operations before the handler, after or both.
+For instance, that's how the logging middleware is constructed: calling the handler, setting the result aside, logging and returning the result.
 
-It can be used in the second argument of `createApp`:
+To be able to use those middlewares, you can use `wrapMiddlewares` to create a handler with its associated middlewares:
+
+> ⚠️ Middlewares are set in the order of their execution, meaning that the first middleware you put in the array will be the closest to the Handler.
+> Said differently, if `middlewareX` did something that needed to be done before we could use `middlewareY`, the order should be `[middlewareX, middlewareY]`.
 
 ```typescript
-createApp(router, [loggingMiddleware(tracer, logger)]);
+import { wrappMiddlewares } from "@fwl/web/dist/middlewares";
+
+const wrappedhandler = wrapMiddlewares([middleware1, middleware2], handler);
 ```
 
-### Create the application
+We also provide a conversion function for Express middlewares:
 
 ```typescript
-import { Application } from "express";
+import { convertMiddleware } from "@fwl/web/dist/express";
+import cors from "cors";
+
+const fwlCors = convertMiddleware(cors);
+```
+
+#### Logging Middleware
+
+This middleware will log each requests with:
+
+- the path,
+- the duration of the request,
+- the HTTP method,
+- the IP address that initiated the request,
+- the status code of the request,
+- the trace ID for the request.
+
+The log message will either be empty in case of success or contain the error message if an error was thrown somewhere.
+
+If you're throwing a `WebError`, the status code of this error will be logged.
+
+#### Error Middleware
+
+This middleware will capture `WebError` thrown in middlewares or handlers and return a formatted Response, with the status code of the error and the error code and message as JSON.
+
+If you don't want to use `WebError`, you can either don't use it or recode your own for your own errors.
+
+> ⚠️ If you use both `loggingMiddleware` and `errorMiddleware` the order must be logging, then error.
+> Otherwise, the error message will not be logged.
+
+#### Recovery Middleware
+
+This middleware only goal is to catch errors and return a 500 Internal Server Error.
+This way, your server will not crash and leak errors when something unexpected happens.
+
+It will also add the error message and stacktrace in the trace of the request for debugging purposes.
+
+#### Tracing Middleware
+
+This middleware should not be used with an Express server as the tracer will automatically create traces.
+It's not the case with Next.JS though and this middleware only task is to create a trace on which to attach the different spans.
+
+> ⚠️ If it's used, it should be the first middleware of the list since the others will try to create spans.
+
+### Usage for Express
+
+This package provides a `createApp` function that create an Express Application from an empty Express app and a list of Routers.
+You also can parametize the Router with Express' `Request` and `Response` type to allow your handlers to use these types without any TypeScript problem.
+
+Here's a basic application creation:
+
+```typescript
 import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
-import { createApp, loggingMiddleware, Router } from "@fwl/web";
-import { handler } from "./handlers";
+import { Router } from "@fwl/web";
+import { createApp } from "@fwl/web/dist/express";
+import {
+  loggingMiddleware,
+  errorMiddleware,
+  recoveryMiddleware,
+} from "@fwl/web/dist/middlewares";
+import express, { Application, Request, Response } from "express";
 
-export function bootstrap(tracer: Tracer, logger: Logger): Application {
-  const router = new Router(tracer, logger);
+export function start(tracer: Tracer, logger: Logger): Application {
+  const router = new Router<Request, Response>([
+    loggingMiddleware(tracer, logger),
+    errorMiddleware(tracer),
+    recoveryMiddleware(tracer),
+  ]);
 
-  router.get("/", handler(spartaApiClient));
+  router.get("/ping", pingHandler(tracer));
 
-  return createApp(router, [loggingMiddleware(tracer, logger)]);
+  return createApp(express(), [router]);
 }
+```
+
+Typing the Router like so allows the Handler to look like this:
+
+```typescript
+import { Tracer } from "@fwl/tracing";
+import { HttpStatus } from "@fwl/web";
+import { Request, Response } from "express";
+
+export function pingHandler(tracer: Tracer) {
+  return (request: Request, response: Response): Promise<void> => {
+    return tracer.span("ping-handler", async () => {
+      response.status(HttpStatus.OK).end("OK");
+    });
+  };
+}
+```
+
+> Notice we couldn't have use `response.status` with a `ServerResponse` type, this function is from Express.
+
+We also provide a conversion function for Express middlewares:
+
+```typescript
+import { convertMiddleware } from "@fwl/web/dist/express";
+import cors from "cors";
+
+const fwlCors = convertMiddleware(cors);
+```
+
+### Usage for Next.Js
+
+Next.JS does not allow our tracing library to patch the underlying node packages: that means that we need to have a middleware which creates the first span.
+
+Here's an example of the `hello` API page with an added error:
+
+```typescript
+import { Endpoint, HttpStatus } from "@fwl/web";
+import { WebError } from "@fwl/web/dist/errors";
+import {
+  loggingMiddleware,
+  wrapMiddlewares,
+  tracingMiddleware,
+  errorMiddleware,
+  recoveryMiddleware,
+} from "@fwl/web/dist/middlewares";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import logger from "../../logger";
+import getTracer from "../../tracer";
+
+const tracer = getTracer();
+
+const handler = (
+  request: NextApiRequest,
+  response: NextApiResponse
+): Promise<void> => {
+  return tracer.span("hello handler", async (span) => {
+    if (request.query.someQueryParam) {
+      span.setDisclosedAttribute(
+        "someQueryParam",
+        request.query.someQueryParam
+      );
+      throw new WebError({
+        error: {
+          code: "1",
+          message: "oups",
+        },
+        httpStatus: HttpStatus.NOT_ACCEPTABLE,
+      });
+    }
+
+    response.statusCode = 200;
+    response.json({ name: "John Doe" });
+  });
+};
+
+const wrappedHandler = wrapMiddlewares(
+  [
+    tracingMiddleware(tracer),
+    recoveryMiddleware(tracer),
+    errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
+  ],
+  handler
+);
+export default new Endpoint().get(wrappedHandler).getHandler();
+```
+
+Usage in a React Page is a bit different because we always need to be returning something and you may need to access `context.params`.
+You can use the `getServerSidePropsWithMiddlewares` function that takes the context, a list of middlewares and a handler.
+Here's an example with the same middlewares as the API Page:
+
+```typescript
+import {
+  loggingMiddleware,
+  tracingMiddleware,
+  errorMiddleware,
+  recoveryMiddleware,
+} from "@fwl/web/dist/middlewares";
+import { getServerSidePropsWithMiddlewares } from "@fwl/web/dist/next";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return getServerSidePropsWithMiddlewares(
+    context,
+    [
+      tracingMiddleware(tracer),
+      recoveryMiddleware(tracer),
+      errorMiddleware(tracer),
+      loggingMiddleware(tracer, logger),
+    ],
+    () => {
+      // do something with `context.params` here
+      return {
+        props: {},
+      };
+    }
+  );
+};
 ```
