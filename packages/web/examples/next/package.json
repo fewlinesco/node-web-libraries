@@ -10,7 +10,7 @@
   "dependencies": {
     "@fwl/logging": "0.1.1",
     "@fwl/tracing": "0.6.1",
-    "@fwl/web": "0.5.0",
+    "@fwl/web": "0.5.1",
     "next": "10.0.4",
     "react": "17.0.1",
     "react-dom": "17.0.1"
