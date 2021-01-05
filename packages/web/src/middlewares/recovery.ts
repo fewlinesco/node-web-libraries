@@ -4,9 +4,12 @@ import { IncomingMessage, ServerResponse } from "http";
 import { HttpStatus } from "../http-statuses";
 import { Middleware } from "../typings/middleware";
 
-export function recoveryMiddleware(tracer: Tracer): Middleware {
+export function recoveryMiddleware<
+  T extends IncomingMessage,
+  U extends ServerResponse
+>(tracer: Tracer): Middleware<T, U> {
   return function withFwlRecoveryErrorHandler(handler) {
-    return function (request: IncomingMessage, response: ServerResponse) {
+    return function (request: T, response: U) {
       return tracer.span("recovery middleware", async (span) => {
         try {
           return await handler(request, response);

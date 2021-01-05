@@ -37,8 +37,8 @@ export const wrapMiddlewares = <
       );
     }
   }
-  for (const middleware of middlewares.reverse()) {
-    handler = middleware(handler);
+  for (let i = middlewares.length - 1; i >= 0; i--) {
+    handler = middlewares[i](handler);
   }
 
   return handler;
