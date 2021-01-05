@@ -2,7 +2,7 @@ import { Logger } from "@fewlines/fwl-logging";
 import { Tracer } from "@fwl/tracing";
 import { Router } from "@fwl/web";
 import { createApp } from "@fwl/web/dist/express";
-import { loggingMiddleware } from "@fwl/web/middlewares";
+import { loggingMiddleware, errorMiddleware } from "@fwl/web/middlewares";
 import express, { Application, Request, Response } from "express";
 
 import * as csvHandler from "./handlers/csv";
@@ -10,7 +10,6 @@ import * as imageHandler from "./handlers/image";
 import { pingHandler } from "./handlers/ping";
 import * as userHandler from "./handlers/users";
 import { authMiddleware } from "./middlewares/auth";
-import { errorMiddleware } from "./middlewares/error";
 
 export function start(tracer: Tracer, logger: Logger): Application {
   const router = new Router<Request, Response>([
