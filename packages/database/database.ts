@@ -21,8 +21,14 @@ interface DatabaseBaseQueryRunner {
   transaction: (txFunc: TransactionFunction) => Promise<any>;
 }
 
-export interface DatabaseQueryRunner extends DatabaseBaseQueryRunner {
-  _type?: "DatabaseQueryRunner";
+export type DatabaseQueryRunner =
+  | DatabaseQueryRunnerWithoutTracing
+  | DatabaseQueryRunnerSandbox
+  | DatabaseQueryRunnerWithTracing;
+
+export interface DatabaseQueryRunnerWithTracing
+  extends DatabaseBaseQueryRunner {
+  _type?: "DatabaseQueryRunnerWithTracing";
 }
 
 export interface DatabaseQueryRunnerWithoutTracing
@@ -78,7 +84,7 @@ function queryRunner(
   pool: Pool,
   tracer: Tracer,
   txClient: undefined | PoolClient = undefined,
-): DatabaseQueryRunner {
+): DatabaseQueryRunnerWithTracing {
   const withoutTracing = queryRunnerWithoutTracing(pool, txClient);
   return {
     close: async (): Promise<void> => {
