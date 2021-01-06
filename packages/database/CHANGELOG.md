@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.0 - 2021-01-07
+
+- `DatabaseQueryRunner` is now a union type of `DatabaseQueryRunnerWithTracing`, `DatabaseQueryRunnerWithoutTracing`, `DatabaseQueryRunnerSandbox`.
+
 ## 0.2.0 - 2021-01-06
 
 - Added a new Sandbox mode for testing purposes.

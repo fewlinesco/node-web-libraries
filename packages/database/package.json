@@ -45,5 +45,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.0.0-experimental-af92ca1"
+  "version": "0.2.1"
 }
