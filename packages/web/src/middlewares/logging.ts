@@ -1,4 +1,4 @@
-import { Logger } from "@fewlines/fwl-logging";
+import { Logger } from "@fwl/logging";
 import { Tracer } from "@fwl/tracing";
 import { IncomingMessage, ServerResponse } from "http";
 

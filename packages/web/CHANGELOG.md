@@ -1,10 +1,14 @@
 # CHANGELOG
 
-## 0.5.1 - 2020-01-05
+## 0.5.2 - 2021-01-06
+
+- Bump dependencies
+
+## 0.5.1 - 2021-01-05
 
 - Fix some things in the previous version and removes the 0.5.0 from npm.
 
-## 0.5.0 - 2020-01-04
+## 0.5.0 - 2021-01-04
 
 - Complete rework of the framework, this version is a total breaking change. Please read the documentation to see the changes.
 
