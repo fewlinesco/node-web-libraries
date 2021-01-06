@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.5.3 - 2021-01-06
+
+- Fix types of `convertMiddleware` to allow Express' `Request` and `Response` types.
+
 ## 0.5.2 - 2021-01-06
 
 - Bump dependencies

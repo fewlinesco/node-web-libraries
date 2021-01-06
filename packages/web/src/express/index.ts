@@ -20,15 +20,18 @@ export function createApp(
   return newApplication;
 }
 
-type ExpressMidleware = (
-  request: IncomingMessage,
-  response: ServerResponse,
+type ExpressMiddleware<T extends IncomingMessage, U extends ServerResponse> = (
+  request: T,
+  response: U,
   next: NextFunction,
 ) => void;
 
-export function convertMiddleware(middleware: ExpressMidleware): Middleware {
-  return (handler: Handler) => {
-    return (request: IncomingMessage, response: ServerResponse) => {
+export function convertMiddleware<
+  T extends IncomingMessage,
+  U extends ServerResponse
+>(middleware: ExpressMiddleware<T, U>): Middleware<T, U> {
+  return (handler: Handler<T, U>) => {
+    return (request: T, response: U) => {
       middleware(request, response, () => {
         handler(request, response);
       });
