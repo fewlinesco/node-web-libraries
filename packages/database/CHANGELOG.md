@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.0 - 2021-01-06
+
+- Added a new Sandbox mode for testing purposes.
+
 ## 0.1.4 - 2020-08-19
 
 - Added new `Error` types -> `BadUUIDError` and `DuplicateEntryError`
