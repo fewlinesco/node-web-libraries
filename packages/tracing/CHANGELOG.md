@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.6.2 - 2021-01-07
+
+- Disable explicitely `pg` and `pg-pool` modules.
+- Add `http` and `https` modules to the dependencies, to have them loaded automatically.
+
 ## 0.6.1 - 2021-01-04
 
 - Calling `startTracer` several times will not register several tracers anymore.
