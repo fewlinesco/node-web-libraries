@@ -1,3 +1,4 @@
+import { Tracer } from "@fwl/tracing";
 import { Application, Response, Request, NextFunction } from "express";
 import { IncomingMessage, ServerResponse } from "http";
 
@@ -29,11 +30,20 @@ type ExpressMiddleware<T extends IncomingMessage, U extends ServerResponse> = (
 export function convertMiddleware<
   T extends IncomingMessage,
   U extends ServerResponse
->(middleware: ExpressMiddleware<T, U>): Middleware<T, U> {
+>(tracer: Tracer, middleware: ExpressMiddleware<T, U>): Middleware<T, U> {
   return (handler: Handler<T, U>) => {
     return (request: T, response: U) => {
-      middleware(request, response, () => {
-        handler(request, response);
+      return new Promise((resolve, reject) => {
+        tracer.span(`Converted Middleware: ${middleware.name}`, async () => {
+          middleware(request, response, async () => {
+            try {
+              const result = await handler(request, response);
+              resolve(result);
+            } catch (error) {
+              reject(error);
+            }
+          });
+        });
       });
     };
   };

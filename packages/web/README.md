@@ -264,9 +264,10 @@ We also provide a conversion function for Express middlewares:
 
 ```typescript
 import { convertMiddleware } from "@fwl/web/dist/express";
-import cors from "cors";
+import cookieParser from "cookie-parser";
+// get your tracer as usual
 
-const fwlCors = convertMiddleware(cors);
+const fwlCookieParser = convertMiddleware(tracer, cookieParser());
 ```
 
 #### Logging Middleware
@@ -361,9 +362,10 @@ We also provide a conversion function for Express middlewares:
 
 ```typescript
 import { convertMiddleware } from "@fwl/web/dist/express";
-import cors from "cors";
+import cookieParser from "cookie-parser";
+// get your tracer as usual
 
-const fwlCors = convertMiddleware(cors);
+const fwlCookieParser = convertMiddleware(tracer, cookieParser());
 ```
 
 ### Usage for Next.Js

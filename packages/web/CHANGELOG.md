@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.6.0- 2021-01-07
+
+- `convertMiddleware` now takes a tracer as a first argument, to allow for a span to be created for it.
+- Fix `convertMiddlware` to allow it to throw back an error if an error occurs in the encapsulated Handlers.
+
 ## 0.5.3 - 2021-01-06
 
 - Fix types of `convertMiddleware` to allow Express' `Request` and `Response` types.
