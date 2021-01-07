@@ -23,6 +23,8 @@ const provider: BasicTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.INFO,
   plugins: {
     express: { enabled: false },
+    pg: { enabled: false },
+    "pg-pool": { enabled: false },
     http: {
       enabled: true,
       path: "@opentelemetry/plugin-http",
