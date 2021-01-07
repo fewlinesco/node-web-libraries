@@ -34,7 +34,7 @@ import { HttpStatus } from "@fwl/web";
 
 export function pingHandler(
   request: IncomingMessage,
-  response: ServerResponse,
+  response: ServerResponse
 ): void {
   response.statusCode = HttpStatus.OK;
   response.end("OK");
@@ -51,7 +51,7 @@ import { HttpStatus } from "@fwl/web";
 export function pingHandler(tracer: Tracer) {
   return (
     request: IncomingMessage,
-    response: ServerResponse,
+    response: ServerResponse
   ): Promise<void> => {
     return tracer.span("ping-handler", async () => {
       response.statusCode = HttpStatus.OK;
@@ -112,7 +112,7 @@ export function createApp(tracer, logger): Application {
   router.get("/users/:id", userHandler.getUserById(tracer));
   router.post(
     "/users",
-    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer)),
+    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer))
   );
 
   return createApp(express(), [withAuthRouter, router]);
@@ -198,7 +198,7 @@ const wrappedHandler = wrapMiddlewares(
     errorMiddleware(tracer),
     recoveryMiddleware(tracer),
   ],
-  handler,
+  handler
 );
 export default new Endpoint().get(wrappedHandler);
 ```
@@ -264,9 +264,10 @@ We also provide a conversion function for Express middlewares:
 
 ```typescript
 import { convertMiddleware } from "@fwl/web/dist/express";
-import cors from "cors";
+import cookieParser from "cookie-parser";
+// get your tracer as usual
 
-const fwlCors = convertMiddleware(cors);
+const fwlCookieParser = convertMiddleware(tracer, cookieParser());
 ```
 
 #### Logging Middleware
@@ -361,9 +362,10 @@ We also provide a conversion function for Express middlewares:
 
 ```typescript
 import { convertMiddleware } from "@fwl/web/dist/express";
-import cors from "cors";
+import cookieParser from "cookie-parser";
+// get your tracer as usual
 
-const fwlCors = convertMiddleware(cors);
+const fwlCookieParser = convertMiddleware(tracer, cookieParser());
 ```
 
 ### Usage for Next.Js
@@ -391,13 +393,13 @@ const tracer = getTracer();
 
 const handler = (
   request: NextApiRequest,
-  response: NextApiResponse,
+  response: NextApiResponse
 ): Promise<void> => {
   return tracer.span("hello handler", async (span) => {
     if (request.query.someQueryParam) {
       span.setDisclosedAttribute(
         "someQueryParam",
-        request.query.someQueryParam,
+        request.query.someQueryParam
       );
       throw new WebError({
         error: {
@@ -420,7 +422,7 @@ const wrappedHandler = wrapMiddlewares(
     errorMiddleware(tracer),
     loggingMiddleware(tracer, logger),
   ],
-  handler,
+  handler
 );
 export default new Endpoint().get(wrappedHandler).getHandler();
 ```
@@ -452,7 +454,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         props: {},
       };
-    },
+    }
   );
 };
 ```
