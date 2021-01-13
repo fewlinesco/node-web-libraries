@@ -2,7 +2,7 @@
 
 ## 0.6.0- 2021-01-07
 
-- Fix `parseBodyAsJson` generic type assertion.
+- Fix `parseBodyAsJson` generic type assertion. It now allows to be parameterised with any interface.
 
 ## 0.6.0- 2021-01-07
 
