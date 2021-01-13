@@ -1,6 +1,25 @@
 # CHANGELOG
 
-## 0.6.2 - 2021-01-07
+## 0.7.0 - 2021-01-13
+
+- Add Lightstep Public Sattelite support.
+- The `TracerConfig` type is updated to reflect this change:
+
+```typescript
+type TracingConfig = {
+  simpleCollector?: {
+    serviceName: string;
+    url: string;
+  };
+  lightstepPublicSatelliteCollector?: {
+    serviceName: string;
+    accessToken: string;
+    url?: string;
+  };
+};
+```
+
+- ## 0.6.2 - 2021-01-07
 
 - Disable explicitely `pg` and `pg-pool` modules.
 - Add `http` and `https` modules to the dependencies, to have them loaded automatically.
