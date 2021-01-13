@@ -1,3 +1,3 @@
-export * from "./tracer";
-export * from "./config/config";
-export * from "./inMemoryTracer";
+export * from "./src/tracer";
+export * from "./src/config";
+export * from "./src/in-memory-tracer";

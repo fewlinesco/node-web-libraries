@@ -1,4 +1,4 @@
-import { InMemoryTracer } from "../inMemoryTracer";
+import { InMemoryTracer } from "../index";
 
 describe("InMemoryTracer:", () => {
   let tracer: InMemoryTracer;
