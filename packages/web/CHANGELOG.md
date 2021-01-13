@@ -2,6 +2,10 @@
 
 ## 0.6.0- 2021-01-07
 
+- Fix `parseBodyAsJson` generic type assertion. It now allows to be parameterised with any interface.
+
+## 0.6.0- 2021-01-07
+
 - `convertMiddleware` now takes a tracer as a first argument, to allow for a span to be created for it.
 - Fix `convertMiddlware` to allow it to throw back an error if an error occurs in the encapsulated Handlers.
 
