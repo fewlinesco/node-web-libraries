@@ -18,13 +18,13 @@ As OpenTelemetry libraries need to monkey patch packages before them being calle
 Here's an example with a simple collector (e.g. Zipkin):
 
 ```typescript
-import { getTracer, startTracer} from "@fwl/tracing";
+import { getTracer, startTracer } from "@fwl/tracing";
 
 startTracer({
   simpleCollector: {
     serviceName: "serviceName",
     url: "http://localhost:9411/api/v2/spans",
-  }
+  },
 });
 
 const tracer = getTracer();
@@ -33,13 +33,13 @@ const tracer = getTracer();
 And an example with a Lightstep public satellite:
 
 ```typescript
-import { getTracer, startTracer} from "@fwl/tracing";
+import { getTracer, startTracer } from "@fwl/tracing";
 
 startTracer({
   lightstepPublicSatelliteCollector: {
     serviceName: "serviceName",
-    accessToken: process.env.LIGHTSTEP_ACCESS_TOKEN
-  }
+    accessToken: process.env.LIGHTSTEP_ACCESS_TOKEN,
+  },
 });
 
 const tracer = getTracer();
@@ -53,7 +53,7 @@ startTracer({
     serviceName: "serviceName",
     accessToken: "",
     url: "http://localhost:8360/api/v2/otel/trace",
-  }
+  },
 });
 ```
 

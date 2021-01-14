@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@fwl/tracing@0.0.0-experimental-64b4cf2":
-  version "0.0.0-experimental-64b4cf2"
-  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.0.0-experimental-64b4cf2.tgz#dad912c503111634c80b6ad1bd4bba175794e9e4"
-  integrity sha512-OvqM2YQqYD0mVvw5ump+cZgWWuDbWsltJH6v+cTiXS5/rCMtIecmnhB8ceTBF8eA0ozR3fe89mWrTG5os1x83g==
+"@fwl/tracing@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.7.0.tgz#eb3896cafad163a125eadd44d01c0f4e82035b08"
+  integrity sha512-cJU4zigJMvBU6g7fEdXA1CQZXwSscXvlpQG7f9fX91queo0rfmwzG/XSRPD6u3Y/+n9JJwpoo0YCAl69PSs3fQ==
   dependencies:
     "@opentelemetry/api" "0.14.0"
     "@opentelemetry/context-async-hooks" "0.14.0"
