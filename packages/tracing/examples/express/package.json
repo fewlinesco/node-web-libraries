@@ -5,7 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
-    "@fwl/tracing": "0.0.0-experimental-64b4cf2"
+    "@fwl/tracing": "0.7.0"
   },
   "devDependencies": {
     "@types/express": "4.17.9",
