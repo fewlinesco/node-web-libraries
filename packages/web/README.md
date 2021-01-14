@@ -76,11 +76,12 @@ This can let us use Express' `Request` and `Response` types and use all of their
 ```typescript
 import express, { Application, Request, Response } from "express";
 import { Router } from "@fwl/web";
+import { createApp } from "@fwl/web/dist/express";
 
-export function createApp(tracer, logger): Application {
+export function start(tracer, logger): Application {
   const router = new Router<Request, Response>([
-    loggingMiddleware(tracer, logger),
     errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
   ]);
 
   router.get("/ping", pingHandler(tracer));
@@ -104,8 +105,8 @@ import {
 
 export function createApp(tracer, logger): Application {
   const router = new Router<Request, Response>([
-    loggingMiddleware(tracer, logger),
     errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
   ]);
 
   router.get("/ping", pingHandler(tracer));
@@ -128,16 +129,16 @@ import { Router } from "@fwl/web";
 
 export function createApp(tracer, logger): Application {
   const router = new Router<Request, Response>([
-    loggingMiddleware(tracer, logger),
     errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
   ]);
 
   router.get("/ping", pingHandler(tracer));
   router.get("/users/:id", userHandler.getUserById(tracer));
 
   const withAuthRouter = new Router([
-    loggingMiddleware(tracer, logger),
     errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
     someAuthMiddleware,
   ]);
   withAuthRouter.post("/users", userHandler.createUser(tracer));
@@ -194,9 +195,9 @@ function handler(request, response) {
 const wrappedHandler = wrapMiddlewares(
   [
     tracingMiddleware(tracer),
-    loggingMiddleware(tracer, logger),
-    errorMiddleware(tracer),
     recoveryMiddleware(tracer),
+    errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
   ],
   handler,
 );
@@ -238,7 +239,7 @@ export function getUserById(tracer: Tracer) {
 Throwing this error will result in a `404 Not Found` with a JSON body with `code` and `message`.
 This is done by catching the error in the `errorMiddleware` and setting the response if it's an instance of `WebError`.
 
-> ⚠️ If you use both `loggingMiddleware` and `errorMiddleware` the order must be logging, then error.
+> ⚠️ If you use both `errorMiddleware` and `loggingMiddleware` the order must be error, then logging.
 > Otherwise, the error message will not be logged.
 
 ### Middlewares
@@ -291,7 +292,7 @@ This middleware will capture `WebError` thrown in middlewares or handlers and re
 
 If you don't want to use `WebError`, you can either don't use it or recode your own for your own errors.
 
-> ⚠️ If you use both `loggingMiddleware` and `errorMiddleware` the order must be logging, then error.
+> ⚠️ If you use both `errorMiddleware` and `loggingMiddleware` the order must be error, then logging.
 > Otherwise, the error message will not be logged.
 
 #### Recovery Middleware
@@ -316,7 +317,8 @@ You also can parametize the Router with Express' `Request` and `Response` type t
 Here's a basic application creation:
 
 ```typescript
-import { Logger } from "@fewlines/fwl-logging";
+// server.ts
+import { Logger } from "@fwl/logging";
 import { Tracer } from "@fwl/tracing";
 import { Router } from "@fwl/web";
 import { createApp } from "@fwl/web/dist/express";
@@ -338,6 +340,28 @@ export function start(tracer: Tracer, logger: Logger): Application {
 
   return createApp(express(), [router]);
 }
+```
+
+And after that, you can have a file that starts your server:
+
+```typescript
+// index.ts
+import { createLogger, EncoderTypeEnum } from "@fwl/logging";
+import { InMemoryTracer } from "@fwl/tracing";
+
+import * as server from "./server";
+
+const logger = createLogger({
+  service: "fwl-sparta-api",
+  encoder: EncoderTypeEnum.JSON,
+});
+const tracer = new InMemoryTracer();
+
+const applicationServer = server.start(tracer, logger);
+
+applicationServer.listen(process.env.PORT, () => {
+  logger.log(`Server started on http://localhost:${process.env.PORT}`);
+});
 ```
 
 Typing the Router like so allows the Handler to look like this:

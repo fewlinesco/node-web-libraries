@@ -31,7 +31,7 @@ export function readBody(request: IncomingMessage): Promise<string> {
   });
 }
 
-export async function parseBodyAsJson<T extends Record<string, unknown>>(
+export async function parseBodyAsJson<T = Record<string, unknown>>(
   request: IncomingMessage,
 ): Promise<T> {
   const stringifiedBody = await readBody(request);
