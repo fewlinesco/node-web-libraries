@@ -1,6 +1,14 @@
 import "./tracing";
-import { getTracer } from "@fwl/tracing";
+import { getTracer, startTracer } from "@fwl/tracing";
 import express from "express";
+
+startTracer({
+  lightstepPublicSatelliteCollector: {
+    serviceName: "express-server",
+    accessToken: "",
+    url: "http://localhost:8360/api/v2/otel/trace",
+  },
+});
 
 const app = express();
 

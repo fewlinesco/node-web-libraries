@@ -50,6 +50,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
+    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
     "prelint": "prettier --trailing-comma all --write './**/*.md'",
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
@@ -59,5 +60,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.6.2"
+  "version": "0.7.0"
 }

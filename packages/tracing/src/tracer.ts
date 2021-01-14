@@ -10,6 +10,7 @@ import type {
 import { SpanKind } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 import { LogLevel } from "@opentelemetry/core";
+import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import {
@@ -17,7 +18,7 @@ import {
   SimpleSpanProcessor,
 } from "@opentelemetry/tracing";
 
-import type { TracingConfig } from "./config/config";
+import type { TracingConfig } from "./config";
 
 const provider: BasicTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.INFO,
@@ -42,14 +43,30 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
   if (isTracerStarted) {
     return;
   }
-  const collector = new ZipkinExporter({
-    serviceName: options.serviceName,
-    url: options.url,
-  });
+  if (options.simpleCollector) {
+    const collector = new ZipkinExporter({
+      serviceName: options.simpleCollector.serviceName,
+      url: options.simpleCollector.url,
+    });
 
-  const spanProcessor = new SimpleSpanProcessor(collector);
+    const spanProcessor = new SimpleSpanProcessor(collector);
 
-  provider.addSpanProcessor(spanProcessor);
+    provider.addSpanProcessor(spanProcessor);
+  }
+  if (options.lightstepPublicSatelliteCollector) {
+    const collector = new CollectorTraceExporter({
+      serviceName: options.lightstepPublicSatelliteCollector.serviceName,
+      headers: {
+        "Lightstep-Access-Token":
+          options.lightstepPublicSatelliteCollector.accessToken,
+      },
+      url:
+        options.lightstepPublicSatelliteCollector.url ||
+        "https://ingest.lightstep.com:443/api/v2/otel/trace",
+    });
+
+    provider.addSpanProcessor(new SimpleSpanProcessor(collector));
+  }
 
   const contextManager = new AsyncHooksContextManager();
   contextManager.enable();
@@ -58,10 +75,15 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
 
   isTracerStarted = true;
 
-  if (logger) {
+  if (logger && options.simpleCollector) {
     logger.log("tracing initialized", {
-      tracingServiceName: options.serviceName,
-      tracingUrl: options.url,
+      tracingServiceName: options.simpleCollector.serviceName,
+      tracingUrl: options.simpleCollector.url,
+    });
+  }
+  if (logger && options.lightstepPublicSatelliteCollector) {
+    logger.log("Lightstep tracing initialized", {
+      tracingServiceName: options.lightstepPublicSatelliteCollector.serviceName,
     });
   }
 }
