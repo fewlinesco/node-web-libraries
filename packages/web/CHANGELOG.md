@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## 0.6.1- 2021-01-07
+## 0.6.1 - 2021-01-07
+
+- Improved `getServerSidePropsWithMiddlewares` typing to allow passing custom middlewares as argument.
+- Improved `Endpoint` typing to allow passing custom middlewares as argument.
 
 ### Bump of dependencies
 
