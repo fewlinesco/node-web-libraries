@@ -1,13 +1,58 @@
 # CHANGELOG
 
-## 0.6.0- 2021-01-07
+## 0.6.1- 2021-01-07
 
-- Fix `parseBodyAsJson` generic type assertion. It now allows to be parameterised with any interface.
+### Bump of dependencies
 
-## 0.6.0- 2021-01-07
+#### Web
 
+##### Patches
+
+```sh
+  qs                      ~9mo     6.9.4  →     6.9.6   ~7d
+  @types/express  dev     ~2mo    4.17.9  →   4.17.11   ~8d
+  @types/jest     dev     ~1mo   26.0.19  →   26.0.20  ~14d
+  @types/node     dev     ~16d  14.14.20  →  14.14.22   ~1d
+  @types/send     dev    ~1.4y    0.14.5  →    0.14.6   ~3d
+  next            dev     ~30d    10.0.4  →    10.0.5  ~14d
+```
+
+##### Minor
+
+```sh
+  qs                      ~9mo     6.9.4  →     6.9.6   ~7d
+  @types/express  dev     ~2mo    4.17.9  →   4.17.11   ~8d
+  @types/jest     dev     ~1mo   26.0.19  →   26.0.20  ~14d
+  @types/node     dev     ~16d  14.14.20  →  14.14.22   ~1d
+  @types/send     dev    ~1.4y    0.14.5  →    0.14.6   ~3d
+  next            dev     ~30d    10.0.4  →    10.0.5  ~14d
+```
+
+##### Major
+
+```sh
+ @fwl/tracing      ~17d  0.6.1  →  0.7.0  ~7d
+```
+
+#### Next example
+
+##### Minor
+
+```sh
+  @fwl/web      ~17d  0.6.0  →  0.6.1 ~1d
+```
+
+##### Major
+
+```sh
+ @fwl/tracing      ~17d  0.6.1  →  0.7.0  ~7d
+```
+
+## 0.6.0 - 2021-01-07
+
+- Fix `convertMiddleware` to allow it to throw back an error if an error occurs in the encapsulated Handlers.
+- Fix `parseBodyAsJson` generic type assertion. It now allows to be parameterized with any interface.
 - `convertMiddleware` now takes a tracer as a first argument, to allow for a span to be created for it.
-- Fix `convertMiddlware` to allow it to throw back an error if an error occurs in the encapsulated Handlers.
 
 ## 0.5.3 - 2021-01-06
 
