@@ -36,12 +36,6 @@
 
 #### Next example
 
-##### Minor
-
-```sh
-  @fwl/web      ~17d  0.6.0  →  0.6.1 ~1d
-```
-
 ##### Major
 
 ```sh
