@@ -276,3 +276,15 @@ export async function getServerSideCookies<T = unknown>(
 
   return JSON.parse(targetedCookie);
 }
+
+export function setAlertMessageCookies(
+  response: ServerResponse,
+  cookieValues: string[],
+): void {
+  cookieValues.forEach((cookieValue, index) => {
+    response.setHeader(
+      "Set-Cookie",
+      cookie.serialize(`alert-message-${index}`, cookieValue),
+    );
+  });
+}
