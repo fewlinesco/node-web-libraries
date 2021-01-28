@@ -281,10 +281,8 @@ export function setAlertMessageCookies(
   response: ServerResponse,
   cookieValues: string[],
 ): void {
-  cookieValues.forEach((cookieValue, index) => {
-    response.setHeader(
-      "Set-Cookie",
-      cookie.serialize(`alert-message-${index}`, cookieValue),
-    );
-  });
+  response.setHeader(
+    "Set-Cookie",
+    cookie.serialize(`alert-messages`, cookieValues.join(";")),
+  );
 }

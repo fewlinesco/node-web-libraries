@@ -1,4 +1,3 @@
-import { IncomingMessage, ServerResponse } from "http";
 import httpMock from "mock-http";
 
 import {
@@ -76,21 +75,38 @@ describe("Server side cookies", () => {
     });
   });
 
-  test("getServerSideCookies", async () => {
-    expect.assertions(3);
+  describe("getServerSideCookies", () => {
+    test("It should get the cookie value if ", async () => {
+      expect.assertions(2);
 
-    const mockedRequest = new httpMock.Request({ headers: { cookie: "" } });
+      const mockedRequest = new httpMock.Request({
+        headers: {
+          cookie: "string=%22bar%22;object=%7B%22key%22%3A%22value%22%7D",
+        },
+      });
 
-    const x = await getServerSideCookies(mockedRequest, {
-      cookieName: "foo",
-      isCookieSealed: false,
+      const firstCookie = await getServerSideCookies(mockedRequest, {
+        cookieName: "string",
+        isCookieSealed: false,
+      });
+      expect(firstCookie).toBe("bar");
+
+      const secondCookie = await getServerSideCookies(mockedRequest, {
+        cookieName: "object",
+        isCookieSealed: false,
+      });
+      expect(secondCookie).toMatchObject({ key: "value" });
     });
-
-    console.log(x);
   });
 
-  // test("setAlertMessageCookies", () => {
-  //   const response = new httpMock.Response();
+  test("setAlertMessageCookies", async () => {
+    expect.assertions(2);
 
-  //   setAlertMessageCookies();
+    const mockedResponse = new httpMock.Response();
+
+    const alertMessages = ["foo", "bar"];
+    setAlertMessageCookies(mockedResponse, alertMessages);
+
+    expect(mockedResponse.getHeader("set-cookie")).toBe("foo;bar");
+  });
 });
