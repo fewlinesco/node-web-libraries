@@ -99,14 +99,27 @@ describe("Server side cookies", () => {
     });
   });
 
-  test("setAlertMessageCookies", async () => {
-    expect.assertions(2);
+  describe("setAlertMessageCookies", () => {
+    test("It should work with a string as cookie value", async () => {
+      expect.assertions(1);
 
-    const mockedResponse = new httpMock.Response();
+      const mockedResponse = new httpMock.Response();
 
-    const alertMessages = ["foo", "bar"];
-    setAlertMessageCookies(mockedResponse, alertMessages);
+      setAlertMessageCookies(mockedResponse, "foo");
 
-    expect(mockedResponse.getHeader("set-cookie")).toBe("foo;bar");
+      expect(mockedResponse.getHeader("set-cookie")).toBe("alert-messages=foo");
+    });
+
+    test("It should work with a list of string as cookie value", async () => {
+      expect.assertions(1);
+
+      const mockedResponse = new httpMock.Response();
+
+      setAlertMessageCookies(mockedResponse, ["foo", "bar"]);
+
+      expect(mockedResponse.getHeader("set-cookie")).toBe(
+        "alert-messages=foo%3Bbar",
+      );
+    });
   });
 });

@@ -279,10 +279,10 @@ export async function getServerSideCookies<T = unknown>(
 
 export function setAlertMessageCookies(
   response: ServerResponse,
-  cookieValues: string[],
+  cookieValues: string | string[],
 ): void {
-  response.setHeader(
-    "Set-Cookie",
-    cookie.serialize(`alert-messages`, cookieValues.join(";")),
-  );
+  const value =
+    typeof cookieValues === "string" ? cookieValues : cookieValues.join(";");
+
+  response.setHeader("Set-Cookie", cookie.serialize(`alert-messages`, value));
 }

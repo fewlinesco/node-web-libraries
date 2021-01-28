@@ -489,6 +489,57 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 #### setServerSideCookies
 
+Used to set a cookie on the server side. This function requires as input:
+
+- The response
+- The cookie name
+- The cookie value (can be a string or an object)
+- The cookie options, which is an object composed of
+  - `shouldCookieBeSealed: boolean`
+  - `cookieSalt?: string`
+  - ..[and the usual cookies options](https://www.npmjs.com/package/cookie#options-1)
+
+```ts
+await setServerSideCookies(
+  response,
+  "cookie-name",
+  { key: "value" },
+  {
+    shouldCookieBeSealed: true,
+    cookieSalt: "7220e882-f534-44b0-99c4-76bdcb8ed0f7",
+    maxAge: 24 * 60 * 60,
+    path: "/",
+    httpOnly: true,
+    secure: true,
+  }
+);
+```
+
 #### getServerSideCookies
 
+Used to get the value of a cookie on the server side. This function requires as input:
+
+- The request
+- The cookie options, which is an object composed of:
+  - `cookieName: string`
+  - `isCookieSealed: boolean`
+  - `cookieSalt?: string`
+
+```ts
+const cookie = await getServerSideCookies<UserCookie>(request, {
+  cookieName: "cookie-name",
+  isCookieSealed: true,
+  cookieSalt: "7220e882-f534-44b0-99c4-76bdcb8ed0f7",
+});
+```
+
 #### setAlertMessageCookies
+
+Used to set a cookie on the server side. This function requires as input:
+
+- The response
+- A string or a list of string as cookie value.
+
+```ts
+setAlertMessageCookies(response, ["foo", "bar"]);
+```
