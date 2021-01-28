@@ -277,12 +277,20 @@ export async function getServerSideCookies<T = unknown>(
   return JSON.parse(targetedCookie);
 }
 
-export function setAlertMessageCookies(
+export function setAlertMessagesCookie(
   response: ServerResponse,
   cookieValues: string | string[],
 ): void {
   const value =
     typeof cookieValues === "string" ? cookieValues : cookieValues.join(";");
 
-  response.setHeader("Set-Cookie", cookie.serialize(`alert-messages`, value));
+  response.setHeader(
+    "Set-Cookie",
+    cookie.serialize(`alert-messages`, value, {
+      maxAge: 24 * 60 * 60,
+      path: "/",
+      httpOnly: true,
+      secure: true,
+    }),
+  );
 }

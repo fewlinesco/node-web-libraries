@@ -2,7 +2,7 @@ import httpMock from "mock-http";
 
 import {
   getServerSideCookies,
-  setAlertMessageCookies,
+  setAlertMessagesCookie,
   setServerSideCookies,
 } from "../src/utils";
 
@@ -99,15 +99,17 @@ describe("Server side cookies", () => {
     });
   });
 
-  describe("setAlertMessageCookies", () => {
+  describe("setAlertMessagesCookie", () => {
     test("It should work with a string as cookie value", async () => {
       expect.assertions(1);
 
       const mockedResponse = new httpMock.Response();
 
-      setAlertMessageCookies(mockedResponse, "foo");
+      setAlertMessagesCookie(mockedResponse, "foo");
 
-      expect(mockedResponse.getHeader("set-cookie")).toBe("alert-messages=foo");
+      expect(mockedResponse.getHeader("set-cookie")).toBe(
+        "alert-messages=foo; Max-Age=86400; Path=/; HttpOnly; Secure",
+      );
     });
 
     test("It should work with a list of string as cookie value", async () => {
@@ -115,10 +117,10 @@ describe("Server side cookies", () => {
 
       const mockedResponse = new httpMock.Response();
 
-      setAlertMessageCookies(mockedResponse, ["foo", "bar"]);
+      setAlertMessagesCookie(mockedResponse, ["foo", "bar"]);
 
       expect(mockedResponse.getHeader("set-cookie")).toBe(
-        "alert-messages=foo%3Bbar",
+        "alert-messages=foo%3Bbar; Max-Age=86400; Path=/; HttpOnly; Secure",
       );
     });
   });

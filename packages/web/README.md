@@ -497,7 +497,7 @@ Used to set a cookie on the server side. This function requires as input:
 - The cookie options, which is an object composed of
   - `shouldCookieBeSealed: boolean`
   - `cookieSalt?: string`
-  - ..[and the usual cookies options](https://www.npmjs.com/package/cookie#options-1)
+  - ..[and the usual cookies options](https://www.npmjs.com/package/cookie#options-1).
 
 ```ts
 await setServerSideCookies(
@@ -533,7 +533,7 @@ const cookie = await getServerSideCookies<UserCookie>(request, {
 });
 ```
 
-#### setAlertMessageCookies
+#### setAlertMessagesCookie
 
 Used to set a cookie on the server side. This function requires as input:
 
@@ -541,5 +541,5 @@ Used to set a cookie on the server side. This function requires as input:
 - A string or a list of string as cookie value.
 
 ```ts
-setAlertMessageCookies(response, ["foo", "bar"]);
+setAlertMessagesCookie(response, ["foo", "bar"]);
 ```
