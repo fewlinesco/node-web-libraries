@@ -1,3 +1,5 @@
+import { seal, defaults, unseal } from "@hapi/iron";
+import cookie from "cookie";
 import { IncomingMessage, ServerResponse } from "http";
 import onFinished from "on-finished";
 import parseurl from "parseurl";
@@ -214,4 +216,63 @@ function _sendfile(
 
   // pipe
   file.pipe(response);
+}
+
+export async function setServerSideCookies(
+  response: ServerResponse,
+  cookieName: string,
+  cookieValue: string | Record<string, unknown>,
+  options: {
+    shouldCookieBeSealed: boolean;
+    cookieSalt?: string;
+  } & cookie.CookieSerializeOptions,
+): Promise<void> {
+  const { shouldCookieBeSealed, cookieSalt, ...setCookieOptions } = options;
+
+  if (shouldCookieBeSealed) {
+    const sealedCookieValue = await seal(
+      JSON.stringify(cookieValue),
+      cookieSalt,
+      defaults,
+    );
+
+    response.setHeader(
+      "Set-Cookie",
+      cookie.serialize(cookieName, sealedCookieValue, setCookieOptions),
+    );
+  } else {
+    response.setHeader(
+      "Set-Cookie",
+      cookie.serialize(
+        cookieName,
+        JSON.stringify(cookieValue),
+        setCookieOptions,
+      ),
+    );
+  }
+}
+
+export async function getServerSideCookies<T = unknown>(
+  request: IncomingMessage,
+  cookieParams: {
+    cookieName: string;
+    isCookieSealed: boolean;
+    cookieSalt?: string;
+  },
+): Promise<T | undefined> {
+  const { cookieName, isCookieSealed, cookieSalt } = cookieParams;
+  const cookies = cookie.parse(request.headers.cookie || "");
+  const targetedCookie = cookies[cookieName];
+
+  if (!targetedCookie) {
+    return undefined;
+  }
+
+  if (isCookieSealed) {
+    const unsealedCookie = await unseal(targetedCookie, cookieSalt, defaults);
+
+    return JSON.parse(unsealedCookie);
+  }
+
+  return JSON.parse(targetedCookie);
 }
