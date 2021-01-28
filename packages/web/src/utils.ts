@@ -281,16 +281,11 @@ export function setAlertMessagesCookie(
   response: ServerResponse,
   cookieValues: string | string[],
 ): void {
-  const value =
-    typeof cookieValues === "string" ? cookieValues : cookieValues.join(";");
-
   response.setHeader(
     "Set-Cookie",
-    cookie.serialize(`alert-messages`, value, {
+    cookie.serialize(`alert-messages`, JSON.stringify(cookieValues), {
       maxAge: 24 * 60 * 60,
       path: "/",
-      httpOnly: true,
-      secure: true,
     }),
   );
 }
