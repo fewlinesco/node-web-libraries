@@ -42,7 +42,7 @@ describe("Server side cookies", () => {
       );
     });
 
-    test("it should set unsealed cookies with string and object values", async () => {
+    test("it should set sealed cookies with string and object values", async () => {
       expect.assertions(3);
 
       const mockedResponse = new httpMock.Response();
@@ -76,7 +76,7 @@ describe("Server side cookies", () => {
   });
 
   describe("getServerSideCookies", () => {
-    test("It should get the cookie value if ", async () => {
+    test("It should get the cookie value", async () => {
       expect.assertions(2);
 
       const mockedRequest = new httpMock.Request({

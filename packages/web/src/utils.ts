@@ -279,11 +279,14 @@ export async function getServerSideCookies<T = unknown>(
 
 export function setAlertMessagesCookie(
   response: ServerResponse,
-  cookieValues: string | string[],
+  alertMessages: string | string[],
 ): void {
+  const cookieValue =
+    typeof alertMessages === "string" ? [alertMessages] : alertMessages;
+
   response.setHeader(
     "Set-Cookie",
-    cookie.serialize(`alert-messages`, JSON.stringify(cookieValues), {
+    cookie.serialize(`alert-messages`, JSON.stringify(cookieValue), {
       maxAge: 24 * 60 * 60,
       path: "/",
     }),

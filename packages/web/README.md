@@ -493,7 +493,7 @@ Used to set a cookie on the server side. This function requires as input:
 
 - The response
 - The cookie name
-- The cookie value (can be a string or an object)
+- The cookie value (anything serializable)
 - The cookie options, which is an object composed of
   - `shouldCookieBeSealed: boolean`
   - `cookieSalt?: string`
@@ -544,7 +544,7 @@ Used to set a cookie on the server side. This function requires as input:
 setAlertMessagesCookie(response, ["foo", "bar"]);
 ```
 
-Note that you will need to un-serialized the value of the cookie, like so:
+Note that you will need to un-serialized the value of the cookie, and that the returned value will be a list of string, even if only one message has been set in the `alert-messages` cookie.
 
 ```ts
 const serializedAlertMessages = await getServerSideCookies(request, {
