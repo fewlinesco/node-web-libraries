@@ -281,12 +281,14 @@ export function setAlertMessagesCookie(
   response: ServerResponse,
   alertMessages: string | string[],
 ): void {
-  const cookieValue =
+  const currentCookieValue = response.getHeader("set-cookie");
+  const newCookieValue =
     typeof alertMessages === "string" ? [alertMessages] : alertMessages;
+  const updatedCookie = `${currentCookieValue} ${newCookieValue}`;
 
   response.setHeader(
     "Set-Cookie",
-    cookie.serialize(`alert-messages`, JSON.stringify(cookieValue), {
+    cookie.serialize(`alert-messages`, JSON.stringify(updatedCookie), {
       maxAge: 24 * 60 * 60,
       path: "/",
     }),
