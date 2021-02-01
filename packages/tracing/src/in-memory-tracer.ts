@@ -1,7 +1,7 @@
 import * as types from "@opentelemetry/api";
 import { Attributes, TimeInput } from "@opentelemetry/api";
 
-import { Span as FwlSpan } from "./tracer";
+import { Span as FwlSpan, Tracer } from "./tracer";
 
 interface Span extends FwlSpan {
   id: string;
@@ -77,7 +77,7 @@ class InMemorySpan implements Span {
 
 type SpanCallback<T> = (span: InMemorySpan) => Promise<T>;
 
-export class InMemoryTracer {
+export class InMemoryTracer implements Tracer {
   public spans: InMemorySpan[];
   private rootSpan?: InMemorySpan;
   private currentSpan?: InMemorySpan;
@@ -87,8 +87,13 @@ export class InMemoryTracer {
     this.spans = [];
   }
 
-  createRootSpan(name: string): InMemorySpan {
-    return this.createSpan(name);
+  async withSpan(
+    name: string,
+    callback: (span: Span) => unknown,
+  ): Promise<void> {
+    const span = this.createSpan(name);
+    await callback(span);
+    span.end();
   }
 
   createSpan(name: string): InMemorySpan {

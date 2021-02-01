@@ -4,14 +4,11 @@ import type {
   Tracer as OpenTelemetryTracer,
   TimeInput,
   AttributeValue,
-  SpanOptions,
   Attributes,
 } from "@opentelemetry/api";
-import { SpanKind } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 import { LogLevel } from "@opentelemetry/core";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
-import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import {
   BasicTracerProvider,
@@ -44,7 +41,16 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
     return;
   }
   if (options.simpleCollector) {
-    const collector = new ZipkinExporter({
+    const collector = new CollectorTraceExporter({
+      logger: logger && {
+        debug: logger.log,
+        error: logger.log,
+        warn: logger.log,
+        info: logger.log,
+      },
+      attributes: {
+        "service.version": "test",
+      },
       serviceName: options.simpleCollector.serviceName,
       url: options.simpleCollector.url,
     });
@@ -55,6 +61,15 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
   }
   if (options.lightstepPublicSatelliteCollector) {
     const collector = new CollectorTraceExporter({
+      logger: logger && {
+        debug: logger.log,
+        error: logger.log,
+        warn: logger.log,
+        info: logger.log,
+      },
+      attributes: {
+        "service.version": "test",
+      },
       serviceName: options.lightstepPublicSatelliteCollector.serviceName,
       headers: {
         "Lightstep-Access-Token":
@@ -91,9 +106,9 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
 type SpanCallback<T> = (span: Span) => Promise<T>;
 
 export interface Tracer {
-  createRootSpan: (name: string) => Span;
   createSpan: (name: string) => Span;
   span: <T>(name: string, callback: SpanCallback<T>) => Promise<T>;
+  withSpan: (name: string, callback: SpanCallback<void>) => Promise<void>;
 }
 
 class TracerImpl implements Tracer {
@@ -102,7 +117,6 @@ class TracerImpl implements Tracer {
   private constructor() {
     this.tracer = provider.getTracer("default");
   }
-  private rootSpan?: OpenTelemetrySpan;
 
   static getInstance(): Tracer {
     if (!TracerImpl.instance) {
@@ -112,49 +126,35 @@ class TracerImpl implements Tracer {
     return TracerImpl.instance;
   }
 
-  createRootSpan(name: string): Span {
-    const spanOptions: SpanOptions = {
-      kind: SpanKind.SERVER,
-    };
-    const span = this.tracer.startSpan(name, spanOptions);
-    this.rootSpan = span;
-
-    return spanFactory(span);
+  withSpan(name, callback): Promise<void> {
+    const span = this.tracer.startSpan(name);
+    return this.tracer.withSpan(span, async () => {
+      try {
+        await callback(spanFactory(span));
+        span.end();
+      } catch (error) {
+        span.end();
+        throw error;
+      }
+    });
   }
 
   createSpan(name: string): Span {
-    if (this.rootSpan) {
-      return this.tracer.withSpan(this.rootSpan, () => {
-        const span = spanFactory(this.tracer.startSpan(name));
-        return span;
-      });
-    } else {
-      const span = spanFactory(this.tracer.startSpan(name));
-      return span;
-    }
+    return spanFactory(this.tracer.startSpan(name));
   }
 
   span<T>(name: string, callback: SpanCallback<T>): Promise<T> {
-    if (this.rootSpan) {
-      return this.tracer.withSpan(this.rootSpan, () => {
-        const span = spanFactory(this.tracer.startSpan(name));
-        return callback(span).finally(() => {
-          span.end();
-        });
-      });
-    } else {
-      const span = spanFactory(this.tracer.startSpan(name));
-      return callback(span).then(
-        (result) => {
-          span.end();
-          return result;
-        },
-        (error) => {
-          span.end();
-          throw error;
-        },
-      );
-    }
+    const span = spanFactory(this.tracer.startSpan(name));
+    return callback(span).then(
+      (result) => {
+        span.end();
+        return result;
+      },
+      (error) => {
+        span.end();
+        throw error;
+      },
+    );
   }
 }
 
