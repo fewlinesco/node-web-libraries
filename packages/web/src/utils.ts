@@ -281,16 +281,35 @@ export function setAlertMessagesCookie(
   response: ServerResponse,
   alertMessages: string | string[],
 ): void {
-  const currentCookieValue = response.getHeader("set-cookie");
   const newCookieValue =
     typeof alertMessages === "string" ? [alertMessages] : alertMessages;
-  const updatedCookie = `${currentCookieValue} ${newCookieValue}`;
 
-  response.setHeader(
-    "Set-Cookie",
-    cookie.serialize(`alert-messages`, JSON.stringify(updatedCookie), {
+  const newCookie = cookie.serialize(
+    `alert-messages`,
+    JSON.stringify(newCookieValue),
+    {
       maxAge: 24 * 60 * 60,
       path: "/",
-    }),
+    },
   );
+
+  const currentSetCookieValue = response.getHeader("set-cookie");
+
+  if (!currentSetCookieValue) {
+    return response.setHeader("Set-Cookie", newCookie);
+  }
+
+  if (typeof currentSetCookieValue === "number") {
+    throw new Error("Set-Cookie header's value should not be a number");
+  }
+
+  let updatedSetCookieValue: string[];
+
+  if (Array.isArray(currentSetCookieValue)) {
+    updatedSetCookieValue = [...currentSetCookieValue, newCookie];
+  } else {
+    updatedSetCookieValue = [currentSetCookieValue, newCookie];
+  }
+
+  return response.setHeader("Set-Cookie", updatedSetCookieValue);
 }
