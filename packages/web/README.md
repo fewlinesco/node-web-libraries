@@ -34,7 +34,7 @@ import { HttpStatus } from "@fwl/web";
 
 export function pingHandler(
   request: IncomingMessage,
-  response: ServerResponse
+  response: ServerResponse,
 ): void {
   response.statusCode = HttpStatus.OK;
   response.end("OK");
@@ -51,7 +51,7 @@ import { HttpStatus } from "@fwl/web";
 export function pingHandler(tracer: Tracer) {
   return (
     request: IncomingMessage,
-    response: ServerResponse
+    response: ServerResponse,
   ): Promise<void> => {
     return tracer.span("ping-handler", async () => {
       response.statusCode = HttpStatus.OK;
@@ -113,7 +113,7 @@ export function createApp(tracer, logger): Application {
   router.get("/users/:id", userHandler.getUserById(tracer));
   router.post(
     "/users",
-    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer))
+    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer)),
   );
 
   return createApp(express(), [withAuthRouter, router]);
@@ -199,7 +199,7 @@ const wrappedHandler = wrapMiddlewares(
     errorMiddleware(tracer),
     loggingMiddleware(tracer, logger),
   ],
-  handler
+  handler,
 );
 export default new Endpoint().get(wrappedHandler);
 ```
@@ -417,13 +417,13 @@ const tracer = getTracer();
 
 const handler = (
   request: NextApiRequest,
-  response: NextApiResponse
+  response: NextApiResponse,
 ): Promise<void> => {
   return tracer.span("hello handler", async (span) => {
     if (request.query.someQueryParam) {
       span.setDisclosedAttribute(
         "someQueryParam",
-        request.query.someQueryParam
+        request.query.someQueryParam,
       );
       throw new WebError({
         error: {
@@ -446,7 +446,7 @@ const wrappedHandler = wrapMiddlewares(
     errorMiddleware(tracer),
     loggingMiddleware(tracer, logger),
   ],
-  handler
+  handler,
 );
 export default new Endpoint().get(wrappedHandler).getHandler();
 ```
@@ -478,7 +478,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         props: {},
       };
-    }
+    },
   );
 };
 ```
@@ -511,11 +511,11 @@ await setServerSideCookies(
     path: "/",
     httpOnly: true,
     secure: true,
-  }
+  },
 );
 ```
 
-This function will check if a `Set-Cookie` is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
+This function will check if a `Set-Cookie` header is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
 
 #### getServerSideCookies
 
@@ -546,7 +546,7 @@ Used to set a cookie on the server side. This function requires as input:
 setAlertMessagesCookie(response, ["foo", "bar"]);
 ```
 
-This function will check if a `Set-Cookie` is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
+This function will check if a `Set-Cookie` header is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
 
 Note that you will need to un-serialized the value of the cookie, and that the returned value will be a list of string, even if only one message has been set in the `alert-messages` cookie.
 

@@ -229,6 +229,12 @@ export async function setServerSideCookies(
 ): Promise<void> {
   const { shouldCookieBeSealed, cookieSalt, ...setCookieOptions } = options;
 
+  const currentSetCookieValue = response.getHeader("set-cookie");
+
+  if (typeof currentSetCookieValue === "number") {
+    throw new Error("Set-Cookie header's value should not be a number");
+  }
+
   if (shouldCookieBeSealed) {
     const sealedCookieValue = await seal(
       JSON.stringify(cookieValue),
@@ -236,19 +242,45 @@ export async function setServerSideCookies(
       defaults,
     );
 
-    response.setHeader(
-      "Set-Cookie",
-      cookie.serialize(cookieName, sealedCookieValue, setCookieOptions),
+    const newCookie = cookie.serialize(
+      cookieName,
+      sealedCookieValue,
+      setCookieOptions,
     );
+
+    if (currentSetCookieValue) {
+      let updatedSetCookieValue: string[];
+
+      if (Array.isArray(currentSetCookieValue)) {
+        updatedSetCookieValue = [...currentSetCookieValue, newCookie];
+      } else {
+        updatedSetCookieValue = [currentSetCookieValue, newCookie];
+      }
+
+      return response.setHeader("Set-Cookie", updatedSetCookieValue);
+    } else {
+      return response.setHeader("Set-Cookie", newCookie);
+    }
   } else {
-    response.setHeader(
-      "Set-Cookie",
-      cookie.serialize(
-        cookieName,
-        JSON.stringify(cookieValue),
-        setCookieOptions,
-      ),
+    const newCookie = cookie.serialize(
+      cookieName,
+      JSON.stringify(cookieValue),
+      setCookieOptions,
     );
+
+    if (currentSetCookieValue) {
+      let updatedSetCookieValue: string[];
+
+      if (Array.isArray(currentSetCookieValue)) {
+        updatedSetCookieValue = [...currentSetCookieValue, newCookie];
+      } else {
+        updatedSetCookieValue = [currentSetCookieValue, newCookie];
+      }
+
+      return response.setHeader("Set-Cookie", updatedSetCookieValue);
+    } else {
+      return response.setHeader("Set-Cookie", newCookie);
+    }
   }
 }
 
@@ -295,12 +327,12 @@ export function setAlertMessagesCookie(
 
   const currentSetCookieValue = response.getHeader("set-cookie");
 
-  if (!currentSetCookieValue) {
-    return response.setHeader("Set-Cookie", newCookie);
-  }
-
   if (typeof currentSetCookieValue === "number") {
     throw new Error("Set-Cookie header's value should not be a number");
+  }
+
+  if (!currentSetCookieValue) {
+    return response.setHeader("Set-Cookie", newCookie);
   }
 
   let updatedSetCookieValue: string[];
