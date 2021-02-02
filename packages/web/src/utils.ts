@@ -1,3 +1,5 @@
+import { seal, defaults, unseal } from "@hapi/iron";
+import cookie from "cookie";
 import { IncomingMessage, ServerResponse } from "http";
 import onFinished from "on-finished";
 import parseurl from "parseurl";
@@ -214,4 +216,132 @@ function _sendfile(
 
   // pipe
   file.pipe(response);
+}
+
+export async function setServerSideCookies(
+  response: ServerResponse,
+  cookieName: string,
+  cookieValue: string | Record<string, unknown>,
+  options: {
+    shouldCookieBeSealed: boolean;
+    cookieSalt?: string;
+  } & cookie.CookieSerializeOptions,
+): Promise<void> {
+  const { shouldCookieBeSealed, cookieSalt, ...setCookieOptions } = options;
+
+  const currentSetCookieValue = response.getHeader("set-cookie");
+
+  if (typeof currentSetCookieValue === "number") {
+    throw new Error("Set-Cookie header's value should not be a number");
+  }
+
+  if (shouldCookieBeSealed) {
+    const sealedCookieValue = await seal(
+      JSON.stringify(cookieValue),
+      cookieSalt,
+      defaults,
+    );
+
+    const newCookie = cookie.serialize(
+      cookieName,
+      sealedCookieValue,
+      setCookieOptions,
+    );
+
+    if (currentSetCookieValue) {
+      let updatedSetCookieValue: string[];
+
+      if (Array.isArray(currentSetCookieValue)) {
+        updatedSetCookieValue = [...currentSetCookieValue, newCookie];
+      } else {
+        updatedSetCookieValue = [currentSetCookieValue, newCookie];
+      }
+
+      return response.setHeader("Set-Cookie", updatedSetCookieValue);
+    } else {
+      return response.setHeader("Set-Cookie", newCookie);
+    }
+  } else {
+    const newCookie = cookie.serialize(
+      cookieName,
+      JSON.stringify(cookieValue),
+      setCookieOptions,
+    );
+
+    if (currentSetCookieValue) {
+      let updatedSetCookieValue: string[];
+
+      if (Array.isArray(currentSetCookieValue)) {
+        updatedSetCookieValue = [...currentSetCookieValue, newCookie];
+      } else {
+        updatedSetCookieValue = [currentSetCookieValue, newCookie];
+      }
+
+      return response.setHeader("Set-Cookie", updatedSetCookieValue);
+    } else {
+      return response.setHeader("Set-Cookie", newCookie);
+    }
+  }
+}
+
+export async function getServerSideCookies<T = unknown>(
+  request: IncomingMessage,
+  cookieParams: {
+    cookieName: string;
+    isCookieSealed: boolean;
+    cookieSalt?: string;
+  },
+): Promise<T | undefined> {
+  const { cookieName, isCookieSealed, cookieSalt } = cookieParams;
+  const cookies = cookie.parse(request.headers.cookie || "");
+  const targetedCookie = cookies[cookieName];
+
+  if (!targetedCookie) {
+    return undefined;
+  }
+
+  if (isCookieSealed) {
+    const unsealedCookie = await unseal(targetedCookie, cookieSalt, defaults);
+
+    return JSON.parse(unsealedCookie);
+  }
+
+  return JSON.parse(targetedCookie);
+}
+
+export function setAlertMessagesCookie(
+  response: ServerResponse,
+  alertMessages: string | string[],
+): void {
+  const newCookieValue =
+    typeof alertMessages === "string" ? [alertMessages] : alertMessages;
+
+  const newCookie = cookie.serialize(
+    `alert-messages`,
+    JSON.stringify(newCookieValue),
+    {
+      maxAge: 24 * 60 * 60,
+      path: "/",
+    },
+  );
+
+  const currentSetCookieValue = response.getHeader("set-cookie");
+
+  if (typeof currentSetCookieValue === "number") {
+    throw new Error("Set-Cookie header's value should not be a number");
+  }
+
+  if (!currentSetCookieValue) {
+    return response.setHeader("Set-Cookie", newCookie);
+  }
+
+  let updatedSetCookieValue: string[];
+
+  if (Array.isArray(currentSetCookieValue)) {
+    updatedSetCookieValue = [...currentSetCookieValue, newCookie];
+  } else {
+    updatedSetCookieValue = [currentSetCookieValue, newCookie];
+  }
+
+  return response.setHeader("Set-Cookie", updatedSetCookieValue);
 }

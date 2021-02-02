@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.7.0 - 2021-01-28
+
+- Added three new util functions to handle server side cookies:
+  - `setServerSideCookies(response, cookieName, value, options)` to set a cookie,
+  - `getServerSideCookies(request, params)` to retrieve a cookie,
+  - `setAlertMessagesCookie(response, value)` to set Alert Messages.
+
 ## 0.6.2 - 2021-01-07
 
 - Improved `getServerSidePropsWithMiddlewares` typing to allow passing middlewares that leverage custom Request and Response types as argument.
