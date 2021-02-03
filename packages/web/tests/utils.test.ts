@@ -2,6 +2,7 @@ import cookie from "cookie";
 import httpMock from "mock-http";
 
 import {
+  deleteServerSideCookie,
   getServerSideCookies,
   setAlertMessagesCookie,
   setServerSideCookies,
@@ -194,6 +195,25 @@ describe("Server side cookies", () => {
       setAlertMessagesCookie(mockedResponse, ["foo", "bar"]);
       expect(mockedResponse.getHeader("set-cookie")).toBe(
         "alert-messages=%5B%22foo%22%2C%22bar%22%5D; Max-Age=86400; Path=/",
+      );
+    });
+  });
+
+  describe("deleteServerSideCookie", () => {
+    it("should correctly set empty an existing cookie value and its maxAge to 0", () => {
+      expect.assertions(3);
+
+      const mockedResponse = new httpMock.Response();
+      expect(mockedResponse.getHeader("cookie")).toBe(undefined);
+
+      setAlertMessagesCookie(mockedResponse, "foo");
+      expect(mockedResponse.getHeader("set-cookie")).toBe(
+        "alert-messages=%5B%22foo%22%5D; Max-Age=86400; Path=/",
+      );
+
+      deleteServerSideCookie(mockedResponse, "alert-messages");
+      expect(mockedResponse.getHeader("set-cookie")).toBe(
+        "alert-messages=; Max-Age=0; Path=/",
       );
     });
   });

@@ -309,6 +309,18 @@ export async function getServerSideCookies<T = unknown>(
   return JSON.parse(targetedCookie);
 }
 
+export async function deleteServerSideCookie(
+  response: ServerResponse,
+  cookieName: string,
+): Promise<void> {
+  const toDeleteCookie = cookie.serialize(cookieName, "", {
+    maxAge: 0,
+    path: "/",
+  });
+
+  response.setHeader("Set-Cookie", toDeleteCookie);
+}
+
 export function setAlertMessagesCookie(
   response: ServerResponse,
   alertMessages: string | string[],
