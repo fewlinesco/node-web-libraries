@@ -92,8 +92,10 @@ export class InMemoryTracer implements Tracer {
     callback: (span: Span) => unknown,
   ): Promise<void> {
     const span = this.createSpan(name);
+    this.rootSpan = span;
     await callback(span);
     span.end();
+    this.rootSpan = undefined;
   }
 
   createSpan(name: string): InMemorySpan {
@@ -109,6 +111,10 @@ export class InMemoryTracer implements Tracer {
     this.currentSpan = span;
 
     return span;
+  }
+
+  getCurrentSpan(): Span | undefined {
+    return this.rootSpan;
   }
 
   span<T>(name: string, callback: SpanCallback<T>): Promise<T> {

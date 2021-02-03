@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.8.0 - 2021-02-03
+
+- Removal of `tracer.createRootSpan` as it is a source of bugs where traces get spans mixed up.
+- Addition of `tracer.withSpan(name, callback)` that can do the same job as the previous `createRootSpan`: everything Span that is called within the callback will be associated with this Span.
+- Addition of `tracer.getCurrentSpan()`: it can be called anywhere within the clalback of `withSpan` to get the Parent Span.
+
 ## 0.7.0 - 2021-01-13
 
 - Add Lightstep Public Sattelite support.

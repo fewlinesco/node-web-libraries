@@ -49,6 +49,28 @@ describe("InMemoryTracer:", () => {
       });
     });
   });
+
+  describe("withSpan: should be able to access the parent span", () => {
+    test("using withSpan should give access to the current span", async () => {
+      expect.assertions(3);
+
+      function insideSpanFunction(): void {
+        const span = tracer.getCurrentSpan();
+        span.setDisclosedAttribute("alsoChild", true);
+        expect(span.name).toBe("parent-span");
+      }
+
+      await tracer.span("root-span", async () => {
+        tracer.withSpan("parent-span", (parentSpan) => {
+          parentSpan.setDisclosedAttribute("parent", true);
+          insideSpanFunction();
+        });
+      });
+      const [span] = tracer.searchSpanByName("parent-span");
+      expect(span.attributes.alsoChild).toBe(true);
+      expect(span.attributes.parent).toBe(true);
+    });
+  });
 });
 
 describe("InMemorySpan:", () => {

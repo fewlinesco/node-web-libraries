@@ -107,6 +107,7 @@ type SpanCallback<T> = (span: Span) => Promise<T>;
 
 export interface Tracer {
   createSpan: (name: string) => Span;
+  getCurrentSpan: () => Span | undefined;
   span: <T>(name: string, callback: SpanCallback<T>) => Promise<T>;
   withSpan: (name: string, callback: SpanCallback<void>) => Promise<void>;
 }
@@ -137,6 +138,14 @@ class TracerImpl implements Tracer {
         throw error;
       }
     });
+  }
+
+  getCurrentSpan(): Span | undefined {
+    const span = this.tracer.getCurrentSpan();
+    if (span) {
+      return spanFactory(span);
+    }
+    return undefined;
   }
 
   createSpan(name: string): Span {
