@@ -2,7 +2,11 @@
 import { Tracer, Span } from "@fwl/tracing";
 import { Pool, QueryArrayResult, PoolClient } from "pg";
 
-import { DatabaseConfig, defaultConfig } from "./config/config";
+import {
+  DatabaseConfig,
+  DatabaseConfigWithDatabaseUrl,
+  defaultConfig,
+} from "./config/config";
 
 function close(pool: Pool): Promise<void> {
   return pool.end();
@@ -235,15 +239,23 @@ function checkDatabaseError(error: any): void {
 
 export function connect(
   tracer: Tracer,
-  options?: DatabaseConfig,
+  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
 ): DatabaseQueryRunner {
-  const config = options ? options : defaultConfig;
+  let config: DatabaseConfig;
+
+  if ("url" in options) {
+    config = convertUrl(options.url);
+  } else {
+    config = options ? options : defaultConfig;
+  }
+
   const pool = new Pool({
     user: config.username,
     password: config.password,
     host: config.host,
     database: config.database,
     port: config.port,
+    ssl: config.ssl ? config.ssl : false,
   });
   return queryRunner(pool, tracer);
 }
@@ -274,4 +286,15 @@ export async function connectInSandbox(
   const client: PoolClient = await pool.connect();
   await client.query("BEGIN");
   return queryRunnerSandbox(pool, client);
+}
+
+function convertUrl(databaseUrl: string): DatabaseConfig {
+  const { hostname, port, password, username, pathname } = new URL(databaseUrl);
+  return {
+    host: hostname,
+    username,
+    password,
+    port: parseInt(port),
+    database: pathname.slice(1),
+  };
 }

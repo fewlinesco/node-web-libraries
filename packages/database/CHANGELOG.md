@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.4.0 - 2021-02-03
+
+- `connect` now accepts a `DatabaseConfigWithDatabaseUrl` config that allows to reach the database through its url.
+- The database config now accepts a `ssl` boolean key.
+
 ## 0.3.0 - 2021-01-07
 
 - `DatabaseQueryRunner` is now a union type of `DatabaseQueryRunnerWithTracing`, `DatabaseQueryRunnerWithoutTracing`, `DatabaseQueryRunnerSandbox`.
