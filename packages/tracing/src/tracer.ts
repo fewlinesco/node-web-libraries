@@ -48,9 +48,7 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
         warn: logger.log,
         info: logger.log,
       },
-      attributes: {
-        "service.version": "test",
-      },
+      attributes: options.attributes,
       serviceName: options.simpleCollector.serviceName,
       url: options.simpleCollector.url,
     });
@@ -67,9 +65,7 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
         warn: logger.log,
         info: logger.log,
       },
-      attributes: {
-        "service.version": "test",
-      },
+      attributes: options.attributes,
       serviceName: options.lightstepPublicSatelliteCollector.serviceName,
       headers: {
         "Lightstep-Access-Token":
