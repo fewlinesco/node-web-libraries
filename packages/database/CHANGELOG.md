@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.4.0 - 2021-02-03
+## 0.3.1 - 2021-02-03
 
 - `connect` now accepts a `DatabaseConfigWithDatabaseUrl` config that allows to reach the database through its url.
 - The database config now accepts a `ssl` boolean key.
