@@ -241,13 +241,7 @@ export function connect(
   tracer: Tracer,
   options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
 ): DatabaseQueryRunner {
-  let config: DatabaseConfig;
-
-  if ("url" in options) {
-    config = convertUrl(options.url);
-  } else {
-    config = options ? options : defaultConfig;
-  }
+  const config = getConfig(options);
 
   const pool = new Pool({
     user: config.username,
@@ -255,14 +249,16 @@ export function connect(
     host: config.host,
     database: config.database,
     port: config.port,
-    ssl: config.ssl ? config.ssl : false,
+    ssl: config.ssl,
   });
   return queryRunner(pool, tracer);
 }
 
 export function connectWithoutTracing(
-  config: DatabaseConfig,
+  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
 ): DatabaseQueryRunnerWithoutTracing {
+  const config = getConfig(options);
+
   const pool = new Pool({
     user: config.username,
     password: config.password,
@@ -274,8 +270,10 @@ export function connectWithoutTracing(
 }
 
 export async function connectInSandbox(
-  config: DatabaseConfig,
+  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
 ): Promise<DatabaseQueryRunnerSandbox> {
+  const config = getConfig(options);
+
   const pool = new Pool({
     user: config.username,
     password: config.password,
@@ -297,4 +295,14 @@ function convertUrl(databaseUrl: string): DatabaseConfig {
     port: parseInt(port),
     database: pathname.slice(1),
   };
+}
+
+function getConfig(
+  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
+): DatabaseConfig {
+  return options
+    ? "url" in options
+      ? { ...convertUrl(options.url), ssl: options.ssl || false }
+      : { ...defaultConfig, ...options }
+    : defaultConfig;
 }

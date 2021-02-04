@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.2 - 2021-02-03
+
+- `connectInSandbox` and `connectWithoutTracing` now accept a `DatabaseConfigWithDatabaseUrl` as `connect` does.
+- When the `connect` function was provided with a `DatabaseConfigWithDatabaseUrl`, the `ssl` options was left unused. This is now fixed.
+
 ## 0.3.1 - 2021-02-03
 
 - `connect` now accepts a `DatabaseConfigWithDatabaseUrl` config that allows to reach the database through its url.
