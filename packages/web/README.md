@@ -535,6 +535,17 @@ const cookie = await getServerSideCookies<UserCookie>(request, {
 });
 ```
 
+#### deleteServerSideCookie
+
+Used to delete a cookie on the server side. This function requires as input:
+
+- The response
+- The cookie name
+
+```ts
+await deleteServerSideCookie(response, "cookie-name");
+```
+
 #### setAlertMessagesCookie
 
 Used to set a cookie on the server side. This function requires as input:
@@ -547,7 +558,6 @@ setAlertMessagesCookie(response, ["foo", "bar"]);
 ```
 
 This function will check if a `Set-Cookie` header is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
-
 Note that you will need to un-serialized the value of the cookie, and that the returned value will be a list of string, even if only one message has been set in the `alert-messages` cookie.
 
 ```ts

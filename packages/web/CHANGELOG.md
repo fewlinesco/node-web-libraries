@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.8.0 - 2021-02-03
+
+- Added a new util function (`deleteServerSideCookie`) to delete server side cookie.
+
 ## 0.7.0 - 2021-01-28
 
 - Added three new util functions to handle server side cookies:
