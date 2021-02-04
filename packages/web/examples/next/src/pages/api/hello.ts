@@ -47,4 +47,6 @@ const wrappedHandler = wrapMiddlewares(
   ],
   handler,
 );
-export default new Endpoint().get(wrappedHandler).getHandler();
+export default new Endpoint<NextApiRequest, NextApiResponse>()
+  .get(wrappedHandler)
+  .getHandler();

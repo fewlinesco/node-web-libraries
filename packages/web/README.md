@@ -482,3 +482,88 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   );
 };
 ```
+
+## Utils
+
+### Server side cookies
+
+#### setServerSideCookies
+
+Used to set a cookie on the server side. This function requires as input:
+
+- The response
+- The cookie name
+- The cookie value (anything serializable)
+- The cookie options, which is an object composed of
+  - `shouldCookieBeSealed: boolean`
+  - `cookieSalt?: string`
+  - ..[and the usual cookies options](https://www.npmjs.com/package/cookie#options-1).
+
+```ts
+await setServerSideCookies(
+  response,
+  "cookie-name",
+  { key: "value" },
+  {
+    shouldCookieBeSealed: true,
+    cookieSalt: "7220e882-f534-44b0-99c4-76bdcb8ed0f7",
+    maxAge: 24 * 60 * 60,
+    path: "/",
+    httpOnly: true,
+    secure: true,
+  },
+);
+```
+
+This function will check if a `Set-Cookie` header is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
+
+#### getServerSideCookies
+
+Used to get the value of a cookie on the server side. This function requires as input:
+
+- The request
+- The cookie options, which is an object composed of:
+  - `cookieName: string`
+  - `isCookieSealed: boolean`
+  - `cookieSalt?: string`
+
+```ts
+const cookie = await getServerSideCookies<UserCookie>(request, {
+  cookieName: "cookie-name",
+  isCookieSealed: true,
+  cookieSalt: "7220e882-f534-44b0-99c4-76bdcb8ed0f7",
+});
+```
+
+#### deleteServerSideCookie
+
+Used to delete a cookie on the server side. This function requires as input:
+
+- The response
+- The cookie name
+
+```ts
+await deleteServerSideCookie(response, "cookie-name");
+```
+
+#### setAlertMessagesCookie
+
+Used to set a cookie on the server side. This function requires as input:
+
+- The response
+- A string or a list of string as cookie value.
+
+```ts
+setAlertMessagesCookie(response, ["foo", "bar"]);
+```
+
+This function will check if a `Set-Cookie` header is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
+Note that you will need to un-serialized the value of the cookie, and that the returned value will be a list of string, even if only one message has been set in the `alert-messages` cookie.
+
+```ts
+const serializedAlertMessages = await getServerSideCookies(request, {
+  cookieName: "alert-messages",
+});
+
+const unSerializedAlertMessages = JSON.parse(serializedAlertMessages);
+```

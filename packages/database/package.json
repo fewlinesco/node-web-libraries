@@ -42,8 +42,8 @@
     "prepare": "yarn build",
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
-    "test": "jest"
+    "test": "jest --runInBand --verbose"
   },
   "types": "dist/index.d.ts",
-  "version": "0.3.0"
+  "version": "0.3.2"
 }
