@@ -1,3 +1,5 @@
+import { Attributes } from "@opentelemetry/api";
+
 export type TracingConfig = {
   simpleCollector?: {
     serviceName: string;
@@ -8,6 +10,7 @@ export type TracingConfig = {
     accessToken: string;
     url?: string;
   };
+  attributes?: Attributes;
 };
 
 export const defaultConfig = (serviceName: string): TracingConfig => {

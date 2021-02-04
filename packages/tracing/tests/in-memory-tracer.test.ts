@@ -9,23 +9,6 @@ describe("InMemoryTracer:", () => {
     tracer = new InMemoryTracer();
   });
 
-  describe("rootSpan function:", () => {
-    test("it should create basic `InMemorySpan`", async () => {
-      expect.assertions(2);
-
-      spanNames.forEach((spanName) => {
-        const span = tracer.createRootSpan(spanName);
-        span.end();
-      });
-
-      const spans = tracer.searchSpanByName("first-span");
-
-      expect(spans.length).toEqual(1);
-
-      expect(spans[0].name).toBe("first-span");
-    });
-  });
-
   describe("span function:", () => {
     test("it should create `InMemorySpan`", async () => {
       expect.assertions(8);
@@ -64,6 +47,28 @@ describe("InMemoryTracer:", () => {
       spans.forEach((span) => {
         expect(span.name).toBe("second-span");
       });
+    });
+  });
+
+  describe("withSpan: should be able to access the parent span", () => {
+    test("using withSpan should give access to the current span", async () => {
+      expect.assertions(3);
+
+      function insideSpanFunction(): void {
+        const span = tracer.getCurrentSpan();
+        span.setDisclosedAttribute("alsoChild", true);
+        expect(span.name).toBe("parent-span");
+      }
+
+      await tracer.span("root-span", async () => {
+        tracer.withSpan("parent-span", (parentSpan) => {
+          parentSpan.setDisclosedAttribute("parent", true);
+          insideSpanFunction();
+        });
+      });
+      const [span] = tracer.searchSpanByName("parent-span");
+      expect(span.attributes.alsoChild).toBe(true);
+      expect(span.attributes.parent).toBe(true);
     });
   });
 });
