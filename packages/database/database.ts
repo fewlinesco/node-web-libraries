@@ -298,9 +298,11 @@ function convertUrl(databaseUrl: string): DatabaseConfig {
 }
 
 function getConfig(
-  options: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
+  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
 ): DatabaseConfig {
-  return "url" in options
-    ? { ...convertUrl(options.url), ssl: options.ssl || false }
-    : { ...defaultConfig, ...options };
+  return options
+    ? "url" in options
+      ? { ...convertUrl(options.url), ssl: options.ssl || false }
+      : { ...defaultConfig, ...options }
+    : defaultConfig;
 }
