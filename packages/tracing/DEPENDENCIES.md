@@ -2,7 +2,7 @@
 
 ## Problems
 
-### "@opentelemetry/*"
+### "@opentelemetry/\*"
 
 Concernes all @opentelemetry packages
 
