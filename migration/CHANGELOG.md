@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [0.1.0] - 2020-08-19
 
+- Add the new `fwl/database` type in the `RunMigrationsConfig` database's types allowing now to provide either a `DatabaseConfigWithDatabaseUrl` or a `DatabaseConfig`.
+## [0.1.0] - 2020-08-19
+
 - Renamed `@fwl/migration` from `@fewlines/fwl-migration`
 
 - Moved config to `config.ts` and separated it as `MigrateConfig` and `DatabaseConfig` which is imported from `@fwl/database`
