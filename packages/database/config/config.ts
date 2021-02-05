@@ -1,15 +1,17 @@
+import { ConnectionOptions } from "tls";
+
 interface DatabaseConfig {
   database: string;
   host: string;
   password: string;
   port: number;
   username: string;
-  ssl?: boolean;
+  ssl?: boolean | ConnectionOptions;
 }
 
 interface DatabaseConfigWithDatabaseUrl {
   url: string;
-  ssl?: boolean;
+  ssl?: boolean | ConnectionOptions;
 }
 
 const defaultConfig: DatabaseConfig = {
@@ -18,7 +20,6 @@ const defaultConfig: DatabaseConfig = {
   username: "",
   database: "",
   port: 5432,
-  ssl: false,
 };
 
 export { DatabaseConfig, DatabaseConfigWithDatabaseUrl, defaultConfig };
