@@ -265,6 +265,7 @@ export function connectWithoutTracing(
     host: config.host,
     database: config.database,
     port: config.port,
+    ssl: config.ssl,
   });
   return queryRunnerWithoutTracing(pool);
 }
@@ -280,13 +281,14 @@ export async function connectInSandbox(
     host: config.host,
     database: config.database,
     port: config.port,
+    ssl: config.ssl,
   });
   const client: PoolClient = await pool.connect();
   await client.query("BEGIN");
   return queryRunnerSandbox(pool, client);
 }
 
-function convertUrl(databaseUrl: string): DatabaseConfig {
+export function convertUrl(databaseUrl: string): DatabaseConfig {
   const { hostname, port, password, username, pathname } = new URL(databaseUrl);
   return {
     host: hostname,
@@ -300,9 +302,17 @@ function convertUrl(databaseUrl: string): DatabaseConfig {
 function getConfig(
   options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
 ): DatabaseConfig {
-  return options
-    ? "url" in options
-      ? { ...convertUrl(options.url), ssl: options.ssl || false }
-      : { ...defaultConfig, ...options }
-    : defaultConfig;
+  if (!options) {
+    return defaultConfig;
+  }
+  let config: DatabaseConfig;
+  if ("url" in options) {
+    config = convertUrl(options.url);
+  } else {
+    config = options;
+  }
+  if ("ssl" in options) {
+    config.ssl = options.ssl;
+  }
+  return config;
 }

@@ -4,12 +4,12 @@ interface DatabaseConfig {
   password: string;
   port: number;
   username: string;
-  ssl?: boolean;
+  ssl?: Record<string, unknown>;
 }
 
 interface DatabaseConfigWithDatabaseUrl {
   url: string;
-  ssl?: boolean;
+  ssl?: Record<string, unknown>;
 }
 
 const defaultConfig: DatabaseConfig = {
@@ -18,7 +18,6 @@ const defaultConfig: DatabaseConfig = {
   username: "",
   database: "",
   port: 5432,
-  ssl: false,
 };
 
 export { DatabaseConfig, DatabaseConfigWithDatabaseUrl, defaultConfig };
