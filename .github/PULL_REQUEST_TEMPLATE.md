@@ -55,4 +55,4 @@
 - [ ] I have added tests to cover my changes.
 - [ ] All new and existing tests passed.
 
-[CONTRIBUTING_FILE]: https://github.com/fewlinesco/connect/blob/master/CONTRIBUTING.md
+[CONTRIBUTING_FILE]: https://github.com/fewlinesco/node-web-libraries/blob/master/CONTRIBUTING.md
