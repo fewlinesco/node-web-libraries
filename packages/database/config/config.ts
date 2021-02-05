@@ -1,10 +1,12 @@
+import { ConnectionOptions } from "tls";
+
 interface DatabaseConfig {
   database: string;
   host: string;
   password: string;
   port: number;
   username: string;
-  ssl?: Record<string, unknown>;
+  ssl?: boolean | ConnectionOptions;
 }
 
 interface DatabaseConfigWithDatabaseUrl {

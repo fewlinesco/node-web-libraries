@@ -2,7 +2,7 @@
 
 ## 0.4.0 - 2021-02-0
 
-- The SSL typing in `DatabaseConfigWithDatabaseUrl` and `DatabaseConfig` has been changed from boolean to object to match the package `pg` ssl option.
+- The SSL typing in `DatabaseConfigWithDatabaseUrl` and `DatabaseConfig` has been changed from `boolean` to `boolean | ConnectionOptions` to match the package `pg` ssl option.
 - SSL connections are now allowed for `connect`, `connectInSandbox` and `connectWithoutTracing`.
 
 ## 0.3.2 - 2021-02-04
