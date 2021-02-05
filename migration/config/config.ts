@@ -1,4 +1,4 @@
-import { DatabaseConfig } from "@fwl/database";
+import { DatabaseConfig, DatabaseConfigWithDatabaseUrl } from "@fwl/database";
 
 export interface MigrateConfig {
   dirPath: string;
@@ -6,7 +6,7 @@ export interface MigrateConfig {
 }
 
 export interface RunMigrationsConfig {
-  database: DatabaseConfig;
+  database: DatabaseConfig | DatabaseConfigWithDatabaseUrl;
   migration: MigrateConfig;
 }
 

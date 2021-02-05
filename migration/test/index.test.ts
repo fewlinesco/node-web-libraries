@@ -59,10 +59,37 @@ describe("runMigrations", () => {
     db.close();
   });
 
-  it("takes a config json as parameter", async () => {
+  it("takes a config json with 'DatabaseConfig' database as parameter", async () => {
     expect.assertions(4);
 
     await runMigrations(config);
+
+    const { rows } = await db.query("SELECT * FROM schema_migrations");
+
+    expect(rows.length).toEqual(3);
+
+    const queries = await getQueries("./test/migrations");
+
+    rows.forEach(({ version }, index) => {
+      expect(version).toEqual(queries[index].timestamp);
+    });
+  });
+
+  it.only("takes a config json with 'DatabaseConfigWithDatabaseUrl' database as parameter", async () => {
+    expect.assertions(4);
+
+    const withUrlConfig = {
+      database: {
+        url: `postgres://${process.env.DATABASE_SQL_USERNAME || "fwl_db"}:${
+          process.env.DATABASE_SQL_PASSWORD || "fwl_db"
+        }@${process.env.DATABASE_SQL_HOST || "localhost"}:${
+          process.env.DATABASE_SQL_PORT || 5432
+        }/${process.env.DATABASE_SQL_DATABASE || "fwl_db"}`,
+      },
+      migration: config.migration,
+    };
+
+    await runMigrations(withUrlConfig);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
