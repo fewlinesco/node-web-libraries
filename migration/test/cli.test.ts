@@ -1,5 +1,4 @@
 import { RunMigrationsConfig } from "config/config";
-import { create } from "domain";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -39,41 +38,38 @@ describe("runCLI", () => {
     done();
   });
 
-describe("migrate", () => {
-  const migrateArgs = ["migrate"];
+  describe("migrate", () => {
+    it("handles too many arguments", async (done) => {
+      expect.assertions(6);
 
-  it("handles too many arguments", async (done) => {
-    expect.assertions(6);
+      const spyMigrate = jest.spyOn(migration, "runMigrations");
+      const mockExit = jest
+        .spyOn(process, "exit")
+        .mockImplementation((code?: number) => {
+          expect(code).not.toBe(0);
+          throw new Error("failed in mock implementation");
+        });
+      const mockLog = jest.spyOn(console, "log");
 
-    const spyMigrate = jest.spyOn(migration, "runMigrations");
-    const mockExit = jest
-      .spyOn(process, "exit")
-      .mockImplementation((code?: number) => {
-        expect(code).not.toBe(0);
-        throw new Error("failed in mock implementation");
-      });
-    const mockLog = jest.spyOn(console, "log");
+      try {
+        await runCLI(["migrate", "foo"]);
+      } catch (error) {
+        expect(spyMigrate).not.toHaveBeenCalled();
+        expect(error.message).toBe("failed in mock implementation");
+        expect(mockExit).toHaveBeenCalled();
+        expect(mockExit).not.toHaveBeenCalledWith(0);
+        expect(mockLog).not.toHaveBeenCalled();
+      }
 
-    try {
-      await runCLI(["migrate", "foo"]);
-    } catch (error) {
-      expect(spyMigrate).not.toHaveBeenCalled();
-      expect(error.message).toBe("failed in mock implementation");
-      expect(mockExit).toHaveBeenCalled();
-      expect(mockExit).not.toHaveBeenCalledWith(0);
-      expect(mockLog).not.toHaveBeenCalled();
-    }
+      mockExit.mockRestore();
+      mockLog.mockRestore();
 
-    mockExit.mockRestore();
-    mockLog.mockRestore();
+      done();
+    });
 
-    done();
-  });
-
-  it("can override the database config with a database url passed as an option", async (done) => {
-    expect.assertions(2)
-    const spyMigrate =
-      jest
+    it("can override the database config with a database url passed as an option", async (done) => {
+      expect.assertions(2);
+      const spyMigrate = jest
         .spyOn(migration, "runMigrations")
         .mockImplementation((config: RunMigrationsConfig) => {
           expect(config.database).toEqual({
@@ -82,54 +78,55 @@ describe("migrate", () => {
             password: "password",
             port: 7777,
             username: "user",
-          })
-          return Promise.resolve()
-        })
+          });
+          return Promise.resolve();
+        });
 
-    try {
-      await runCLI(["migrate", "--databaseURL", "postgres://user:password@host:7777/database"]);
-    } catch (error) {
-      fail(error)
-    }
-    // Don't remove, this is a mysterious magic trick without it, tests do not pass
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+      try {
+        await runCLI([
+          "migrate",
+          "--databaseURL",
+          "postgres://user:password@host:7777/database",
+        ]);
+      } catch (error) {
+        fail(error);
+      }
+      // Don't remove, this is a mysterious magic trick without it, tests do not pass
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    expect(spyMigrate).toHaveBeenCalled()
-    done();
-  })
+      expect(spyMigrate).toHaveBeenCalled();
+      done();
+    });
 
-  it("can override the migrations table with the right option", async (done) => {
-    expect.assertions(2)
-    const mockExit = jest
-      .spyOn(process, "exit")
-      .mockImplementation((code?: number) => {
-        throw new Error("failed in mock implementation");
-      });
-    const spyMigrate =
-      jest
+    it("can override the migrations table with the right option", async (done) => {
+      expect.assertions(2);
+
+      const spyMigrate = jest
         .spyOn(migration, "runMigrations")
         .mockImplementation((config: RunMigrationsConfig) => {
-          expect(config.migration.tableName).toBe("custom_table")
-          return Promise.resolve()
-        })
+          expect(config.migration.tableName).toBe("custom_table");
+          return Promise.resolve();
+        });
 
-    try {
-      await runCLI(["migrate", "--migrationsTable", "custom_table"]);
-    } catch (error) {
-      fail(error)
-    }
-    // Don't remove, this is a mysterious magic trick without it, tests do not pass
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+      try {
+        await runCLI(["migrate", "--migrationsTable", "custom_table"]);
+      } catch (error) {
+        fail(error);
+      }
+      // Don't remove, this is a mysterious magic trick without it, tests do not pass
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    expect(spyMigrate).toHaveBeenCalled()
-    done();
-  })
-});
+      expect(spyMigrate).toHaveBeenCalled();
+      done();
+    });
+  });
 
   describe("create", () => {
     const createArgs = ["create", "foo"];
 
     it("creates a timestamped migration file", async (done) => {
+      const realConsoleLog = console.log;
+      console.log = jest.fn();
       expect.assertions(1);
 
       process.argv = [...createArgs];
@@ -149,7 +146,7 @@ describe("migrate", () => {
       );
 
       await fs.promises.unlink(`${migrationsDirPath}/${createdMigrationFile}`);
-
+      console.log = realConsoleLog;
       done();
     });
 

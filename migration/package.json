@@ -2,7 +2,7 @@
   "author": "Fewlines",
   "description": "Migration part of Fewlines Web Libraries",
   "dependencies": {
-    "@fwl/database": "0.1.3",
+    "@fwl/database": "0.4.0",
     "uuid": "8.2.0"
   },
   "devDependencies": {
@@ -44,7 +44,7 @@
     "prepare": "yarn build",
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand --verbose"
   },
   "bin": {
     "migration": "dist/runCli.js"
