@@ -77,8 +77,8 @@ const migrateCommand = {
     };
 
     return _loadConfig(argv.configPath, overrides)
-      .then(config => {
-        return config
+      .then((config) => {
+        return config;
       })
       .then((config) => runMigrations(config))
       .then(() => {
@@ -111,7 +111,10 @@ const createCommand = {
       ? { migration: { dirPath: argv.migrationPath } }
       : {};
     const config = await _loadConfig(argv.configPath, overrides);
-    return createMigrationFile(name, config.migration.dirPath);
+    return createMigrationFile(
+      (name as unknown) as string,
+      config.migration.dirPath,
+    );
   },
 };
 
@@ -160,11 +163,11 @@ const dryRunCommand = {
 };
 
 export async function runCLI(args): Promise<void> {
-   await yargs
+  await yargs
     .command(migrateCommand)
     .command(createCommand)
     .command(dryRunCommand)
     .demandCommand()
     .help("help")
-    .parse(args)
+    .parse(args);
 }
