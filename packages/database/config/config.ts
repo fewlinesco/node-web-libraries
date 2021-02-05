@@ -11,7 +11,7 @@ interface DatabaseConfig {
 
 interface DatabaseConfigWithDatabaseUrl {
   url: string;
-  ssl?: Record<string, unknown>;
+  ssl?: boolean | ConnectionOptions;
 }
 
 const defaultConfig: DatabaseConfig = {
