@@ -12,7 +12,7 @@ jobs:
             - yarn-packages-v1-
       - run:
           name: yarn-install
-          command: yarn install --cache-folder ~/.cache/yarn
+          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
       - save_cache:
           paths:
             - ~/.cache/yarn
