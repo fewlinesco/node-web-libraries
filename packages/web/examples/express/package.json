@@ -3,7 +3,7 @@
   "description": "@fwl/web Express usage example",
   "dependencies": {
     "@fwl/logging": "0.1.1",
-    "@fwl/tracing": "0.8.0",
+    "@fwl/tracing": "0.8.1",
     "@fwl/web": "0.0.0-experimental-b210d8a",
     "express": "4.17.1"
   },
