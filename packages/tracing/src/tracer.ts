@@ -211,4 +211,4 @@ interface Span {
   end(endTime?: TimeInput): void;
 }
 
-export { startTracer, Tracer, getTracer, Span };
+export { getTracer, startTracer, Span, Tracer };
