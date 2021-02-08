@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.1.1] - 2021-02-08
 
-- Add the new `fwl/database` type in the `RunMigrationsConfig` database's types allowing now to provide either a `DatabaseConfigWithDatabaseUrl` or a `DatabaseConfig`.
+- Bump `fwl/database` to allow the use of a database url in configuration.
 
 ## [0.1.0] - 2020-08-19
 

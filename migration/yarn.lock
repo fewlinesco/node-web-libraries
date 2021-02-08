@@ -299,10 +299,10 @@
   resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-3.1.0.tgz#8945bb48c16b43862374489fa502b1401de1ca5b"
   integrity sha512-F6FFVA0UqjQ8lcDiu2VooKwNGXrk1UQLfM0U+xEQYbacWUelE6bXDrHI1FwRXn993fW36kXH2U0BW3lFhalvzw==
 
-"@fwl/database@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@fwl/database/-/database-0.4.1.tgz#dbe81503b6b2710d6eab2042913909dfbe34c9c8"
-  integrity sha512-IoBgwDAtdTAVgu3ykeUcYgkkwPKWKlmGfgxRQCFtdjsvPHrhXMZYEfNK6P9NYKoMkc3dV/pCXKofydl0e54CUw==
+"@fwl/database@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@fwl/database/-/database-0.5.0.tgz#6d6dcc6ed60eda55abbf0b4603375e531964a718"
+  integrity sha512-I4KHxqQ6Z+hybZ4CEVBU0FE2O5biy6Fif645sLRyc+UGgcnJpbvl/jg7vlBc1JtLrnKhDLTXeP0+TE3R2ii4iQ==
   dependencies:
     "@fwl/tracing" "0.8.1"
     pg "8.5.1"
