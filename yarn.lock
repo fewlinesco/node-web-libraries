@@ -387,19 +387,6 @@
   resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-3.1.0.tgz#8945bb48c16b43862374489fa502b1401de1ca5b"
   integrity sha512-F6FFVA0UqjQ8lcDiu2VooKwNGXrk1UQLfM0U+xEQYbacWUelE6bXDrHI1FwRXn993fW36kXH2U0BW3lFhalvzw==
 
-"@fwl/tracing@0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.6.1.tgz#6e2b07ee0d8d2d179e83c3ee96f15f1fbd520fd7"
-  integrity sha512-yWuIAQ00JxzdoM6i7nv9Mt3nOCSvoLo0dvT5zPiyoZW9BfejC9fUp0oZ1xtwl+m3o8tOjSVvjqwnmRwPH7+yZQ==
-  dependencies:
-    "@opentelemetry/api" "0.14.0"
-    "@opentelemetry/context-async-hooks" "0.14.0"
-    "@opentelemetry/core" "0.14.0"
-    "@opentelemetry/exporter-collector" "0.14.0"
-    "@opentelemetry/exporter-zipkin" "0.14.0"
-    "@opentelemetry/node" "0.14.0"
-    "@opentelemetry/tracing" "0.14.0"
-
 "@fwl/tracing@0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.7.0.tgz#eb3896cafad163a125eadd44d01c0f4e82035b08"

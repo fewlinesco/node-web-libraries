@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.1 - 2021-02-0
+
+- Bump `fwl/tracing`.
+
 ## 0.4.0 - 2021-02-0
 
 - The SSL typing in `DatabaseConfigWithDatabaseUrl` and `DatabaseConfig` has been changed from `boolean` to `boolean | ConnectionOptions` to match the package `pg` ssl option.
