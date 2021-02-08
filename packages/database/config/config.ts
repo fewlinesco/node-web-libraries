@@ -1,20 +1,22 @@
 import { ConnectionOptions } from "tls";
 
-interface DatabaseConfig {
+type DatabaseConfig = DatabaseConfigWithObject | DatabaseConfigWithDatabaseUrl;
+
+type DatabaseConfigWithObject = {
   database: string;
   host: string;
   password: string;
   port: number;
   username: string;
   ssl?: boolean | ConnectionOptions;
-}
+};
 
-interface DatabaseConfigWithDatabaseUrl {
+type DatabaseConfigWithDatabaseUrl = {
   url: string;
   ssl?: boolean | ConnectionOptions;
-}
+};
 
-const defaultConfig: DatabaseConfig = {
+const defaultConfig: DatabaseConfigWithObject = {
   host: "localhost",
   password: "",
   username: "",
@@ -22,4 +24,4 @@ const defaultConfig: DatabaseConfig = {
   port: 5432,
 };
 
-export { DatabaseConfig, DatabaseConfigWithDatabaseUrl, defaultConfig };
+export { DatabaseConfig, DatabaseConfigWithObject, defaultConfig };

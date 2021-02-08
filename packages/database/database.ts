@@ -4,7 +4,7 @@ import { Pool, QueryArrayResult, PoolClient } from "pg";
 
 import {
   DatabaseConfig,
-  DatabaseConfigWithDatabaseUrl,
+  DatabaseConfigWithObject,
   defaultConfig,
 } from "./config/config";
 
@@ -239,7 +239,7 @@ function checkDatabaseError(error: any): void {
 
 export function connect(
   tracer: Tracer,
-  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
+  options?: DatabaseConfig,
 ): DatabaseQueryRunner {
   const config = getConfig(options);
 
@@ -255,7 +255,7 @@ export function connect(
 }
 
 export function connectWithoutTracing(
-  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
+  options?: DatabaseConfig,
 ): DatabaseQueryRunnerWithoutTracing {
   const config = getConfig(options);
 
@@ -271,7 +271,7 @@ export function connectWithoutTracing(
 }
 
 export async function connectInSandbox(
-  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
+  options?: DatabaseConfig,
 ): Promise<DatabaseQueryRunnerSandbox> {
   const config = getConfig(options);
 
@@ -288,7 +288,7 @@ export async function connectInSandbox(
   return queryRunnerSandbox(pool, client);
 }
 
-export function convertUrl(databaseUrl: string): DatabaseConfig {
+export function convertUrl(databaseUrl: string): DatabaseConfigWithObject {
   const { hostname, port, password, username, pathname } = new URL(databaseUrl);
   return {
     host: hostname,
@@ -299,13 +299,11 @@ export function convertUrl(databaseUrl: string): DatabaseConfig {
   };
 }
 
-function getConfig(
-  options?: DatabaseConfig | DatabaseConfigWithDatabaseUrl,
-): DatabaseConfig {
+function getConfig(options?: DatabaseConfig): DatabaseConfigWithObject {
   if (!options) {
     return defaultConfig;
   }
-  let config: DatabaseConfig;
+  let config: DatabaseConfigWithObject;
   if ("url" in options) {
     config = convertUrl(options.url);
   } else {
