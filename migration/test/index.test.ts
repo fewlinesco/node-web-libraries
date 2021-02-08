@@ -55,7 +55,6 @@ describe("runMigrations", () => {
 
   afterAll(async () => {
     await cleanDatabase(db);
-    cleanDatabase(db);
     db.close();
   });
 
