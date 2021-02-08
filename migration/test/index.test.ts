@@ -1,8 +1,13 @@
 import * as database from "@fwl/database";
+import { DatabaseQueryRunner } from "@fwl/database";
 import * as fs from "fs";
 import * as path from "path";
 
-import { runMigrations, dryRunPendingMigrations } from "../index";
+import {
+  runMigrations,
+  dryRunPendingMigrations,
+  RunMigrationsConfig,
+} from "../index";
 import { getConfig } from "../utils/getConfig";
 import { getQueries } from "../utils/getQueries";
 
@@ -11,59 +16,52 @@ jest.mock("../utils/getConfig", () => {
 
   return {
     getConfig: async () =>
-      await fs.promises
+      fs.promises
         .readFile(path.join(cleanConfigPath), "utf-8")
         .then(JSON.parse)
         .catch((error) => console.log(error)),
   };
 });
 
-beforeEach(async () => {
-  const db = database.connectWithoutTracing({
-    username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-    host: process.env.DATABASE_SQL_HOST || "localhost",
-    password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-    database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-    port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-  });
-
-  await db.query("DROP TABLE IF EXISTS schema_migrations");
-  await db.query("DROP TABLE IF EXISTS profiles");
-  await db.query("DROP TABLE IF EXISTS posts");
-  await db.query("DROP TABLE IF EXISTS rogues");
-  await db.query("DROP TABLE IF EXISTS users");
-
-  await db.close();
-});
-
-afterEach(async () => {
-  const db = database.connectWithoutTracing({
-    username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
-    host: process.env.DATABASE_SQL_HOST || "localhost",
-    password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
-    database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
-    port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
-  });
-  await db.query("DROP TABLE IF EXISTS schema_migrations");
-  await db.query("DROP TABLE IF EXISTS custom_schema_migrations");
-  await db.query("DROP TABLE IF EXISTS profiles");
-  await db.query("DROP TABLE IF EXISTS posts");
-  await db.query("DROP TABLE IF EXISTS rogues");
-  await db.query("DROP TABLE IF EXISTS users");
-  await db.query("DROP TABLE IF EXISTS good");
-
-  await db.close();
-});
+async function cleanDatabase(database: DatabaseQueryRunner): Promise<void> {
+  const { rows } = await database.query(`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+    ORDER BY table_name;
+  `);
+  for await (const tableName of rows.map(({ table_name }) => table_name)) {
+    await database.query(`DROP TABLE IF EXISTS ${tableName}`);
+  }
+}
 
 describe("runMigrations", () => {
-  it("takes a config json as parameter", async (done) => {
+  let db: database.DatabaseQueryRunner;
+  let config: RunMigrationsConfig;
+
+  beforeAll(async () => {
+    config = await getConfig("./test/config.json");
+
+    db = database.connectWithoutTracing({
+      username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
+      host: process.env.DATABASE_SQL_HOST || "localhost",
+      password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
+      database: process.env.DATABASE_SQL_DATABASE || "fwl_db",
+      port: parseFloat(process.env.DATABASE_SQL_PORT) || 5432,
+    });
+  });
+
+  beforeEach(async () => cleanDatabase(db));
+
+  afterAll(async () => {
+    await cleanDatabase(db);
+    db.close();
+  });
+
+  it("takes a config json with 'DatabaseConfig' database as parameter", async () => {
     expect.assertions(4);
 
-    const config = await getConfig("./test/config.json");
-
     await runMigrations(config);
-
-    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
@@ -74,20 +72,39 @@ describe("runMigrations", () => {
     rows.forEach(({ version }, index) => {
       expect(version).toEqual(queries[index].timestamp);
     });
-
-    await db.close();
-
-    done();
   });
 
-  it("does each migrations if used as a custom implementation", async (done) => {
+  it("takes a config json with 'DatabaseConfigWithDatabaseUrl' database as parameter", async () => {
+    expect.assertions(4);
+
+    const withUrlConfig = {
+      database: {
+        url: `postgres://${process.env.DATABASE_SQL_USERNAME || "fwl_db"}:${
+          process.env.DATABASE_SQL_PASSWORD || "fwl_db"
+        }@${process.env.DATABASE_SQL_HOST || "localhost"}:${
+          process.env.DATABASE_SQL_PORT || 5432
+        }/${process.env.DATABASE_SQL_DATABASE || "fwl_db"}`,
+      },
+      migration: config.migration,
+    };
+
+    await runMigrations(withUrlConfig);
+
+    const { rows } = await db.query("SELECT * FROM schema_migrations");
+
+    expect(rows.length).toEqual(3);
+
+    const queries = await getQueries("./test/migrations");
+
+    rows.forEach(({ version }, index) => {
+      expect(version).toEqual(queries[index].timestamp);
+    });
+  });
+
+  it("does each migrations if used as a custom implementation", async () => {
     expect.assertions(5);
 
-    const config = await getConfig("./test/config.json");
-
     await runMigrations(config);
-
-    const db = database.connectWithoutTracing(config.database);
 
     const dbTables = await db.transaction(async (client) => {
       try {
@@ -110,22 +127,16 @@ describe("runMigrations", () => {
     });
 
     expect(dbTables.length).toEqual(4);
-
-    await db.close();
-
-    done();
   });
 
-  it("does each migrations in  a custom table if configured", async (done) => {
+  it("does each migrations in a custom table if configured", async () => {
     expect.assertions(5);
 
-    const config = await getConfig("./test/config.json");
+    const customConfig = await getConfig("./test/migrations");
 
-    config.migration.tableName = "custom_schema_migrations";
+    customConfig.migration.tableName = "custom_schema_migrations";
 
-    await runMigrations(config);
-
-    const db = database.connectWithoutTracing(config.database);
+    await runMigrations(customConfig);
 
     const dbTables = await db.transaction(async (client) => {
       try {
@@ -148,20 +159,12 @@ describe("runMigrations", () => {
     });
 
     expect(dbTables.length).toEqual(4);
-
-    await db.close();
-
-    done();
   });
 
-  it("does each migrations if used as a CLI", async (done) => {
+  it("does each migrations if used as a CLI", async () => {
     expect.assertions(5);
 
-    const config = await getConfig("./test/config.json");
-
     await runMigrations(config);
-
-    const db = database.connectWithoutTracing(config.database);
 
     const dbTables = await db.transaction(async (client) => {
       try {
@@ -184,20 +187,12 @@ describe("runMigrations", () => {
     });
 
     expect(dbTables.length).toEqual(4);
-
-    await db.close();
-
-    done();
   });
 
-  it("runs unrun migrations, prior to the last one ran", async (done) => {
+  it("runs unrun migrations, prior to the last one ran", async () => {
     expect.assertions(3);
 
-    const config = await getConfig("./test/config.json");
-
     await runMigrations(config);
-
-    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
@@ -230,21 +225,14 @@ describe("runMigrations", () => {
       "SELECT * FROM schema_migrations",
     );
 
-    await db.close();
-
     expect(updatedRows.length).toEqual(4);
-
-    done();
   });
 
-  it("runs pending migrations in a transaction and rollback afterwards", async (done) => {
+  it("runs pending migrations in a transaction and rollback afterwards", async () => {
+    const spyLog = jest.spyOn(console, "log").mockImplementation(jest.fn());
     expect.assertions(1);
 
-    const config = await getConfig("./test/config.json");
-
     await runMigrations(config);
-
-    const db = database.connectWithoutTracing(config.database);
 
     const { rows } = await db.query("SELECT * FROM schema_migrations");
 
@@ -276,14 +264,11 @@ describe("runMigrations", () => {
       "SELECT * FROM schema_migrations",
     );
     expect(currentMigrationNumber).toEqual(updatedRows.length);
-
-    done();
+    spyLog.mockRestore();
   });
 
-  it("runs pending migrations with one containing an error, rollbacks then throw the error", async (done) => {
+  it("runs pending migrations with one containing an error, rollbacks then throw the error", async () => {
     expect.assertions(2);
-
-    const config = await getConfig("./test/config.json");
 
     await runMigrations(config);
 
@@ -310,7 +295,5 @@ describe("runMigrations", () => {
     await fs.promises
       .unlink(`${config.migration.dirPath}/${fileName}`)
       .catch((error) => fail(error));
-
-    done();
   });
 });

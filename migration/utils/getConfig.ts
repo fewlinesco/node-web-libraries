@@ -5,9 +5,7 @@ import * as url from "url";
 
 import { RunMigrationsConfig } from "../config/config";
 
-export async function getConfig(
-  configPath?: string,
-): Promise<RunMigrationsConfig> {
+async function getConfig(configPath?: string): Promise<RunMigrationsConfig> {
   configPath = configPath ? configPath : "./config.json";
 
   const cleanConfigPath = path.isAbsolute
@@ -17,13 +15,15 @@ export async function getConfig(
   return fs.promises.readFile(cleanConfigPath, "utf8").then(JSON.parse);
 }
 
-export function parseDatabaseURL(databaseURL: string): DatabaseConfig {
+function parseDatabaseURL(databaseURL: string): DatabaseConfig {
   const parsedDatabaseURL = new url.URL(databaseURL);
   return {
-    database: parsedDatabaseURL.pathname.replace(/^\/+/g, ''),
+    database: parsedDatabaseURL.pathname.replace(/^\/+/g, ""),
     host: parsedDatabaseURL.hostname,
     port: parseInt(parsedDatabaseURL.port),
     username: parsedDatabaseURL.username,
     password: parsedDatabaseURL.password,
   };
 }
+
+export { getConfig, parseDatabaseURL };

@@ -21,11 +21,9 @@ beforeAll(async (done) => {
 });
 beforeEach(() => db.query("TRUNCATE schema_migrations"));
 
-afterAll(async (done) => {
+afterAll(async () => {
   await db.query("DROP TABLE schema_migrations");
-  await db.close();
-
-  done();
+  db.close();
 });
 
 it("should connect and get data", async (done) => {
