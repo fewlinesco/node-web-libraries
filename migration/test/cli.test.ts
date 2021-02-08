@@ -126,7 +126,6 @@ describe("runCLI", () => {
 
     it("creates a timestamped migration file", async (done) => {
       const spyLog = jest.spyOn(console, "log").mockImplementation(jest.fn());
-      console.log = jest.fn();
       expect.assertions(1);
 
       process.argv = [...createArgs];
