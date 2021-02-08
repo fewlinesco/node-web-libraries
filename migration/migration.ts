@@ -9,13 +9,13 @@ import { createTimestamp } from "./utils/createTimestamp";
 import { getPendingMigrations } from "./utils/getPendingMigrations";
 import { getQueries } from "./utils/getQueries";
 
-export type Query = {
+type Query = {
   timestamp: string;
   query: string;
   fileName: string;
 };
 
-export type SchemaMigrationsRow = {
+type SchemaMigrationsRow = {
   id: string;
   version: string;
   file_name: string;
@@ -23,9 +23,7 @@ export type SchemaMigrationsRow = {
   created_at: string;
 };
 
-export async function runMigrations(
-  config: RunMigrationsConfig,
-): Promise<void> {
+async function runMigrations(config: RunMigrationsConfig): Promise<void> {
   const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
     config.database,
   );
@@ -67,7 +65,7 @@ export async function runMigrations(
   databaseQueryRunner.close();
 }
 
-export async function createMigrationFile(
+async function createMigrationFile(
   name: string,
   migrationPath?: string,
 ): Promise<string> {
@@ -94,7 +92,7 @@ export async function createMigrationFile(
   return fileName;
 }
 
-export async function dryRunPendingMigrations(
+async function dryRunPendingMigrations(
   config: RunMigrationsConfig,
 ): Promise<void> {
   const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
@@ -143,3 +141,11 @@ export async function dryRunPendingMigrations(
 
   return databaseQueryRunner.close();
 }
+
+export {
+  createMigrationFile,
+  dryRunPendingMigrations,
+  Query,
+  runMigrations,
+  SchemaMigrationsRow,
+};

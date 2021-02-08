@@ -1,20 +1,20 @@
 import { DatabaseConfig, DatabaseConfigWithDatabaseUrl } from "@fwl/database";
 
-export interface MigrateConfig {
+interface MigrateConfig {
   dirPath: string;
   tableName?: string;
 }
 
-export interface RunMigrationsConfig {
+interface RunMigrationsConfig {
   database: DatabaseConfig | DatabaseConfigWithDatabaseUrl;
   migration: MigrateConfig;
 }
 
-export const defaultMigrateConfig = {
+const defaultMigrateConfig = {
   dirPath: "./migrations",
 };
 
-export const defaultDatabaseConfig = {
+const defaultDatabaseConfig = {
   host: "localhost",
   port: 5432,
   username: "postgres",
@@ -22,7 +22,15 @@ export const defaultDatabaseConfig = {
   database: "postgres",
 };
 
-export const defaultMigrationConfig = {
+const defaultMigrationConfig = {
   database: defaultDatabaseConfig,
   migration: defaultMigrateConfig,
+};
+
+export {
+  defaultDatabaseConfig,
+  defaultMigrateConfig,
+  defaultMigrationConfig,
+  MigrateConfig,
+  RunMigrationsConfig,
 };
