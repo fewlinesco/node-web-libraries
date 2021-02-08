@@ -41,9 +41,9 @@ export const wrapMiddlewares = <
   const route = path ? path : handler["__route"];
   for (let i = middlewares.length - 1; i >= 0; i--) {
     handler = middlewares[i](handler);
-  }
-  if (route) {
-    handler["__route"] = route;
+    if (route) {
+      handler["__route"] = route;
+    }
   }
 
   return handler;

@@ -63,7 +63,7 @@ export function loggingMiddleware<
         const statusCode = error.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
 
         const endTime = process.hrtime.bigint();
-        const duration = ((endTime - startTime) / BigInt(1000)).toString();
+        const duration = ((endTime - startTime) / BigInt(1000000)).toString();
         logger.log(
           error.toString(),
           logAttributes(duration, request, statusCode, span.getTraceId()),
