@@ -3,8 +3,8 @@
   "description": "@fwl/web Express usage example",
   "dependencies": {
     "@fwl/logging": "0.1.1",
-    "@fwl/tracing": "0.6.1",
-    "@fwl/web": "0.5.1",
+    "@fwl/tracing": "0.8.0",
+    "@fwl/web": "0.0.0-experimental-b210d8a",
     "express": "4.17.1"
   },
   "devDependencies": {
@@ -38,6 +38,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
+    "dev": "ts-node index.ts",
     "prelint": "prettier --trailing-comma all --write './**/*.md'",
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
