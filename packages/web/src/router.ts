@@ -31,6 +31,7 @@ export class Router<
     if (!this.paths[path]) {
       this.paths[path] = {};
     }
+    handler["__route"] = path;
     this.paths[path][method] = wrapMiddlewares<T, U>(this.middlewares, handler);
     return this;
   }

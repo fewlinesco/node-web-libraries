@@ -9,12 +9,18 @@ export function tracingMiddleware<
 >(tracer: Tracer): Middleware<T, U> {
   return (handler) => {
     return async function (request: T, response: U) {
-      const spanName = `${request.method || "GET"} ${request.url}`;
-      const span = tracer.createRootSpan(spanName);
-      const result = await handler(request, response);
-      span.setDisclosedAttribute("http.status_code", response.statusCode);
-      span.end();
-      return result;
+      const displayedName = handler["__route"]
+        ? handler["__route"]
+        : request.url;
+      const spanName = `${request.method || "GET"} ${displayedName}`;
+      return tracer.withSpan(spanName, async (span) => {
+        const result = await handler(request, response);
+        span.setDisclosedAttribute("http.status_code", response.statusCode);
+        span.setDisclosedAttribute("http.target", request.headers.host);
+        span.setDisclosedAttribute("http.url", request.url);
+
+        return result;
+      });
     };
   };
 }

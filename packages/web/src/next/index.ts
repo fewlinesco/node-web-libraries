@@ -13,11 +13,13 @@ export async function getServerSidePropsWithMiddlewares<P>(
   context: GetServerSidePropsContext,
   middlewares: Middleware<NextApiRequest, NextApiResponse>[],
   handler: Handler = () => Promise.resolve(),
+  path?: string,
 ): Promise<GetServerSidePropsResult<P>> {
-  const result = await wrapMiddlewares(middlewares, handler)(
-    context.req,
-    context.res,
-  );
+  const result = await wrapMiddlewares(
+    middlewares,
+    handler,
+    path,
+  )(context.req, context.res);
 
   return result ? result : { props: {} };
 }
