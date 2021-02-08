@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.8.1 - 2021-02-05
+
+- Addition `@fwl/logging` in dependencies.
+
 ## 0.8.0 - 2021-02-03
 
 - Removal of `tracer.createRootSpan` as it is a source of bugs where traces get spans mixed up.

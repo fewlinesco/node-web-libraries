@@ -36,7 +36,7 @@ const provider: BasicTracerProvider = new NodeTracerProvider({
 
 let isTracerStarted = false;
 
-export function startTracer(options: TracingConfig, logger?: Logger): void {
+function startTracer(options: TracingConfig, logger?: Logger): void {
   if (isTracerStarted) {
     return;
   }
@@ -101,7 +101,7 @@ export function startTracer(options: TracingConfig, logger?: Logger): void {
 
 type SpanCallback<T> = (span: Span) => Promise<T>;
 
-export interface Tracer {
+interface Tracer {
   createSpan: (name: string) => Span;
   getCurrentSpan: () => Span | undefined;
   span: <T>(name: string, callback: SpanCallback<T>) => Promise<T>;
@@ -163,7 +163,7 @@ class TracerImpl implements Tracer {
   }
 }
 
-export function getTracer(): Tracer {
+function getTracer(): Tracer {
   return TracerImpl.getInstance();
 }
 
@@ -199,7 +199,7 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
   };
 }
 
-export interface Span {
+interface Span {
   addEvent(
     name: string,
     attributesOrStartTime?: TimeInput | Attributes,
@@ -210,3 +210,5 @@ export interface Span {
   setDisclosedAttribute(key: string, value: unknown): this;
   end(endTime?: TimeInput): void;
 }
+
+export { getTracer, startTracer, Span, Tracer };

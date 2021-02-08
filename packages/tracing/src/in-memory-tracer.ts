@@ -77,7 +77,7 @@ class InMemorySpan implements Span {
 
 type SpanCallback<T> = (span: InMemorySpan) => Promise<T>;
 
-export class InMemoryTracer implements Tracer {
+class InMemoryTracer implements Tracer {
   public spans: InMemorySpan[];
   private rootSpan?: InMemorySpan;
   private currentSpan?: InMemorySpan;
@@ -153,3 +153,5 @@ export class InMemoryTracer implements Tracer {
     return this.spans.filter((span) => span.name === name);
   }
 }
+
+export { InMemoryTracer };

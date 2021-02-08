@@ -1,6 +1,6 @@
 import { Attributes } from "@opentelemetry/api";
 
-export type TracingConfig = {
+type TracingConfig = {
   simpleCollector?: {
     serviceName: string;
     url: string;
@@ -13,7 +13,7 @@ export type TracingConfig = {
   attributes?: Attributes;
 };
 
-export const defaultConfig = (serviceName: string): TracingConfig => {
+const defaultConfig = (serviceName: string): TracingConfig => {
   return {
     simpleCollector: {
       serviceName,
@@ -21,3 +21,5 @@ export const defaultConfig = (serviceName: string): TracingConfig => {
     },
   };
 };
+
+export { defaultConfig, TracingConfig };
