@@ -1,10 +1,14 @@
 # CHANGELOG
 
-## 0.4.1 - 2021-02-0
+## 0.5.0 - 2021-02-08
+
+- The config type has been changed back to only `DatabaseConfig` which is now either `DatabaseConfigWithDatabaseUrl` or `DatabaseConfigWithObject`.
+
+## 0.4.1 - 2021-02-08
 
 - Bump `fwl/tracing`.
 
-## 0.4.0 - 2021-02-0
+## 0.4.0 - 2021-02-05
 
 - The SSL typing in `DatabaseConfigWithDatabaseUrl` and `DatabaseConfig` has been changed from `boolean` to `boolean | ConnectionOptions` to match the package `pg` ssl option.
 - SSL connections are now allowed for `connect`, `connectInSandbox` and `connectWithoutTracing`.
