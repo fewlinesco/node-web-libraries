@@ -11,17 +11,17 @@ type DatabaseConfigWithObject = {
   ssl?: boolean | ConnectionOptions;
 };
 
-type DatabaseConfigWithDatabaseUrl = {
-  url: string;
-  ssl?: boolean | ConnectionOptions;
-};
-
 const defaultConfig: DatabaseConfigWithObject = {
   host: "localhost",
   password: "",
   username: "",
   database: "",
   port: 5432,
+};
+
+type DatabaseConfigWithDatabaseUrl = {
+  url: string;
+  ssl?: boolean | ConnectionOptions;
 };
 
 export { DatabaseConfig, DatabaseConfigWithObject, defaultConfig };
