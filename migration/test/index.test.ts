@@ -229,8 +229,7 @@ describe("runMigrations", () => {
   });
 
   it("runs pending migrations in a transaction and rollback afterwards", async () => {
-    const realConsoleLog = console.log;
-    console.log = jest.fn();
+    const spyLog = jest.spyOn(console, "log").mockImplementation(jest.fn());
     expect.assertions(1);
 
     await runMigrations(config);
@@ -265,7 +264,7 @@ describe("runMigrations", () => {
       "SELECT * FROM schema_migrations",
     );
     expect(currentMigrationNumber).toEqual(updatedRows.length);
-    console.log = realConsoleLog;
+    spyLog.mockRestore();
   });
 
   it("runs pending migrations with one containing an error, rollbacks then throw the error", async () => {

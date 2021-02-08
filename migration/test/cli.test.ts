@@ -125,7 +125,7 @@ describe("runCLI", () => {
     const createArgs = ["create", "foo"];
 
     it("creates a timestamped migration file", async (done) => {
-      const realConsoleLog = console.log;
+      const spyLog = jest.spyOn(console, "log").mockImplementation(jest.fn());
       console.log = jest.fn();
       expect.assertions(1);
 
@@ -146,7 +146,7 @@ describe("runCLI", () => {
       );
 
       await fs.promises.unlink(`${migrationsDirPath}/${createdMigrationFile}`);
-      console.log = realConsoleLog;
+      spyLog.mockRestore();
       done();
     });
 
