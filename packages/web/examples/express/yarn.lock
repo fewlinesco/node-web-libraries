@@ -299,13 +299,6 @@
   resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-3.0.0.tgz#2d8c2be46b8bfec8222942b8ccc999d6d6d714f3"
   integrity sha512-5J9UukKUA4phA1zAgZJIcVLv8Ps5kpNGAD3jtPqe/Ee2HhLN6AZTlThmgUIqIvm/0ZpDI7d/mrBPNcnt0nOuYA==
 
-"@fewlines/fwl-logging@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@fewlines/fwl-logging/-/fwl-logging-1.0.1.tgz#5fa1ea63206f363cdd7c8359b6fd16a63ef35430"
-  integrity sha512-+37gzaT5Sn6+vIB3tfzQJ0FXX92EwA6139wUIHHOK8fm9OkxgHnz2yeRKN175Jdad3UrsUo5hQy+T64dXn5cJg==
-  dependencies:
-    logfmt "1.3.2"
-
 "@fwl/logging@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@fwl/logging/-/logging-0.1.1.tgz#bd89581c63b5b6b4ba90c34b3d891b4beee64cb2"
@@ -313,10 +306,10 @@
   dependencies:
     logfmt "1.3.2"
 
-"@fwl/tracing@0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.6.1.tgz#6e2b07ee0d8d2d179e83c3ee96f15f1fbd520fd7"
-  integrity sha512-yWuIAQ00JxzdoM6i7nv9Mt3nOCSvoLo0dvT5zPiyoZW9BfejC9fUp0oZ1xtwl+m3o8tOjSVvjqwnmRwPH7+yZQ==
+"@fwl/tracing@0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.8.0.tgz#6e92a65440afb5fd9969f3f15af85b3a4e40d102"
+  integrity sha512-L6lShvl7NyZ3RVZeZeM2H/FjfpJQ06MbbOLLO3jAJoRgwIpKqAqGNXRiTVFduK8V3ck/hkKGJWaPPYimqlsSkw==
   dependencies:
     "@opentelemetry/api" "0.14.0"
     "@opentelemetry/context-async-hooks" "0.14.0"
@@ -324,19 +317,64 @@
     "@opentelemetry/exporter-collector" "0.14.0"
     "@opentelemetry/exporter-zipkin" "0.14.0"
     "@opentelemetry/node" "0.14.0"
+    "@opentelemetry/plugin-http" "0.14.0"
+    "@opentelemetry/plugin-https" "0.14.0"
     "@opentelemetry/tracing" "0.14.0"
 
-"@fwl/web@0.0.0-experimental-a81e88d":
-  version "0.0.0-experimental-a81e88d"
-  resolved "https://registry.yarnpkg.com/@fwl/web/-/web-0.0.0-experimental-a81e88d.tgz#f98c10b2541d0b3f182c018122b13d4c4535f9f2"
-  integrity sha512-sBAeW2gn4r7QnM1vSOCZfkU2H2NXQx6vXDf5qEKWaUHJutgjhQqL203b9N3bmbshbqvJPin4JDBJrWrE3n4ZaA==
+"@fwl/web@0.0.0-experimental-b210d8a":
+  version "0.0.0-experimental-b210d8a"
+  resolved "https://registry.yarnpkg.com/@fwl/web/-/web-0.0.0-experimental-b210d8a.tgz#496d29e774727b2d23361b9e3d6f0c5e5002b1a1"
+  integrity sha512-5EmA6OiTvXRczgSP80hNKjmLHxteT2Yb/9zobjCYtXmFvXm3ZmOQa0kVi36f1tjWApSZlcCZStpwSvgxuWvnWQ==
   dependencies:
-    "@fewlines/fwl-logging" "1.0.1"
-    "@fwl/tracing" "0.6.1"
+    "@fwl/logging" "0.1.1"
+    "@fwl/tracing" "0.8.0"
+    "@hapi/iron" "6.0.0"
     on-finished "2.3.0"
     parseurl "1.3.3"
-    qs "6.9.4"
+    qs "6.9.6"
     send "0.17.1"
+
+"@hapi/b64@5.x.x":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@hapi/b64/-/b64-5.0.0.tgz#b8210cbd72f4774985e78569b77e97498d24277d"
+  integrity sha512-ngu0tSEmrezoiIaNGG6rRvKOUkUuDdf4XTPnONHGYfSGRmDqPZX5oJL6HAdKTo1UQHECbdB4OzhWrfgVppjHUw==
+  dependencies:
+    "@hapi/hoek" "9.x.x"
+
+"@hapi/boom@9.x.x":
+  version "9.1.1"
+  resolved "https://registry.yarnpkg.com/@hapi/boom/-/boom-9.1.1.tgz#89e6f0e01637c2a4228da0d113e8157c93677b04"
+  integrity sha512-VNR8eDbBrOxBgbkddRYIe7+8DZ+vSbV6qlmaN2x7eWjsUjy2VmQgChkOKcVZIeupEZYj+I0dqNg430OhwzagjA==
+  dependencies:
+    "@hapi/hoek" "9.x.x"
+
+"@hapi/bourne@2.x.x":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@hapi/bourne/-/bourne-2.0.0.tgz#5bb2193eb685c0007540ca61d166d4e1edaf918d"
+  integrity sha512-WEezM1FWztfbzqIUbsDzFRVMxSoLy3HugVcux6KDDtTqzPsLE8NDRHfXvev66aH1i2oOKKar3/XDjbvh/OUBdg==
+
+"@hapi/cryptiles@5.x.x":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@hapi/cryptiles/-/cryptiles-5.1.0.tgz#655de4cbbc052c947f696148c83b187fc2be8f43"
+  integrity sha512-fo9+d1Ba5/FIoMySfMqPBR/7Pa29J2RsiPrl7bkwo5W5o+AN1dAYQRi4SPrPwwVxVGKjgLOEWrsvt1BonJSfLA==
+  dependencies:
+    "@hapi/boom" "9.x.x"
+
+"@hapi/hoek@9.x.x":
+  version "9.1.1"
+  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.1.1.tgz#9daf5745156fd84b8e9889a2dc721f0c58e894aa"
+  integrity sha512-CAEbWH7OIur6jEOzaai83jq3FmKmv4PmX1JYfs9IrYcGEVI/lyL1EXJGCj7eFVJ0bg5QR8LMxBlEtA+xKiLpFw==
+
+"@hapi/iron@6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@hapi/iron/-/iron-6.0.0.tgz#ca3f9136cda655bdd6028de0045da0de3d14436f"
+  integrity sha512-zvGvWDufiTGpTJPG1Y/McN8UqWBu0k/xs/7l++HVU535NLHXsHhy54cfEMdW7EjwKfbBfM9Xy25FmTiobb7Hvw==
+  dependencies:
+    "@hapi/b64" "5.x.x"
+    "@hapi/boom" "9.x.x"
+    "@hapi/bourne" "2.x.x"
+    "@hapi/cryptiles" "5.x.x"
+    "@hapi/hoek" "9.x.x"
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
@@ -616,6 +654,29 @@
     "@opentelemetry/tracing" "^0.14.0"
     require-in-the-middle "^5.0.0"
     semver "^7.1.3"
+
+"@opentelemetry/plugin-http@0.14.0", "@opentelemetry/plugin-http@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/plugin-http/-/plugin-http-0.14.0.tgz#5c5ac23bd3a5cbd8891fce857d52a86bb0dbf51c"
+  integrity sha512-j6VHSotl+geN+znYgGgn/GohTAirAtHum8Zpc52VZ/WQCrNfHcmEf4NYaGCuz5tW2EgmbH+66iDM/lgNadQuQg==
+  dependencies:
+    "@opentelemetry/api" "^0.14.0"
+    "@opentelemetry/core" "^0.14.0"
+    "@opentelemetry/semantic-conventions" "^0.14.0"
+    semver "^7.1.3"
+    shimmer "^1.2.1"
+
+"@opentelemetry/plugin-https@0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/plugin-https/-/plugin-https-0.14.0.tgz#60a0db56339de497b35aaae0de91b10ecff9b0ea"
+  integrity sha512-FyT3iaEO9CdGu1EeIe+JmAwfoYwjG9GtHiyWSovFEKO/0OLQLrXA2AQDgltOeelu/snPGB2MF92iPqbpfVdhHw==
+  dependencies:
+    "@opentelemetry/api" "^0.14.0"
+    "@opentelemetry/core" "^0.14.0"
+    "@opentelemetry/plugin-http" "^0.14.0"
+    "@opentelemetry/semantic-conventions" "^0.14.0"
+    semver "^7.1.3"
+    shimmer "^1.2.1"
 
 "@opentelemetry/resources@^0.14.0":
   version "0.14.0"
@@ -3963,10 +4024,10 @@ qs@6.7.0:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
   integrity sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==
 
-qs@6.9.4:
-  version "6.9.4"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.4.tgz#9090b290d1f91728d3c22e54843ca44aea5ab687"
-  integrity sha512-A1kFqHekCTM7cz0udomYUoYNWjBebHm/5wzU/XqrBRBNWectVH0QIiN+NEcZ0Dte5hvzHwbr8+XQmguPhJ6WdQ==
+qs@6.9.6:
+  version "6.9.6"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.6.tgz#26ed3c8243a431b2924aca84cc90471f35d5a0ee"
+  integrity sha512-TIRk4aqYLNoJUbd+g2lEdz5kLWIuTMRagAXxl78Q0RiVjAOugHmeKNGdd3cwo/ktpf9aL9epCfFqWDEKysUlLQ==
 
 qs@~6.5.2:
   version "6.5.2"
@@ -4313,6 +4374,11 @@ shellwords@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
   integrity sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
+
+shimmer@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/shimmer/-/shimmer-1.2.1.tgz#610859f7de327b587efebf501fb43117f9aff337"
+  integrity sha512-sQTKC1Re/rM6XyFM6fIAGHRPVGvyXfgzIDvzoq608vM+jeyVD0Tu1E6Np0Kc2zAIFWIj963V2800iF/9LPieQw==
 
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.3"

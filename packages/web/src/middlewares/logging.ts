@@ -15,14 +15,13 @@ function getAddr(request: IncomingMessage): string {
 }
 
 function logAttributes(
-  startTime: bigint,
+  duration: string,
   request: IncomingMessage,
   statusCode: HttpStatus,
   traceId: string,
 ): Record<string, string | number> {
-  const endTime = process.hrtime.bigint();
   return {
-    duration: ((endTime - startTime) / BigInt(1000)).toString(),
+    duration,
     method: request.method ? request.method : "Undefined method",
     path: request.url ? request.url : "Undefined request URL",
     remoteaddr: getAddr(request),
@@ -37,30 +36,45 @@ export function loggingMiddleware<
 >(tracer: Tracer, logger: Logger): Middleware<T, U> {
   return function withFwlLoggingHandler(handler) {
     return async (request: T, response: U) => {
+      const span = tracer.getCurrentSpan();
+
       const startTime = process.hrtime.bigint();
-      return tracer.span("logging middleware", async (span) => {
-        try {
-          const result = await handler(request, response);
-          logger.log(
-            "",
-            logAttributes(
-              startTime,
-              request,
-              response.statusCode,
-              span.getTraceId(),
-            ),
-          );
-          return result;
-        } catch (error) {
-          const statusCode =
-            error.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
-          logger.log(
-            error.toString(),
-            logAttributes(startTime, request, statusCode, span.getTraceId()),
-          );
-          throw error;
-        }
-      });
+      try {
+        const result = await handler(request, response);
+        const endTime = process.hrtime.bigint();
+        const duration = ((endTime - startTime) / BigInt(1000000)).toString();
+        logger.log(
+          "",
+          logAttributes(
+            duration,
+            request,
+            response.statusCode,
+            span.getTraceId(),
+          ),
+        );
+
+        span.setDisclosedAttribute(
+          "middlewares.logging.duration_in_ms",
+          duration,
+        );
+
+        return result;
+      } catch (error) {
+        const statusCode = error.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
+
+        const endTime = process.hrtime.bigint();
+        const duration = ((endTime - startTime) / BigInt(1000000)).toString();
+        logger.log(
+          error.toString(),
+          logAttributes(duration, request, statusCode, span.getTraceId()),
+        );
+        span.setDisclosedAttribute(
+          "middlewares.logging.duration_in_ms",
+          duration,
+        );
+
+        throw error;
+      }
     };
   };
 }

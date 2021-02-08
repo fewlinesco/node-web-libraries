@@ -33,16 +33,57 @@ export function convertMiddleware<
 >(tracer: Tracer, middleware: ExpressMiddleware<T, U>): Middleware<T, U> {
   return (handler: Handler<T, U>) => {
     return (request: T, response: U) => {
+      const startTime = process.hrtime.bigint();
+
       return new Promise((resolve, reject) => {
-        tracer.span(`Converted Middleware: ${middleware.name}`, async () => {
-          middleware(request, response, async () => {
-            try {
-              const result = await handler(request, response);
-              resolve(result);
-            } catch (error) {
-              reject(error);
+        const span = tracer.getCurrentSpan();
+
+        middleware(request, response, async () => {
+          try {
+            const result = await handler(request, response);
+
+            const endTime = process.hrtime.bigint();
+            const duration = ((endTime - startTime) / BigInt(1000)).toString();
+            span.setDisclosedAttribute(
+              `middlewares.${middleware.name}.duration_in_ms`,
+              duration,
+            );
+
+            resolve(result);
+          } catch (error) {
+            const endTime = process.hrtime.bigint();
+            const duration = ((endTime - startTime) / BigInt(1000)).toString();
+            span.setDisclosedAttribute(
+              `middlewares.${middleware.name}.duration_in_ms`,
+              duration,
+            );
+            span.setDisclosedAttribute(
+              `middlewares.${middleware.name}.error`,
+              true,
+            );
+
+            if (error instanceof Error) {
+              span.setDisclosedAttribute(
+                `middlewares.${middleware.name}.exception.class`,
+                error.toString(),
+              );
+              span.setDisclosedAttribute(
+                `middlewares.${middleware.name}.exception.message`,
+                error.message,
+              );
+              span.setDisclosedAttribute(
+                `middlewares.${middleware.name}.stack_trace_hash`,
+                error.stack,
+              );
+            } else {
+              span.setDisclosedAttribute(
+                `middlewares.${middleware.name}.exception.class`,
+                error.toString(),
+              );
             }
-          });
+
+            reject(error);
+          }
         });
       });
     };

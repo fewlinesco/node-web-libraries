@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.9.0 - 2021-02-08
+
+- Changed how the Tracing middleware works to reflect the changes in `@fwl/tracing`:
+  - The name of the Span uses the route path as much as possible to regroup traces.
+  - It now uses `tracer.withSpan` to create a root span.
+- Updated the middlewares to not create a Span but just add attributes to the Span of the Tracing middleware.
+
 ## 0.8.0 - 2021-02-03
 
 - Added a new util function (`deleteServerSideCookie`) to delete server side cookie.

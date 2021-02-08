@@ -179,6 +179,8 @@ export default new Endpoint().put(handler).patch(handler);
 Applying middlewares can be done like so:
 
 ```typescript
+// pages/api/hello.ts
+
 import { Endpoint } from "@fwl/web";
 import {
   errorMiddleware,
@@ -200,6 +202,7 @@ const wrappedHandler = wrapMiddlewares(
     loggingMiddleware(tracer, logger),
   ],
   handler,
+  "/api/hello",
 );
 export default new Endpoint().get(wrappedHandler);
 ```
@@ -258,8 +261,14 @@ To be able to use those middlewares, you can use `wrapMiddlewares` to create a h
 ```typescript
 import { wrappMiddlewares } from "@fwl/web/dist/middlewares";
 
-const wrappedhandler = wrapMiddlewares([middleware1, middleware2], handler);
+const wrappedhandler = wrapMiddlewares(
+  [middleware1, middleware2],
+  handler,
+  routePath,
+);
 ```
+
+The last parameter `routePath` is optionnal but will be used to name the tracing span on requests.
 
 We also provide a conversion function for Express middlewares:
 
@@ -304,8 +313,7 @@ It will also add the error message and stacktrace in the trace of the request fo
 
 #### Tracing Middleware
 
-This middleware should not be used with an Express server as the tracer will automatically create traces.
-It's not the case with Next.JS though and this middleware only task is to create a trace on which to attach the different spans.
+This middleware will create a trace per request, it should be used when we want to use tracing with Express and Next.JS.
 
 > ⚠️ If it's used, it should be the first middleware of the list since the others will try to create spans.
 
@@ -326,14 +334,16 @@ import {
   loggingMiddleware,
   errorMiddleware,
   recoveryMiddleware,
+  tracingMiddleware,
 } from "@fwl/web/dist/middlewares";
 import express, { Application, Request, Response } from "express";
 
 export function start(tracer: Tracer, logger: Logger): Application {
   const router = new Router<Request, Response>([
-    loggingMiddleware(tracer, logger),
-    errorMiddleware(tracer),
+    tracingMiddleware(tracer),
     recoveryMiddleware(tracer),
+    errorMiddleware(tracer),
+    loggingMiddleware(tracer, logger),
   ]);
 
   router.get("/ping", pingHandler(tracer));

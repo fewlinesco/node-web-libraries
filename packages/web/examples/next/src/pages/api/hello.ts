@@ -7,6 +7,7 @@ import {
   errorMiddleware,
   recoveryMiddleware,
 } from "@fwl/web/dist/middlewares";
+import fetch from "cross-fetch";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import logger from "../../logger";
@@ -33,6 +34,13 @@ const handler = (
       });
     }
 
+    if (request.query.error) {
+      throw new Error("youho");
+    }
+
+    const result = await fetch("https://api.chucknorris.io/jokes/random");
+    await result.json();
+
     response.statusCode = 200;
     response.json({ name: "John Doe" });
   });
@@ -46,6 +54,7 @@ const wrappedHandler = wrapMiddlewares(
     loggingMiddleware(tracer, logger),
   ],
   handler,
+  "api/hello",
 );
 export default new Endpoint<NextApiRequest, NextApiResponse>()
   .get(wrappedHandler)

@@ -1,5 +1,5 @@
 import { createLogger, EncoderTypeEnum } from "@fwl/logging";
-import { InMemoryTracer } from "@fwl/tracing";
+import { getTracer, startTracer } from "@fwl/tracing";
 
 import * as server from "./server";
 
@@ -7,7 +7,13 @@ const logger = createLogger({
   service: "fwl-sparta-api",
   encoder: EncoderTypeEnum.JSON,
 });
-const tracer = new InMemoryTracer();
+startTracer({
+  simpleCollector: {
+    serviceName: "test-express-app",
+    url: "http://localhost:55681/v1/traces",
+  },
+});
+const tracer = getTracer();
 
 const applicationServer = server.start(tracer, logger);
 
