@@ -75,7 +75,7 @@ describe("runMigrations", () => {
     });
   });
 
-  it.only("takes a config json with 'DatabaseConfigWithDatabaseUrl' database as parameter", async () => {
+  it("takes a config json with 'DatabaseConfigWithDatabaseUrl' database as parameter", async () => {
     expect.assertions(4);
 
     const withUrlConfig = {
