@@ -43,7 +43,10 @@ export function convertMiddleware<
             const result = await handler(request, response);
 
             const endTime = process.hrtime.bigint();
-            const duration = ((endTime - startTime) / BigInt(1000)).toString();
+            const duration = (
+              (endTime - startTime) /
+              BigInt(1000000)
+            ).toString();
             span.setDisclosedAttribute(
               `middlewares.${middleware.name}.duration_in_ms`,
               duration,
@@ -52,7 +55,10 @@ export function convertMiddleware<
             resolve(result);
           } catch (error) {
             const endTime = process.hrtime.bigint();
-            const duration = ((endTime - startTime) / BigInt(1000)).toString();
+            const duration = (
+              (endTime - startTime) /
+              BigInt(1000000)
+            ).toString();
             span.setDisclosedAttribute(
               `middlewares.${middleware.name}.duration_in_ms`,
               duration,

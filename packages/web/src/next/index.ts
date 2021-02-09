@@ -12,8 +12,8 @@ import { Middleware } from "../typings/middleware";
 export async function getServerSidePropsWithMiddlewares<P>(
   context: GetServerSidePropsContext,
   middlewares: Middleware<NextApiRequest, NextApiResponse>[],
-  handler: Handler = () => Promise.resolve(),
   path?: string,
+  handler: Handler = () => Promise.resolve({ props: {} }),
 ): Promise<GetServerSidePropsResult<P>> {
   const result = await wrapMiddlewares(
     middlewares,
@@ -21,5 +21,5 @@ export async function getServerSidePropsWithMiddlewares<P>(
     path,
   )(context.req, context.res);
 
-  return result ? result : { props: {} };
+  return result;
 }

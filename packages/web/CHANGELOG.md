@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.10.0 - 2021-02-09
+
+- `getServerSidePropsWithMiddlewares`: The `path` argument is now set as the first optional argument.
+- Updated the `docker-compose` and `otel-collector-config` in `examples/`.
+- The `hrtime` in the express logger is now set as milliseconds.
+
 ## 0.9.0 - 2021-02-08
 
 - Changed how the Tracing middleware works to reflect the changes in `@fwl/tracing`:

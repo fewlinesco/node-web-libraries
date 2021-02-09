@@ -1,9 +1,8 @@
-
 receivers:
   otlp:
     protocols:
-        http:
-          endpoint: "0.0.0.0:55681"
+      http:
+        endpoint: "0.0.0.0:55681"
 
 processors:
   batch:
