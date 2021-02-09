@@ -1,10 +1,10 @@
 # CHANGELOG
 
-## 0.9.1 - 2021-02-09
+## 0.10.0 - 2021-02-09
 
-- `getServerSidePropsWithMiddlewares`: The `path` argument is not set as the first optional argument.
+- `getServerSidePropsWithMiddlewares`: The `path` argument is now set as the first optional argument.
 - Updated the `docker-compose` and `otel-collector-config` in `examples/`.
-- The `hrtime` in the express logger is not set as milliseconds.
+- The `hrtime` in the express logger is now set as milliseconds.
 
 ## 0.9.0 - 2021-02-08
 
