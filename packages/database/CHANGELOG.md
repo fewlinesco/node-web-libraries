@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.5.1 - 2021-02-09
+
+- Bump `@fwl/tracing`.
+
 ## 0.5.0 - 2021-02-08
 
 - The config type has been changed back to only `DatabaseConfig` which is now either `DatabaseConfigWithDatabaseUrl` or `DatabaseConfigWithObject`.
