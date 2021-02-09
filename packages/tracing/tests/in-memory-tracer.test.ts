@@ -61,7 +61,7 @@ describe("InMemoryTracer:", () => {
       }
 
       await tracer.span("root-span", async () => {
-        tracer.withSpan("parent-span", (parentSpan) => {
+        tracer.withSpan("parent-span", async (parentSpan) => {
           parentSpan.setDisclosedAttribute("parent", true);
           insideSpanFunction();
         });

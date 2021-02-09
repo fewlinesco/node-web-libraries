@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.9.0 - 2021-02-09
+
+- `tracer.withSpan` is now parameterizable and returns whatever the callback returns.
+- OpenTelemetry dependencies bumped to `0.16.0`.
+
 ## 0.8.1 - 2021-02-05
 
 - Addition `@fwl/logging` in dependencies.
