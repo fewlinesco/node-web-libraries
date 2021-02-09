@@ -1,5 +1,8 @@
 import { Logger } from "@fwl/logging";
-import type {
+import {
+  context,
+  getSpan,
+  setSpan,
   Span as OpenTelemetrySpan,
   Tracer as OpenTelemetryTracer,
   TimeInput,
@@ -42,12 +45,6 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
   }
   if (options.simpleCollector) {
     const collector = new CollectorTraceExporter({
-      logger: logger && {
-        debug: logger.log,
-        error: logger.log,
-        warn: logger.log,
-        info: logger.log,
-      },
       attributes: options.attributes,
       serviceName: options.simpleCollector.serviceName,
       url: options.simpleCollector.url,
@@ -59,12 +56,6 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
   }
   if (options.lightstepPublicSatelliteCollector) {
     const collector = new CollectorTraceExporter({
-      logger: logger && {
-        debug: logger.log,
-        error: logger.log,
-        warn: logger.log,
-        info: logger.log,
-      },
       attributes: options.attributes,
       serviceName: options.lightstepPublicSatelliteCollector.serviceName,
       headers: {
@@ -105,7 +96,7 @@ interface Tracer {
   createSpan: (name: string) => Span;
   getCurrentSpan: () => Span | undefined;
   span: <T>(name: string, callback: SpanCallback<T>) => Promise<T>;
-  withSpan: (name: string, callback: SpanCallback<void>) => Promise<void>;
+  withSpan: <T>(name: string, callback: SpanCallback<T>) => Promise<T>;
 }
 
 class TracerImpl implements Tracer {
@@ -123,12 +114,13 @@ class TracerImpl implements Tracer {
     return TracerImpl.instance;
   }
 
-  withSpan(name, callback): Promise<void> {
+  withSpan<T>(name: string, callback: SpanCallback<T>): Promise<T> {
     const span = this.tracer.startSpan(name);
-    return this.tracer.withSpan(span, async () => {
+    return context.with(setSpan(context.active(), span), async () => {
       try {
-        await callback(spanFactory(span));
+        const result = await callback(spanFactory(span));
         span.end();
+        return result;
       } catch (error) {
         span.end();
         throw error;
@@ -137,7 +129,7 @@ class TracerImpl implements Tracer {
   }
 
   getCurrentSpan(): Span | undefined {
-    const span = this.tracer.getCurrentSpan();
+    const span = getSpan(context.active());
     if (span) {
       return spanFactory(span);
     }
