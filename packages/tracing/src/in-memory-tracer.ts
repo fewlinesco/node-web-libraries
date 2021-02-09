@@ -87,15 +87,16 @@ class InMemoryTracer implements Tracer {
     this.spans = [];
   }
 
-  async withSpan(
+  async withSpan<T>(
     name: string,
-    callback: (span: Span) => unknown,
-  ): Promise<void> {
+    callback: (span: Span) => Promise<T>,
+  ): Promise<T> {
     const span = this.createSpan(name);
     this.rootSpan = span;
-    await callback(span);
+    const result = await callback(span);
     span.end();
     this.rootSpan = undefined;
+    return result;
   }
 
   createSpan(name: string): InMemorySpan {
