@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2021-02-09
+
+- Bump `fwl/database` to bump OpenTelemetry Tracing
+
 ## [0.1.1] - 2021-02-08
 
 - Bump `fwl/database` to allow the use of a database url in configuration.
