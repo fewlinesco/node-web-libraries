@@ -8,6 +8,7 @@ import {
   loggingMiddleware,
   errorMiddleware,
   recoveryMiddleware,
+  tracingMiddleware,
 } from "../../src/middlewares";
 import { InMemoryLogger } from "../utils";
 
@@ -27,7 +28,11 @@ test("logs and catch a WebError correctly", async () => {
     });
   };
   const wrappedhandler = wrapMiddlewares(
-    [errorMiddleware(tracer), loggingMiddleware(tracer, logger)],
+    [
+      tracingMiddleware(tracer),
+      errorMiddleware(tracer),
+      loggingMiddleware(tracer, logger),
+    ],
     handler,
   );
   const response = new httpMock.Response();
@@ -66,6 +71,7 @@ test("logs and catch a random error correctly", async () => {
   };
   const wrappedhandler = wrapMiddlewares(
     [
+      tracingMiddleware(tracer),
       recoveryMiddleware(tracer),
       errorMiddleware(tracer),
       loggingMiddleware(tracer, logger),

@@ -2,7 +2,11 @@ import { InMemoryTracer } from "@fwl/tracing";
 import httpMock from "mock-http";
 
 import { HttpStatus } from "../../index";
-import { wrapMiddlewares, recoveryMiddleware } from "../../src/middlewares";
+import {
+  wrapMiddlewares,
+  recoveryMiddleware,
+  tracingMiddleware,
+} from "../../src/middlewares";
 
 test("catch the error one is thrown and return a 500 Internal Server Error", async () => {
   expect.assertions(1);
@@ -12,7 +16,10 @@ test("catch the error one is thrown and return a 500 Internal Server Error", asy
   const handler = (): void => {
     throw new Error("unexpected error");
   };
-  const wrappedhandler = wrapMiddlewares([middleware], handler);
+  const wrappedhandler = wrapMiddlewares(
+    [tracingMiddleware(tracer), middleware],
+    handler,
+  );
   const response = new httpMock.Response();
 
   await wrappedhandler(

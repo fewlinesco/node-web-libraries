@@ -3,7 +3,11 @@ import httpMock from "mock-http";
 
 import { HttpStatus } from "../../index";
 import { WebError } from "../../src/errors";
-import { wrapMiddlewares, errorMiddleware } from "../../src/middlewares";
+import {
+  wrapMiddlewares,
+  errorMiddleware,
+  tracingMiddleware,
+} from "../../src/middlewares";
 
 test("catch the error when a WebError is thrown and update the status code and the body accordingly", async () => {
   expect.assertions(2);
@@ -20,7 +24,10 @@ test("catch the error when a WebError is thrown and update the status code and t
       httpStatus: HttpStatus.NOT_FOUND,
     });
   };
-  const wrappedhandler = wrapMiddlewares([middleware], handler);
+  const wrappedhandler = wrapMiddlewares(
+    [tracingMiddleware(tracer), middleware],
+    handler,
+  );
   const response = new httpMock.Response();
 
   await wrappedhandler(
@@ -42,7 +49,10 @@ test("does not catch the error when something else than a WebError is thrown", a
   const handler = (): void => {
     throw new Error("unexpected error");
   };
-  const wrappedhandler = wrapMiddlewares([middleware], handler);
+  const wrappedhandler = wrapMiddlewares(
+    [tracingMiddleware(tracer), middleware],
+    handler,
+  );
   const response = new httpMock.Response();
 
   try {
