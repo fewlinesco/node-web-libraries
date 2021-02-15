@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.10.2 - 2021-02-17
+
+- Add a new middleware for rate limiting.
+
 ## 0.10.1 - 2021-02-16
 
 - Recovery middleware now returns `{props:{}}` if in a Next.JS context.
