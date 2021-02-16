@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.10.1 - 2021-02-16
+
+- Recovery middleware now returns `{props:{}}` if in a Next.JS context.
+
 ## 0.10.0 - 2021-02-09
 
 - `getServerSidePropsWithMiddlewares`: The `path` argument is now set as the first optional argument.

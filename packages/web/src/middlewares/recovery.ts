@@ -36,6 +36,7 @@ export function recoveryMiddleware<
         );
 
         response.end();
+
         if (handler["__nextjs"]) {
           return { props: {} };
         }
