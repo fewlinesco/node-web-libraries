@@ -15,6 +15,8 @@ export async function getServerSidePropsWithMiddlewares<P>(
   path?: string,
   handler: Handler = () => Promise.resolve({ props: {} }),
 ): Promise<GetServerSidePropsResult<P>> {
+  handler["__nextjs"] = true;
+
   const result = await wrapMiddlewares(
     middlewares,
     handler,
