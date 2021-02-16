@@ -35,7 +35,13 @@ export function recoveryMiddleware<
           duration,
         );
 
-        return response.end();
+        response.end();
+
+        if (handler["__nextjs"]) {
+          return { props: {} };
+        }
+
+        return;
       }
     };
   };
