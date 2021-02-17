@@ -323,11 +323,11 @@ This middleware can be placed right after the Tracing middleware and will block 
 It takes the `tracer` and `logger` as parameter as well as an `options` object:
 
 - `windowMs` a number of milliseconds, the window of time during which the count for one IP will be logged in. If you're blocked, you will need to wait that much time before attempting new requests.
-- `block` is an object with:
-  - `maxRequests` is the number of requests that are accepted in the `windowMs` time before blocking this IP.
-- `slowdown` is optional. If it's set, the middleware will first artificially makes the requests slower. It's an object with:
-  - `requestsUntilDelay` is the number of number of requests that are accepted before starting to slow down subsequent requests.
+- `requestsUntilBlock` is the number of requests that are accepted in the `windowMs` time before blocking this IP.
+- `slowdown` is optional, if set, the middleware will first artificially makes the requests slower. It's an object with:
+  - `requestsUntilDelay` is the number of requests that are accepted before starting to slow down subsequent requests.
   - `incrementalDelayBetweenRequestMs` is the number of milliseconds that will be added to each requests when slowing down. Each requests will be incrementally longer (for instance, if this value is `500`, the first slow down request will take 500ms longer, the following 1000ms longer, the following 1500ms etc...).
+    > The maximum delay will be 3 seconds.
 - `memcachedClient` is optional. If you want to use Memcache as a storage for this middleware, you will need to provide a `memjs.Client` object.
 
 If this middleware is used and a request is blocked, it will act as the logging middleware.

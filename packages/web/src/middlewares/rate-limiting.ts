@@ -21,9 +21,7 @@ type Options = {
     requestsUntilDelay: number;
     incrementalDelayBetweenRequestMs: number;
   };
-  block: {
-    maxRequests: number;
-  };
+  requestsUntilBlock: number;
   memcachedClient?: memjs.Client;
 };
 
@@ -90,18 +88,32 @@ function sleep(timeMs: number): Promise<void> {
   });
 }
 
+function getExpirationTime(options: Options): number {
+  if (options.slowDown) {
+    if (options.requestsUntilBlock === 0) {
+      return Math.min(
+        3000,
+        (options.slowDown.requestsUntilDelay + 1) *
+          options.slowDown.incrementalDelayBetweenRequestMs,
+      );
+    } else {
+      return Math.max(
+        (options.requestsUntilBlock - options.slowDown.requestsUntilDelay + 1) *
+          options.slowDown.incrementalDelayBetweenRequestMs,
+        options.windowMs,
+      );
+    }
+  } else {
+    return options.windowMs;
+  }
+}
+
 export function rateLimitingMiddleware<
   T extends IncomingMessage,
   U extends ServerResponse
 >(tracer: Tracer, logger: Logger, options: Options): Middleware<T, U> {
   let store: Store;
-  const expiration = options.slowDown
-    ? Math.max(
-        (options.block.maxRequests - options.slowDown.requestsUntilDelay + 1) *
-          options.slowDown.incrementalDelayBetweenRequestMs,
-        options.windowMs,
-      )
-    : options.windowMs;
+  const expiration = getExpirationTime(options);
 
   if (options.memcachedClient) {
     store = new MemcacheStore({
@@ -121,7 +133,8 @@ export function rateLimitingMiddleware<
       if (
         options.slowDown &&
         count > options.slowDown.requestsUntilDelay &&
-        count <= options.block.maxRequests
+        (count <= options.requestsUntilBlock ||
+          options.requestsUntilBlock === 0)
       ) {
         const span = tracer.createSpan("rate-limit-slow-down");
         span.setDisclosedAttribute("ip", ip);
@@ -131,7 +144,10 @@ export function rateLimitingMiddleware<
         );
         span.end();
       }
-      if (count > options.block.maxRequests) {
+      if (
+        options.requestsUntilBlock > 0 &&
+        count > options.requestsUntilBlock
+      ) {
         const endTime = process.hrtime.bigint();
         const duration = ((endTime - startTime) / BigInt(1000000)).toString();
         logger.log("Blocked because of too many requests", {
