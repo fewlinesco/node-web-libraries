@@ -1,0 +1,10 @@
+version: '2.1'
+
+services:
+  memcached:
+    image: bitnami/memcached:1.6.9
+    environment:
+      MEMCACHED_USERNAME: "memcached"
+      MEMCACHED_PASSWORD: "memcached"
+    ports:
+      - "11211:11211"

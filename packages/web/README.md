@@ -34,7 +34,7 @@ import { HttpStatus } from "@fwl/web";
 
 export function pingHandler(
   request: IncomingMessage,
-  response: ServerResponse,
+  response: ServerResponse
 ): void {
   response.statusCode = HttpStatus.OK;
   response.end("OK");
@@ -51,7 +51,7 @@ import { HttpStatus } from "@fwl/web";
 export function pingHandler(tracer: Tracer) {
   return (
     request: IncomingMessage,
-    response: ServerResponse,
+    response: ServerResponse
   ): Promise<void> => {
     return tracer.span("ping-handler", async () => {
       response.statusCode = HttpStatus.OK;
@@ -113,7 +113,7 @@ export function createApp(tracer, logger): Application {
   router.get("/users/:id", userHandler.getUserById(tracer));
   router.post(
     "/users",
-    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer)),
+    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer))
   );
 
   return createApp(express(), [withAuthRouter, router]);
@@ -202,7 +202,7 @@ const wrappedHandler = wrapMiddlewares(
     loggingMiddleware(tracer, logger),
   ],
   handler,
-  "/api/hello",
+  "/api/hello"
 );
 export default new Endpoint().get(wrappedHandler);
 ```
@@ -264,7 +264,7 @@ import { wrappMiddlewares } from "@fwl/web/dist/middlewares";
 const wrappedhandler = wrapMiddlewares(
   [middleware1, middleware2],
   handler,
-  routePath,
+  routePath
 );
 ```
 
@@ -316,6 +316,22 @@ It will also add the error message and stacktrace in the trace of the request fo
 This middleware will create a trace per request, it should be used when we want to use tracing with Express and Next.JS.
 
 > ⚠️ If it's used, it should be the first middleware of the list since the others will try to create spans.
+
+#### Rate Limiting Middleware
+
+This middleware can be placed right after the Tracing middleware and will block or slow down requests if there are too many hits from the same IP address.
+It takes the `tracer` and `logger` as parameter as well as an `options` object:
+
+- `windowMs` a number of milliseconds, the window of time during which the count for one IP will be logged in. If you're blocked, you will need to wait that much time before attempting new requests.
+- `requestsUntilBlock` is the number of requests that are accepted in the `windowMs` time before blocking this IP.
+- `slowdown` is optional, if set, the middleware will first artificially makes the requests slower. It's an object with:
+  - `requestsUntilDelay` is the number of requests that are accepted before starting to slow down subsequent requests.
+  - `incrementalDelayBetweenRequestMs` is the number of milliseconds that will be added to each requests when slowing down. Each requests will be incrementally longer (for instance, if this value is `500`, the first slow down request will take 500ms longer, the following 1000ms longer, the following 1500ms etc...).
+    > The maximum delay will be 3 seconds.
+- `memcachedClient` is optional. If you want to use Memcache as a storage for this middleware, you will need to provide a `memjs.Client` object.
+
+If this middleware is used and a request is blocked, it will act as the logging middleware.
+If the request is slowed down, it will add a span that represent this artifical slow down.
 
 ### Usage for Express
 
@@ -427,13 +443,13 @@ const tracer = getTracer();
 
 const handler = (
   request: NextApiRequest,
-  response: NextApiResponse,
+  response: NextApiResponse
 ): Promise<void> => {
   return tracer.span("hello handler", async (span) => {
     if (request.query.someQueryParam) {
       span.setDisclosedAttribute(
         "someQueryParam",
-        request.query.someQueryParam,
+        request.query.someQueryParam
       );
       throw new WebError({
         error: {
@@ -456,7 +472,7 @@ const wrappedHandler = wrapMiddlewares(
     errorMiddleware(tracer),
     loggingMiddleware(tracer, logger),
   ],
-  handler,
+  handler
 );
 export default new Endpoint().get(wrappedHandler).getHandler();
 ```
@@ -488,7 +504,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         props: {},
       };
-    },
+    }
   );
 };
 ```
@@ -521,7 +537,7 @@ await setServerSideCookies(
     path: "/",
     httpOnly: true,
     secure: true,
-  },
+  }
 );
 ```
 

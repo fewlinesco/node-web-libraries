@@ -4,7 +4,11 @@ import httpMock from "mock-http";
 
 import { HttpStatus } from "../../index";
 import { WebError } from "../../src/errors";
-import { wrapMiddlewares, loggingMiddleware } from "../../src/middlewares";
+import {
+  wrapMiddlewares,
+  loggingMiddleware,
+  tracingMiddleware,
+} from "../../src/middlewares";
 import { InMemoryLogger } from "../utils";
 
 test("logs a good result", async () => {
@@ -19,7 +23,10 @@ test("logs a good result", async () => {
   ): void => {
     response.end();
   };
-  const wrappedhandler = wrapMiddlewares([middleware], handler);
+  const wrappedhandler = wrapMiddlewares(
+    [tracingMiddleware(tracer), middleware],
+    handler,
+  );
 
   await wrappedhandler(
     new httpMock.Request({
@@ -52,7 +59,10 @@ test("logs the error message with the right statusCode when a WebError is thrown
       httpStatus: HttpStatus.NOT_FOUND,
     });
   };
-  const wrappedhandler = wrapMiddlewares([middleware], handler);
+  const wrappedhandler = wrapMiddlewares(
+    [tracingMiddleware(tracer), middleware],
+    handler,
+  );
 
   try {
     await wrappedhandler(
@@ -83,7 +93,10 @@ test("should log a 500 when an unknown error is thrown", async () => {
   const handler = (): void => {
     throw new Error("something wrong happened");
   };
-  const wrappedhandler = wrapMiddlewares([middleware], handler);
+  const wrappedhandler = wrapMiddlewares(
+    [tracingMiddleware(tracer), middleware],
+    handler,
+  );
 
   try {
     await wrappedhandler(
