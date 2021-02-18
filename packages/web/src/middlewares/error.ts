@@ -40,6 +40,10 @@ export function errorMiddleware<
             duration,
           );
 
+          if (handler["__nextjs"]) {
+            return { props: {} };
+          }
+
           return response.end(JSON.stringify(error.getMessage()));
         }
 
