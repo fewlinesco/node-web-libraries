@@ -24,14 +24,8 @@ export function errorMiddleware<
             "http.status_code_group",
             error.httpStatus.toString()[0] + "xx",
           );
-          span.setDisclosedAttribute(
-            "exception.class",
-            error.parentError ? error.parentError.toString() : error.toString(),
-          );
-          span.setDisclosedAttribute(
-            "exception.message",
-            error.parentError ? error.parentError.message : error.message,
-          );
+          span.setDisclosedAttribute("exception.class", error.getClassName());
+          span.setDisclosedAttribute("exception.message", error.toString());
           span.setDisclosedAttribute(
             "unified_error_code",
             error.applicationStatus,

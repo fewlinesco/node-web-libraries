@@ -61,6 +61,22 @@ export class WebError extends Error {
     }
     return message;
   }
+
+  toString(): string {
+    const errorString: string = this.parentError
+      ? super.toString() + "\n" + this.parentError.toString()
+      : super.toString();
+
+    return errorString;
+  }
+
+  getClassName(): string {
+    const errorClassName: string = this.parentError
+      ? this.constructor.name + "\n" + this.parentError.constructor.name
+      : this.constructor.name;
+
+    return errorClassName;
+  }
 }
 
 export function NotFoundError(
