@@ -40,11 +40,17 @@ export function errorMiddleware<
             duration,
           );
 
+          response.end(JSON.stringify(error.getMessage()));
+
           if (handler["__nextjs"]) {
-            return { props: {} };
+            return response.statusCode === 404
+              ? {
+                  notFound: true,
+                }
+              : { props: {} };
           }
 
-          return response.end(JSON.stringify(error.getMessage()));
+          return;
         }
 
         throw error;
