@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.10.4 - 2021-02-19
+
+- Improvement of `errorMiddleware`, which now use `parentError` when provided, to give more informations about errors in Spans and logger.
+
 ## 0.10.3 - 2021-02-18
 
 - Error middleware now returns `{props:{}}` in the context of Next.JS.
