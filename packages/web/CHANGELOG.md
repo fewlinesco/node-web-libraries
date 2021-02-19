@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.10.3 - 2021-02-18
+
+- Error middleware now returns `{props:{}}` in the context of Next.JS.
+
 ## 0.10.2 - 2021-02-17
 
 - Add a new middleware for rate limiting.
