@@ -245,6 +245,27 @@ This is done by catching the error in the `errorMiddleware` and setting the resp
 > ⚠️ If you use both `errorMiddleware` and `loggingMiddleware` the order must be error, then logging.
 > Otherwise, the error message will not be logged.
 
+You can also specify the optionnal `parentError` attribute when throwing a new `WebError`. When this attribute is provided with the `error` that triggered the `WebError`, both the `errorMiddleware` and `loggingMiddleware`
+will use it to display its name and message along with the `WebError`'s ones in traces and logs.
+
+```typescript
+try {
+  await insertUser(user);
+} catch (error) {
+  if (error instanceof UserAlreadyExistsError) {
+    throw new WebError({
+      error: {
+        code: "user_already_exists",
+        message: "User already exists",
+      },
+      httpStatus: HttpStatus.BAD_REQUEST,
+      parentError: error,
+    });
+  }
+  throw error;
+}
+```
+
 ### Middlewares
 
 This package provides a middleware API different from Express.
