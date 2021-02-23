@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.10.5 - 2021-02-23
+
+- Bug fix: add missing `cookie` dependency
+
 ## 0.10.4 - 2021-02-19
 
 - Improvement of `errorMiddleware`, which now use `parentError` when provided, to give more informations about errors in Spans and logger.
