@@ -1,7 +1,7 @@
 import { HttpStatus } from "./http-statuses";
 
 export interface WebErrorDetails {
-  [key: string]: string;
+  [key: string]: unknown;
 }
 
 export type ApplicationError = {
