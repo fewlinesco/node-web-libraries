@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## 0.10.6 - 2021-03-02
+
+- Changing type of `WebErrorDetails`.
+
 ## 0.10.5 - 2021-02-23
 
-- Bug fix: add missing `cookie` dependency
+- Bug fix: add missing `cookie` dependency.
 
 ## 0.10.4 - 2021-02-19
 
