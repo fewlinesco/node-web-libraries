@@ -53,6 +53,41 @@ test("catch the error when a WebError is thrown, update the status code and the 
   const handler = (): void => {
     throw new WebError({
       error,
+      httpStatus: HttpStatus.BAD_REQUEST,
+    });
+  };
+
+  handler["__nextjs"] = true;
+
+  const wrappedhandler = wrapMiddlewares(
+    [tracingMiddleware(tracer), middleware],
+    handler,
+  );
+  const response = new httpMock.Response();
+
+  const returnedProps = await wrappedhandler(
+    new httpMock.Request({
+      url: "/test",
+    }),
+    response,
+  );
+
+  expect(response.statusCode).toBe(HttpStatus.BAD_REQUEST);
+  expect(returnedProps).toMatchObject({ props: {} });
+});
+
+test("catch the error when a WebError is thrown, update the status code and the body accordingly, and return {notFound: true} in the context of Next.JS and a 404", async () => {
+  expect.assertions(2);
+
+  const tracer = new InMemoryTracer();
+  const middleware = errorMiddleware(tracer);
+  const error = {
+    code: "TST_201221_HGTE",
+    message: "something wrong happened",
+  };
+  const handler = (): void => {
+    throw new WebError({
+      error,
       httpStatus: HttpStatus.NOT_FOUND,
     });
   };
@@ -73,7 +108,7 @@ test("catch the error when a WebError is thrown, update the status code and the 
   );
 
   expect(response.statusCode).toBe(HttpStatus.NOT_FOUND);
-  expect(returnedProps).toMatchObject({ props: {} });
+  expect(returnedProps).toMatchObject({ notFound: true });
 });
 
 test("does not catch the error when something else than a WebError is thrown", async () => {
