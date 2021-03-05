@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.11.0 - 2021-03-05
+
+- 💥 `setAlertMessagesCookie` now requires to receive a list of alert messages, even if there is only one. We also added an `expiresAt` key.
+- Export three new types:
+  - SetServerSideCookiesOptions
+  - GetServerSideCookiesParams
+  - AlertMessage
+
 ## 0.10.5 - 2021-02-23
 
 - Bug fix: add missing `cookie` dependency

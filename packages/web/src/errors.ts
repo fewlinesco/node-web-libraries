@@ -1,25 +1,25 @@
 import { HttpStatus } from "./http-statuses";
 
-export interface WebErrorDetails {
+interface WebErrorDetails {
   [key: string]: string;
 }
 
-export type ApplicationError = {
+type ApplicationError = {
   code: string;
   message: string;
 };
 
-export type WebErrorMessage = {
+type WebErrorMessage = {
   code: string;
   message: string;
   details?: WebErrorDetails;
 };
 
-export interface WebErrorMessages {
+interface WebErrorMessages {
   [key: string]: WebErrorMessage;
 }
 
-export class WebError extends Error {
+class WebError extends Error {
   public applicationStatus: string;
   public errorDetails?: WebErrorDetails;
   public message: string;
@@ -79,10 +79,7 @@ export class WebError extends Error {
   }
 }
 
-export function NotFoundError(
-  applicationStatus: string,
-  error?: Error,
-): WebError {
+function NotFoundError(applicationStatus: string, error?: Error): WebError {
   return new WebError({
     error: {
       code: applicationStatus,
@@ -93,10 +90,7 @@ export function NotFoundError(
   });
 }
 
-export function BadRequestError(
-  applicationStatus: string,
-  error?: Error,
-): WebError {
+function BadRequestError(applicationStatus: string, error?: Error): WebError {
   return new WebError({
     error: { code: "400000", message: `[${applicationStatus}] Bad Request` },
     httpStatus: HttpStatus.BAD_REQUEST,
@@ -104,7 +98,7 @@ export function BadRequestError(
   });
 }
 
-export function UnmanagedError(error: Error): WebError {
+function UnmanagedError(error: Error): WebError {
   return new WebError({
     error: { code: "500000", message: "Unexpected Error" },
     httpStatus: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -112,10 +106,33 @@ export function UnmanagedError(error: Error): WebError {
   });
 }
 
-export function UnauthorizedError(error: Error): WebError {
+function UnauthorizedError(error: Error): WebError {
   return new WebError({
     error: { code: "401000", message: "Unauthorized" },
     httpStatus: HttpStatus.UNAUTHORIZED,
     parentError: error,
   });
 }
+
+function SetCookieHeaderValueShouldNotBeANumber(): WebError {
+  return new WebError({
+    error: {
+      code: "400001",
+      message: "Set-Cookie header's value should not be a number",
+    },
+    httpStatus: HttpStatus.BAD_REQUEST,
+  });
+}
+
+export {
+  WebErrorDetails,
+  ApplicationError,
+  WebErrorMessage,
+  WebErrorMessages,
+  WebError,
+  NotFoundError,
+  BadRequestError,
+  UnmanagedError,
+  UnauthorizedError,
+  SetCookieHeaderValueShouldNotBeANumber,
+};
