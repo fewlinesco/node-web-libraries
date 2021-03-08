@@ -387,6 +387,11 @@
   resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-3.1.0.tgz#8945bb48c16b43862374489fa502b1401de1ca5b"
   integrity sha512-F6FFVA0UqjQ8lcDiu2VooKwNGXrk1UQLfM0U+xEQYbacWUelE6bXDrHI1FwRXn993fW36kXH2U0BW3lFhalvzw==
 
+"@fewlines/eslint-config@3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-3.1.2.tgz#14e9bbc8c6027a118e1fc4135827b2f028dfc87f"
+  integrity sha512-JDSQ4FR4MDf6KaOSLinP+9S212BFRiYKo2GTk9OfjzJg+5CXajIilJKfpehIiCnzi2Ptcj7+Xr88njOspPid2Q==
+
 "@hapi/accept@5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@hapi/accept/-/accept-5.0.1.tgz#068553e867f0f63225a506ed74e899441af53e10"
