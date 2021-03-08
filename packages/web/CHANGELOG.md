@@ -2,7 +2,7 @@
 
 ## 0.11.1 - 2021-03-08
 
-- Fixed export for typings utils.
+- Fixed export path for utils types.
 
 ## 0.11.0 - 2021-03-05
 
