@@ -7,7 +7,14 @@ import qs from "qs";
 import send from "send";
 import { Stream } from "stream";
 
-export function setHeaders(
+import { SetCookieHeaderValueShouldNotBeANumber } from "../errors";
+import {
+  AlertMessage,
+  GetServerSideCookiesParams,
+  SetServerSideCookiesOptions,
+} from "./typings/utils";
+
+function setHeaders(
   response: ServerResponse,
   headers: Record<string, string>,
 ): void {
@@ -16,12 +23,12 @@ export function setHeaders(
   });
 }
 
-export function sendJSON(response: ServerResponse, json: unknown): void {
+function sendJSON(response: ServerResponse, json: unknown): void {
   response.setHeader("Content-Type", "application/json");
   response.end(JSON.stringify(json));
 }
 
-export function readBody(request: IncomingMessage): Promise<string> {
+function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((resolve) => {
     let body = "";
     request.on("data", function (chunk) {
@@ -33,14 +40,14 @@ export function readBody(request: IncomingMessage): Promise<string> {
   });
 }
 
-export async function parseBodyAsJson<T = Record<string, unknown>>(
+async function parseBodyAsJson<T = Record<string, unknown>>(
   request: IncomingMessage,
 ): Promise<T> {
   const stringifiedBody = await readBody(request);
   return JSON.parse(stringifiedBody) as T;
 }
 
-export function redirect(
+function redirect(
   response: ServerResponse,
   status: number,
   path: string,
@@ -62,14 +69,14 @@ function isAbsolute(path: string): boolean {
   return false;
 }
 
-export function query(request: IncomingMessage): qs.ParsedQs {
+function query(request: IncomingMessage): qs.ParsedQs {
   const queryparse = qs.parse;
 
   const val = parseurl(request).query as string;
   return queryparse(val, { allowPrototypes: true });
 }
 
-export function sendFile(
+function sendFile(
   request: IncomingMessage,
   response: ServerResponse,
   path: string,
@@ -218,14 +225,11 @@ function _sendfile(
   file.pipe(response);
 }
 
-export async function setServerSideCookies(
+async function setServerSideCookies(
   response: ServerResponse,
   cookieName: string,
   cookieValue: string | Record<string, unknown>,
-  options: {
-    shouldCookieBeSealed: boolean;
-    cookieSalt?: string;
-  } & cookie.CookieSerializeOptions,
+  options: SetServerSideCookiesOptions,
 ): Promise<void> {
   const { shouldCookieBeSealed, cookieSalt, ...setCookieOptions } = options;
 
@@ -284,13 +288,9 @@ export async function setServerSideCookies(
   }
 }
 
-export async function getServerSideCookies<T = unknown>(
+async function getServerSideCookies<T = unknown>(
   request: IncomingMessage,
-  cookieParams: {
-    cookieName: string;
-    isCookieSealed: boolean;
-    cookieSalt?: string;
-  },
+  cookieParams: GetServerSideCookiesParams,
 ): Promise<T | undefined> {
   const { cookieName, isCookieSealed, cookieSalt } = cookieParams;
   const cookies = cookie.parse(request.headers.cookie || "");
@@ -309,7 +309,7 @@ export async function getServerSideCookies<T = unknown>(
   return JSON.parse(targetedCookie);
 }
 
-export async function deleteServerSideCookie(
+async function deleteServerSideCookie(
   response: ServerResponse,
   cookieName: string,
 ): Promise<void> {
@@ -321,16 +321,13 @@ export async function deleteServerSideCookie(
   response.setHeader("Set-Cookie", toDeleteCookie);
 }
 
-export function setAlertMessagesCookie(
+function setAlertMessagesCookie(
   response: ServerResponse,
-  alertMessages: string | string[],
+  alertMessages: AlertMessage[],
 ): void {
-  const newCookieValue =
-    typeof alertMessages === "string" ? [alertMessages] : alertMessages;
-
   const newCookie = cookie.serialize(
     `alert-messages`,
-    JSON.stringify(newCookieValue),
+    JSON.stringify(alertMessages),
     {
       maxAge: 24 * 60 * 60,
       path: "/",
@@ -340,7 +337,7 @@ export function setAlertMessagesCookie(
   const currentSetCookieValue = response.getHeader("set-cookie");
 
   if (typeof currentSetCookieValue === "number") {
-    throw new Error("Set-Cookie header's value should not be a number");
+    throw SetCookieHeaderValueShouldNotBeANumber();
   }
 
   if (!currentSetCookieValue) {
@@ -357,3 +354,17 @@ export function setAlertMessagesCookie(
 
   return response.setHeader("Set-Cookie", updatedSetCookieValue);
 }
+
+export {
+  setHeaders,
+  sendJSON,
+  readBody,
+  parseBodyAsJson,
+  redirect,
+  query,
+  sendFile,
+  setServerSideCookies,
+  getServerSideCookies,
+  deleteServerSideCookie,
+  setAlertMessagesCookie,
+};

@@ -148,9 +148,10 @@ describe("Server side cookies", () => {
   });
 
   describe("setAlertMessagesCookie", () => {
+    const currentTime = Date.now();
+
     test("It should concat the previous `Set-Cookie` header", () => {
       expect.assertions(3);
-
       const mockedResponse = new httpMock.Response();
       const previousCookie = cookie.serialize(
         `previous-cookie`,
@@ -166,24 +167,17 @@ describe("Server side cookies", () => {
         "previous-cookie=%22This%20needs%20to%20be%20concatenated%22; Max-Age=86400; Path=/",
       );
 
-      setAlertMessagesCookie(mockedResponse, "This is the second cookie");
+      const newCookie = {
+        text: "This is the second cookie",
+        expiresAt: currentTime,
+      };
+
+      setAlertMessagesCookie(mockedResponse, [newCookie]);
       expect(mockedResponse.getHeader("set-cookie")).toBeInstanceOf(Array);
       expect(mockedResponse.getHeader("set-cookie")).toStrictEqual([
         "previous-cookie=%22This%20needs%20to%20be%20concatenated%22; Max-Age=86400; Path=/",
-        "alert-messages=%5B%22This%20is%20the%20second%20cookie%22%5D; Max-Age=86400; Path=/",
+        `alert-messages=%5B%7B%22text%22%3A%22This%20is%20the%20second%20cookie%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
       ]);
-    });
-
-    test("It should work with a string as cookie value", async () => {
-      expect.assertions(2);
-
-      const mockedResponse = new httpMock.Response();
-      expect(mockedResponse.getHeader("cookie")).toBe(undefined);
-
-      setAlertMessagesCookie(mockedResponse, "foo");
-      expect(mockedResponse.getHeader("set-cookie")).toBe(
-        "alert-messages=%5B%22foo%22%5D; Max-Age=86400; Path=/",
-      );
     });
 
     test("It should work with a list of string as cookie value", async () => {
@@ -192,23 +186,39 @@ describe("Server side cookies", () => {
       const mockedResponse = new httpMock.Response();
       expect(mockedResponse.getHeader("cookie")).toBe(undefined);
 
-      setAlertMessagesCookie(mockedResponse, ["foo", "bar"]);
+      setAlertMessagesCookie(mockedResponse, [
+        {
+          text: "foo",
+          expiresAt: currentTime,
+        },
+        {
+          text: "bar",
+          expiresAt: currentTime,
+        },
+      ]);
       expect(mockedResponse.getHeader("set-cookie")).toBe(
-        "alert-messages=%5B%22foo%22%2C%22bar%22%5D; Max-Age=86400; Path=/",
+        `alert-messages=%5B%7B%22text%22%3A%22foo%22%2C%22expiresAt%22%3A${currentTime}%7D%2C%7B%22text%22%3A%22bar%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
       );
     });
   });
 
   describe("deleteServerSideCookie", () => {
+    const currentTime = Date.now();
+
     it("should correctly set empty an existing cookie value and its maxAge to 0", () => {
       expect.assertions(3);
 
       const mockedResponse = new httpMock.Response();
       expect(mockedResponse.getHeader("cookie")).toBe(undefined);
 
-      setAlertMessagesCookie(mockedResponse, "foo");
+      setAlertMessagesCookie(mockedResponse, [
+        {
+          text: "foo",
+          expiresAt: currentTime,
+        },
+      ]);
       expect(mockedResponse.getHeader("set-cookie")).toBe(
-        "alert-messages=%5B%22foo%22%5D; Max-Age=86400; Path=/",
+        `alert-messages=%5B%7B%22text%22%3A%22foo%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
       );
 
       deleteServerSideCookie(mockedResponse, "alert-messages");

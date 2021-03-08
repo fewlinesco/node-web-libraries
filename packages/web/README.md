@@ -34,7 +34,7 @@ import { HttpStatus } from "@fwl/web";
 
 export function pingHandler(
   request: IncomingMessage,
-  response: ServerResponse
+  response: ServerResponse,
 ): void {
   response.statusCode = HttpStatus.OK;
   response.end("OK");
@@ -51,7 +51,7 @@ import { HttpStatus } from "@fwl/web";
 export function pingHandler(tracer: Tracer) {
   return (
     request: IncomingMessage,
-    response: ServerResponse
+    response: ServerResponse,
   ): Promise<void> => {
     return tracer.span("ping-handler", async () => {
       response.statusCode = HttpStatus.OK;
@@ -113,7 +113,7 @@ export function createApp(tracer, logger): Application {
   router.get("/users/:id", userHandler.getUserById(tracer));
   router.post(
     "/users",
-    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer))
+    wrapMiddlewares([someAuthMiddleware], userHandler.createUser(tracer)),
   );
 
   return createApp(express(), [withAuthRouter, router]);
@@ -202,7 +202,7 @@ const wrappedHandler = wrapMiddlewares(
     loggingMiddleware(tracer, logger),
   ],
   handler,
-  "/api/hello"
+  "/api/hello",
 );
 export default new Endpoint().get(wrappedHandler);
 ```
@@ -285,7 +285,7 @@ import { wrappMiddlewares } from "@fwl/web/dist/middlewares";
 const wrappedhandler = wrapMiddlewares(
   [middleware1, middleware2],
   handler,
-  routePath
+  routePath,
 );
 ```
 
@@ -464,13 +464,13 @@ const tracer = getTracer();
 
 const handler = (
   request: NextApiRequest,
-  response: NextApiResponse
+  response: NextApiResponse,
 ): Promise<void> => {
   return tracer.span("hello handler", async (span) => {
     if (request.query.someQueryParam) {
       span.setDisclosedAttribute(
         "someQueryParam",
-        request.query.someQueryParam
+        request.query.someQueryParam,
       );
       throw new WebError({
         error: {
@@ -493,7 +493,7 @@ const wrappedHandler = wrapMiddlewares(
     errorMiddleware(tracer),
     loggingMiddleware(tracer, logger),
   ],
-  handler
+  handler,
 );
 export default new Endpoint().get(wrappedHandler).getHandler();
 ```
@@ -525,7 +525,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         props: {},
       };
-    }
+    },
   );
 };
 ```
@@ -558,7 +558,7 @@ await setServerSideCookies(
     path: "/",
     httpOnly: true,
     secure: true,
-  }
+  },
 );
 ```
 
@@ -595,22 +595,28 @@ await deleteServerSideCookie(response, "cookie-name");
 
 #### setAlertMessagesCookie
 
-Used to set a cookie on the server side. This function requires as input:
+Used to set a cookie on the server side.
 
-- The response
-- A string or a list of string as cookie value.
+Alert message data structure: `{text: string, expiresAt: number}`.
+
+This function requires as input:
+
+- The response object from the current process.
+- A **list** of alert messages — even you only want to set a single alert message.
 
 ```ts
-setAlertMessagesCookie(response, ["foo", "bar"]);
+const alertMessage = { text: "foo", expiresAt: Date.now() + 300000 };
+
+setAlertMessagesCookie(response, [alertMessage]);
 ```
 
-This function will check if a `Set-Cookie` header is already being set, and will concat them into a list, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
-Note that you will need to un-serialized the value of the cookie, and that the returned value will be a list of string, even if only one message has been set in the `alert-messages` cookie.
+This function will check if a `Set-Cookie` header is already being set. It will concat them to update the list passed as argument, following the [RFC spec](https://tools.ietf.org/html/rfc2109#section-4.2.2).
+Note that you will need to un-serialized the value of the cookie, and that the returned value will be a list of alert messages, even if only one message has been set in the `alert-messages` cookie.
 
 ```ts
 const serializedAlertMessages = await getServerSideCookies(request, {
   cookieName: "alert-messages",
 });
 
-const unSerializedAlertMessages = JSON.parse(serializedAlertMessages);
+JSON.parse(serializedAlertMessages); // { text: "foo", expiresAt: 1614939460723 }
 ```
