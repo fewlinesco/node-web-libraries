@@ -9,7 +9,7 @@ import { wrapMiddlewares } from "../middlewares/wrapper";
 import { Handler } from "../typings/handler";
 import { Middleware } from "../typings/middleware";
 
-export async function getServerSidePropsWithMiddlewares<P>(
+async function getServerSidePropsWithMiddlewares<P>(
   context: GetServerSidePropsContext,
   middlewares: Middleware<NextApiRequest, NextApiResponse>[],
   path?: string,
@@ -25,3 +25,5 @@ export async function getServerSidePropsWithMiddlewares<P>(
 
   return result;
 }
+
+export { getServerSidePropsWithMiddlewares };

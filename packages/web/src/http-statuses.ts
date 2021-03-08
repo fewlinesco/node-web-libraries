@@ -1,4 +1,4 @@
-export enum HttpStatus {
+enum HttpStatus {
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.3.3
    *
@@ -313,3 +313,5 @@ export enum HttpStatus {
    */
   UNSUPPORTED_MEDIA_TYPE = 415,
 }
+
+export { HttpStatus };

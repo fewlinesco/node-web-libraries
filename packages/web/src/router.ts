@@ -11,7 +11,8 @@ type pathHandlers<T extends IncomingMessage, U extends ServerResponse> = {
   put?: Handler<T, U>;
   delete?: Handler<T, U>;
 };
-export class Router<
+
+class Router<
   T extends IncomingMessage = IncomingMessage,
   U extends ServerResponse = ServerResponse
 > {
@@ -63,3 +64,5 @@ export class Router<
     return this.paths;
   }
 }
+
+export { Router };

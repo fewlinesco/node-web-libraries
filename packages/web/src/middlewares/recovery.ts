@@ -4,7 +4,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { HttpStatus } from "../http-statuses";
 import { Middleware } from "../typings/middleware";
 
-export function recoveryMiddleware<
+function recoveryMiddleware<
   T extends IncomingMessage,
   U extends ServerResponse
 >(tracer: Tracer): Middleware<T, U> {
@@ -46,3 +46,5 @@ export function recoveryMiddleware<
     };
   };
 }
+
+export { recoveryMiddleware };

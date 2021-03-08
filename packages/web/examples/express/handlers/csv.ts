@@ -2,7 +2,7 @@ import { Tracer } from "@fwl/tracing";
 import { HttpStatus, Handler } from "@fwl/web";
 import { Request, Response } from "express";
 
-export function getCsv(tracer: Tracer): Handler<Request, Response> {
+function getCsv(tracer: Tracer): Handler<Request, Response> {
   return (request: Request, response: Response) => {
     return tracer.span("csv-handler", async () => {
       const csvData = "1,Frieda,Ewlines";
@@ -13,3 +13,5 @@ export function getCsv(tracer: Tracer): Handler<Request, Response> {
     });
   };
 }
+
+export { getCsv };

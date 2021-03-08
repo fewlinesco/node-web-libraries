@@ -124,11 +124,14 @@ function SetCookieHeaderValueShouldNotBeANumber(): WebError {
   });
 }
 
-export {
+export type {
   WebErrorDetails,
   ApplicationError,
   WebErrorMessage,
   WebErrorMessages,
+};
+
+export {
   WebError,
   NotFoundError,
   BadRequestError,

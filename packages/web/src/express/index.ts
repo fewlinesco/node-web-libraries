@@ -6,7 +6,7 @@ import { Router } from "../../index";
 import { Middleware } from "../../middlewares";
 import { Handler } from "../typings/handler";
 
-export function createApp(
+function createApp(
   newApplication: Application,
   routers: Router<Request, Response>[],
 ): Application {
@@ -27,10 +27,10 @@ type ExpressMiddleware = (
   next: NextFunction,
 ) => void;
 
-export function convertMiddleware<
-  T extends IncomingMessage,
-  U extends ServerResponse
->(tracer: Tracer, middleware: ExpressMiddleware): Middleware<T, U> {
+function convertMiddleware<T extends IncomingMessage, U extends ServerResponse>(
+  tracer: Tracer,
+  middleware: ExpressMiddleware,
+): Middleware<T, U> {
   return (handler: Handler<T, U>) => {
     return (request: T, response: U) => {
       const startTime = process.hrtime.bigint();
@@ -99,3 +99,5 @@ export function convertMiddleware<
     };
   };
 }
+
+export { createApp, convertMiddleware };

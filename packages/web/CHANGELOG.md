@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.11.1 - 2021-03-08
+
+- Fixed export path for utils types.
+
 ## 0.11.0 - 2021-03-05
 
 - 💥 `setAlertMessagesCookie` now requires to receive a list of alert messages, even if there is only one. We also added an `expiresAt` key.

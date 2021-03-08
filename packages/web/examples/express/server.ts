@@ -16,7 +16,7 @@ import { pingHandler } from "./handlers/ping";
 import * as userHandler from "./handlers/users";
 import { authMiddleware } from "./middlewares/auth";
 
-export function start(tracer: Tracer, logger: Logger): Application {
+function start(tracer: Tracer, logger: Logger): Application {
   const router = new Router<Request, Response>([
     tracingMiddleware(tracer),
     recoveryMiddleware(tracer),
@@ -45,3 +45,5 @@ export function start(tracer: Tracer, logger: Logger): Application {
 
   return createApp(express(), [authRouter, router]);
 }
+
+export { start };

@@ -3,10 +3,9 @@ import { IncomingMessage, ServerResponse } from "http";
 
 import { Middleware } from "../typings/middleware";
 
-export function tracingMiddleware<
-  T extends IncomingMessage,
-  U extends ServerResponse
->(tracer: Tracer): Middleware<T, U> {
+function tracingMiddleware<T extends IncomingMessage, U extends ServerResponse>(
+  tracer: Tracer,
+): Middleware<T, U> {
   return (handler) => {
     return async function (request: T, response: U) {
       const displayedName = handler["__route"]
@@ -24,3 +23,5 @@ export function tracingMiddleware<
     };
   };
 }
+
+export { tracingMiddleware };

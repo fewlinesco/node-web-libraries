@@ -108,7 +108,7 @@ function getExpirationTime(options: Options): number {
   }
 }
 
-export function rateLimitingMiddleware<
+function rateLimitingMiddleware<
   T extends IncomingMessage,
   U extends ServerResponse
 >(tracer: Tracer, logger: Logger, options: Options): Middleware<T, U> {
@@ -164,3 +164,5 @@ export function rateLimitingMiddleware<
     };
   };
 }
+
+export { rateLimitingMiddleware };

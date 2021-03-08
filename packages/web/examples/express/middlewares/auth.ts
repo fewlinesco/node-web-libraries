@@ -3,7 +3,7 @@ import { UnauthorizedError } from "@fwl/web/dist/errors";
 import { Middleware } from "@fwl/web/dist/middlewares";
 import { Request, Response } from "express";
 
-export function authMiddleware(tracer: Tracer): Middleware<Request, Response> {
+function authMiddleware(tracer: Tracer): Middleware<Request, Response> {
   return (handler) => {
     return function (request: Request, response: Response) {
       return tracer.span<void>("auth-middleware", async () => {
@@ -19,3 +19,5 @@ export function authMiddleware(tracer: Tracer): Middleware<Request, Response> {
     };
   };
 }
+
+export { authMiddleware };
