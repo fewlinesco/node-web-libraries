@@ -2,7 +2,7 @@ import { Logger } from "@fwl/logging";
 
 type Metadata = Record<string, string | number>;
 type Log = Metadata & { message: string };
-export class InMemoryLogger implements Logger {
+class InMemoryLogger implements Logger {
   private logs: Log[];
   private metadata?: Metadata;
 
@@ -25,3 +25,5 @@ export class InMemoryLogger implements Logger {
     return this.logs[index];
   }
 }
+
+export { InMemoryLogger };

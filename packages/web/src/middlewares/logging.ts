@@ -30,10 +30,10 @@ function logAttributes(
   };
 }
 
-export function loggingMiddleware<
-  T extends IncomingMessage,
-  U extends ServerResponse
->(tracer: Tracer, logger: Logger): Middleware<T, U> {
+function loggingMiddleware<T extends IncomingMessage, U extends ServerResponse>(
+  tracer: Tracer,
+  logger: Logger,
+): Middleware<T, U> {
   return function withFwlLoggingHandler(handler) {
     return async (request: T, response: U) => {
       const span = tracer.getCurrentSpan();
@@ -78,3 +78,5 @@ export function loggingMiddleware<
     };
   };
 }
+
+export { loggingMiddleware };

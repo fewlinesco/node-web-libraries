@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { HttpStatus } from "./http-statuses";
 import { Handler } from "./typings/handler";
 
-export class Endpoint<
+class Endpoint<
   T extends IncomingMessage = IncomingMessage,
   U extends ServerResponse = ServerResponse
 > {
@@ -55,3 +55,5 @@ export class Endpoint<
     };
   }
 }
+
+export { Endpoint };

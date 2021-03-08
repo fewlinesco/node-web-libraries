@@ -3,10 +3,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { Handler } from "../typings/handler";
 import { Middleware } from "../typings/middleware";
 
-export const wrapMiddlewares = <
-  T extends IncomingMessage,
-  U extends ServerResponse
->(
+const wrapMiddlewares = <T extends IncomingMessage, U extends ServerResponse>(
   middlewares: Middleware<T, U>[],
   handler: Handler<T, U>,
   path?: string,
@@ -60,3 +57,5 @@ export const wrapMiddlewares = <
 
   return handler;
 };
+
+export { wrapMiddlewares };
