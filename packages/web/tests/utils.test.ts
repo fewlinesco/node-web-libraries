@@ -247,4 +247,17 @@ describe("#createApp", () => {
       message: "Not Found",
     });
   });
+
+  test("Respond with HTML formatted answer for 404 when no accept header is send", async () => {
+    expect.assertions(3);
+    const app = createApp(express(), []);
+    const response = await request(app).get("/non-existing-endpoint");
+
+    expect(response.status).toBe(404);
+    expect(response.headers["content-type"]).not.toMatch(/application\/json/);
+    expect(response.body).not.toMatchObject({
+      code: "not_found",
+      message: "Not Found",
+    });
+  });
 });
