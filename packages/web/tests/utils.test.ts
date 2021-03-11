@@ -1,9 +1,10 @@
 import cookie from "cookie";
-import express from "express";
+import express, { Request, Response } from "express";
 import httpMock from "mock-http";
 import request from "supertest";
 
 import { createApp } from "../src/express";
+import { Router } from "../src/router";
 import {
   deleteServerSideCookie,
   getServerSideCookies,
@@ -255,6 +256,26 @@ describe("#createApp", () => {
 
     expect(response.status).toBe(404);
     expect(response.headers["content-type"]).not.toMatch(/application\/json/);
+    expect(response.body).not.toMatchObject({
+      code: "not_found",
+      message: "Not Found",
+    });
+  });
+
+  test("Still works as intended on existing endpoints", async () => {
+    expect.assertions(2);
+
+    const router = new Router<Request, Response>([]);
+
+    router.get("/ping", (request: Request, response: Response): void => {
+      response.statusCode = 200;
+      response.end("OK");
+    });
+
+    const app = createApp(express(), [router]);
+    const response = await request(app).get("/ping");
+
+    expect(response.status).toBe(200);
     expect(response.body).not.toMatchObject({
       code: "not_found",
       message: "Not Found",
