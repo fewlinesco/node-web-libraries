@@ -20,7 +20,11 @@ function createApp(
   });
 
   newApplication.use((request, response, next) => {
-    if (request.headers["content-type"] === "application/json") {
+    if (
+      request.headers["accept"] === "application/json" ||
+      request.headers["Accept"] === "application/json"
+    ) {
+      response.type("application/json");
       response.status(404).json({
         code: "not_found",
         message: "Not Found",
