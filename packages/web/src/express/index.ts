@@ -18,6 +18,12 @@ function createApp(
       });
     });
   });
+  newApplication.use((request, response) => {
+    response.status(404).json({
+      code: "not_found",
+      message: "Not Found",
+    });
+  });
   return newApplication;
 }
 
