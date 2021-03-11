@@ -18,12 +18,18 @@ function createApp(
       });
     });
   });
-  newApplication.use((request, response) => {
-    response.status(404).json({
-      code: "not_found",
-      message: "Not Found",
-    });
+
+  newApplication.use((request, response, next) => {
+    if (request.headers["content-type"] === "application/json") {
+      response.status(404).json({
+        code: "not_found",
+        message: "Not Found",
+      });
+    } else {
+      next();
+    }
   });
+
   return newApplication;
 }
 
