@@ -19,20 +19,19 @@ function createApp(
     });
   });
 
-  newApplication.use((request, response, next) => {
-    if (
-      request.headers["accept"] === "application/json" ||
-      request.headers["Accept"] === "application/json"
-    ) {
-      response.type("application/json");
-      response.status(404).json({
-        code: "not_found",
-        message: "Not Found",
-      });
-    } else {
-      next();
-    }
-  });
+  newApplication.use(
+    (request: Request, response: Response, next: NextFunction) => {
+      if (request.get("accept") === "application/json") {
+        response.type("application/json");
+        response.status(404).json({
+          code: "not_found",
+          message: "Not Found",
+        });
+      } else {
+        next();
+      }
+    },
+  );
 
   return newApplication;
 }
