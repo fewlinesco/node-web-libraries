@@ -97,13 +97,14 @@ If you need to add a middleware to one route in particular, you can use `wrapMid
 ```typescript
 import express, { Application, Request, Response } from "express";
 import { Router } from "@fwl/web";
+import { createApp } from "@fwl/web/dist/express";
 import {
   errorMiddleware,
   loggingMiddleware,
   wrapMiddlewares,
 } from "@fwl/web/dist/middlewares";
 
-export function createApp(tracer, logger): Application {
+export function start(tracer, logger): Application {
   const router = new Router<Request, Response>([
     errorMiddleware(tracer),
     loggingMiddleware(tracer, logger),
@@ -127,7 +128,7 @@ import express, { Application, Request, Response } from "express";
 import { errorMiddleware, loggingMiddleware } from "@fwl/web/dist/middlewares";
 import { Router } from "@fwl/web";
 
-export function createApp(tracer, logger): Application {
+export function start(tracer, logger): Application {
   const router = new Router<Request, Response>([
     errorMiddleware(tracer),
     loggingMiddleware(tracer, logger),

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.11.2 - 2021-03-11
+
+- The `createApp` utility function for Express now automatically sends a 404 JSON formatted response when the `Accept` header of the request is explicitly set as `application/json`.
+
 ## 0.11.1 - 2021-03-08
 
 - Fixed export path for utils types.

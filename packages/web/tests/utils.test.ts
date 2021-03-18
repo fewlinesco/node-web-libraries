@@ -1,6 +1,10 @@
 import cookie from "cookie";
+import express, { Request, Response } from "express";
 import httpMock from "mock-http";
+import request from "supertest";
 
+import { createApp } from "../src/express";
+import { Router } from "../src/router";
 import {
   deleteServerSideCookie,
   getServerSideCookies,
@@ -225,6 +229,56 @@ describe("Server side cookies", () => {
       expect(mockedResponse.getHeader("set-cookie")).toBe(
         "alert-messages=; Max-Age=0; Path=/",
       );
+    });
+  });
+});
+
+describe("#createApp", () => {
+  test("Respond with JSON formatted answer for 404 when 'application/json' accept header is send", async () => {
+    expect.assertions(3);
+    const app = createApp(express(), []);
+    const response = await request(app)
+      .get("/non-existing-endpoint")
+      .set("Accept", "application/json");
+
+    expect(response.status).toBe(404);
+    expect(response.headers["content-type"]).toMatch(/application\/json/);
+    expect(response.body).toMatchObject({
+      code: "not_found",
+      message: "Not Found",
+    });
+  });
+
+  test("Respond with HTML formatted answer for 404 when no accept header is send", async () => {
+    expect.assertions(3);
+    const app = createApp(express(), []);
+    const response = await request(app).get("/non-existing-endpoint");
+
+    expect(response.status).toBe(404);
+    expect(response.headers["content-type"]).not.toMatch(/application\/json/);
+    expect(response.body).not.toMatchObject({
+      code: "not_found",
+      message: "Not Found",
+    });
+  });
+
+  test("Still works as intended on existing endpoints", async () => {
+    expect.assertions(2);
+
+    const router = new Router<Request, Response>([]);
+
+    router.get("/ping", (request: Request, response: Response): void => {
+      response.statusCode = 200;
+      response.end("OK");
+    });
+
+    const app = createApp(express(), [router]);
+    const response = await request(app).get("/ping");
+
+    expect(response.status).toBe(200);
+    expect(response.body).not.toMatchObject({
+      code: "not_found",
+      message: "Not Found",
     });
   });
 });
