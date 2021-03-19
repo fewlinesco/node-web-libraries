@@ -172,6 +172,7 @@ describe("Server side cookies", () => {
       );
 
       const newCookie = {
+        id: "5ae024cb-9442-4f84-867d-b77ac549594f",
         text: "This is the second cookie",
         expiresAt: currentTime,
       };
@@ -180,7 +181,7 @@ describe("Server side cookies", () => {
       expect(mockedResponse.getHeader("set-cookie")).toBeInstanceOf(Array);
       expect(mockedResponse.getHeader("set-cookie")).toStrictEqual([
         "previous-cookie=%22This%20needs%20to%20be%20concatenated%22; Max-Age=86400; Path=/",
-        `alert-messages=%5B%7B%22text%22%3A%22This%20is%20the%20second%20cookie%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
+        `alert-messages=%5B%7B%22id%22%3A%225ae024cb-9442-4f84-867d-b77ac549594f%22%2C%22text%22%3A%22This%20is%20the%20second%20cookie%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
       ]);
     });
 
@@ -192,16 +193,18 @@ describe("Server side cookies", () => {
 
       setAlertMessagesCookie(mockedResponse, [
         {
+          id: "17c8948d-d2fc-43e4-95cd-0698524a8f77",
           text: "foo",
           expiresAt: currentTime,
         },
         {
+          id: "da947d28-8ea2-41d1-84eb-495e7e79de18",
           text: "bar",
           expiresAt: currentTime,
         },
       ]);
       expect(mockedResponse.getHeader("set-cookie")).toBe(
-        `alert-messages=%5B%7B%22text%22%3A%22foo%22%2C%22expiresAt%22%3A${currentTime}%7D%2C%7B%22text%22%3A%22bar%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
+        `alert-messages=%5B%7B%22id%22%3A%2217c8948d-d2fc-43e4-95cd-0698524a8f77%22%2C%22text%22%3A%22foo%22%2C%22expiresAt%22%3A${currentTime}%7D%2C%7B%22id%22%3A%22da947d28-8ea2-41d1-84eb-495e7e79de18%22%2C%22text%22%3A%22bar%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
       );
     });
   });
@@ -217,6 +220,7 @@ describe("Server side cookies", () => {
 
       setAlertMessagesCookie(mockedResponse, [
         {
+          id: "25c8c95c-0b7c-4b30-8d1e-e93e450dea32",
           text: "foo",
           expiresAt: currentTime,
         },
