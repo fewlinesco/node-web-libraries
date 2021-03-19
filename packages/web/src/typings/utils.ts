@@ -12,6 +12,7 @@ type GetServerSideCookiesParams = {
 };
 
 type AlertMessage = {
+  id: string;
   text: string;
   expiresAt: number;
 };

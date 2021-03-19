@@ -598,7 +598,7 @@ await deleteServerSideCookie(response, "cookie-name");
 
 Used to set a cookie on the server side.
 
-Alert message data structure: `{text: string, expiresAt: number}`.
+Alert message data structure: `{id: string, text: string, expiresAt: number}`.
 
 This function requires as input:
 
@@ -606,7 +606,11 @@ This function requires as input:
 - A **list** of alert messages — even you only want to set a single alert message.
 
 ```ts
-const alertMessage = { text: "foo", expiresAt: Date.now() + 300000 };
+const alertMessage = {
+  id: "e308b694-7fc1-49dd-9a6e-0cf1d0fcc00c",
+  text: "foo",
+  expiresAt: Date.now() + 300000,
+};
 
 setAlertMessagesCookie(response, [alertMessage]);
 ```
@@ -619,5 +623,5 @@ const serializedAlertMessages = await getServerSideCookies(request, {
   cookieName: "alert-messages",
 });
 
-JSON.parse(serializedAlertMessages); // { text: "foo", expiresAt: 1614939460723 }
+JSON.parse(serializedAlertMessages); // { id: "e308b694-7fc1-49dd-9a6e-0cf1d0fcc00c", text: "foo", expiresAt: 1614939460723 }
 ```
