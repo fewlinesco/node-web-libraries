@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2021-03-29
+
+- Fixed CLI exit code in case of an exception raised.
+
 ## [0.1.2] - 2021-02-09
 
 - Bump `fwl/database` to bump OpenTelemetry Tracing
