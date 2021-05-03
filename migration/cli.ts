@@ -162,7 +162,7 @@ const dryRunCommand = {
   },
 };
 
-export async function runCLI(args: string[]): Promise<void> {
+async function runCLI(args: string[]): Promise<void> {
   await yargs
     .command(migrateCommand)
     .command(createCommand)
@@ -171,3 +171,5 @@ export async function runCLI(args: string[]): Promise<void> {
     .help("help")
     .parse(args);
 }
+
+export { runCLI };
