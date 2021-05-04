@@ -266,6 +266,52 @@ describe("runCLI", () => {
         expect(spyMigrate).toHaveBeenCalled();
         done();
       });
+
+      it("should work both with absolute or relative path", async (done) => {
+        expect.assertions(2);
+
+        const spyDryRun = jest
+          .spyOn(migration, "runMigrations")
+          .mockImplementation((config: RunMigrationsConfig) => {
+            expect(config.database).toEqual({
+              database: "database",
+              host: "host",
+              password: "password",
+              port: 7777,
+              username: "user",
+              ssl: {
+                rejectUnauthorized: false,
+                ca: "fake-postgresql.key",
+                key: "fake-postgresql.key",
+              },
+            });
+
+            return Promise.resolve();
+          });
+
+        try {
+          await runCLI([
+            "migrate",
+            "--databaseURL",
+            "postgres://user:password@host:7777/database",
+            "--sslCaPath",
+            "./test/ssl-certs/fake-postgresql.key",
+            "--sslKeyPath",
+            `${path.join(
+              process.cwd(),
+              "./test/ssl-certs/fake-postgresql.key",
+            )}`,
+          ]);
+        } catch (error) {
+          fail(error);
+        }
+
+        // Don't remove, this is a mysterious magic trick without it, tests do not pass
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        expect(spyDryRun).toHaveBeenCalled();
+        done();
+      });
     });
 
     it("can override the migrations table with the right option", async (done) => {
@@ -544,6 +590,52 @@ describe("runCLI", () => {
             "./test/ssl-certs/fake-postgresql.key",
             "--sslCertPath",
             "./test/ssl-certs/fake-postgresql.crt",
+          ]);
+        } catch (error) {
+          fail(error);
+        }
+
+        // Don't remove, this is a mysterious magic trick without it, tests do not pass
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        expect(spyDryRun).toHaveBeenCalled();
+        done();
+      });
+
+      it("should work both with absolute or relative path", async (done) => {
+        expect.assertions(2);
+
+        const spyDryRun = jest
+          .spyOn(migration, "dryRunPendingMigrations")
+          .mockImplementation((config: RunMigrationsConfig) => {
+            expect(config.database).toEqual({
+              database: "database",
+              host: "host",
+              password: "password",
+              port: 7777,
+              username: "user",
+              ssl: {
+                rejectUnauthorized: false,
+                ca: "fake-postgresql.key",
+                key: "fake-postgresql.key",
+              },
+            });
+
+            return Promise.resolve();
+          });
+
+        try {
+          await runCLI([
+            "dryRun",
+            "--databaseURL",
+            "postgres://user:password@host:7777/database",
+            "--sslCaPath",
+            "./test/ssl-certs/fake-postgresql.key",
+            "--sslKeyPath",
+            `${path.join(
+              process.cwd(),
+              "./test/ssl-certs/fake-postgresql.key",
+            )}`,
           ]);
         } catch (error) {
           fail(error);
