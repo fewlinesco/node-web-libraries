@@ -60,17 +60,17 @@ const migrateCommand = {
       })
       .option("sslCaPath", {
         describe:
-          "Should be the file path relative to the execution path. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Can be the relative or the absolute path to the file. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslKeyPath", {
         describe:
-          "Should be the file path relative to the execution path. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Can be the relative or the absolute path to the file. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslCertPath", {
         describe:
-          "Should be the file path relative to the execution path. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Can be the relative or the absolute path to the file. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("migrationsPath", {
@@ -108,9 +108,11 @@ const migrateCommand = {
       argv.sslCaPath &&
       typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl.ca = fs
-        .readFileSync(path.join(process.cwd(), argv.sslCaPath))
-        .toString();
+      const targetedFile = path.isAbsolute(argv.sslCaPath)
+        ? argv.sslCaPath
+        : path.join(process.cwd(), argv.sslCaPath);
+
+      overrides.database.ssl.ca = fs.readFileSync(targetedFile).toString();
     }
 
     if (
@@ -118,9 +120,11 @@ const migrateCommand = {
       argv.sslKeyPath &&
       typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl.key = fs
-        .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
-        .toString();
+      const targetedFile = path.isAbsolute(argv.sslKeyPath)
+        ? argv.sslKeyPath
+        : path.join(process.cwd(), argv.sslKeyPath);
+
+      overrides.database.ssl.key = fs.readFileSync(targetedFile).toString();
     }
 
     if (
@@ -128,9 +132,11 @@ const migrateCommand = {
       argv.sslCertPath &&
       typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl.cert = fs
-        .readFileSync(path.join(process.cwd(), argv.sslCertPath))
-        .toString();
+      const targetedFile = path.isAbsolute(argv.sslCertPath)
+        ? argv.sslCertPath
+        : path.join(process.cwd(), argv.sslCertPath);
+
+      overrides.database.ssl.cert = fs.readFileSync(targetedFile).toString();
     }
 
     return _loadConfig(argv.configPath, overrides)
@@ -193,17 +199,17 @@ const dryRunCommand = {
       })
       .option("sslCaPath", {
         describe:
-          "Should be the file path relative to the execution path. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Can be the relative or the absolute path to the file. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslKeyPath", {
         describe:
-          "Should be the file path relative to the execution path. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Can be the relative or the absolute path to the file. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslCertPath", {
         describe:
-          "Should be the file path relative to the execution path. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Can be the relative or the absolute path to the file. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("migrationsPath", {
@@ -241,9 +247,11 @@ const dryRunCommand = {
       argv.sslCaPath &&
       typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl.ca = fs
-        .readFileSync(path.join(process.cwd(), argv.sslCaPath))
-        .toString();
+      const targetedFile = path.isAbsolute(argv.sslCaPath)
+        ? argv.sslCaPath
+        : path.join(process.cwd(), argv.sslCaPath);
+
+      overrides.database.ssl.ca = fs.readFileSync(targetedFile).toString();
     }
 
     if (
@@ -251,9 +259,11 @@ const dryRunCommand = {
       argv.sslKeyPath &&
       typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl.key = fs
-        .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
-        .toString();
+      const targetedFile = path.isAbsolute(argv.sslKeyPath)
+        ? argv.sslKeyPath
+        : path.join(process.cwd(), argv.sslKeyPath);
+
+      overrides.database.ssl.key = fs.readFileSync(targetedFile).toString();
     }
 
     if (
@@ -261,9 +271,11 @@ const dryRunCommand = {
       argv.sslCertPath &&
       typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl.cert = fs
-        .readFileSync(path.join(process.cwd(), argv.sslCertPath))
-        .toString();
+      const targetedFile = path.isAbsolute(argv.sslCertPath)
+        ? argv.sslCertPath
+        : path.join(process.cwd(), argv.sslCertPath);
+
+      overrides.database.ssl.cert = fs.readFileSync(targetedFile).toString();
     }
 
     return _loadConfig(argv.configPath, overrides)

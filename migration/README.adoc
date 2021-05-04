@@ -67,13 +67,13 @@ Run the database migration process. The following options can be passed to this 
 | Override the database configuration, should be a valid PostgreSQL URL (setting this will override the configuration file).
 
 | sslCaPath
-| Should be the file path relative to the execution path. Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
+| Can be the relative or the absolute path to the file. Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
 
 | sslKeyPath
-| Should be the file path relative to the execution path. Add the SSL Key to the config object, and set `rejectUnauthorized` to false.
+| Can be the relative or the absolute path to the file. Add the SSL Key to the config object, and set `rejectUnauthorized` to false.
 
 | sslCertPath
-| Should be the file path relative to the execution path. Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
+| Can be the relative or the absolute path to the file. Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
 
 | migrationsPath
 | Override the path to the migrations SQL files (setting this will override the configuration file).
@@ -96,13 +96,13 @@ Run the migration process and rolls it back right away. The following options ca
 | Override the database configuration, should be a valid PostgreSQL URL (setting this will override the configuration file).
 
 | sslCaPath
-| Should be the file path relative to the execution path. Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
+| Can be the relative or the absolute path to the file. Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
 
 | sslKeyPath
-| Should be the file path relative to the execution path. Add the SSL Key to the config object, and set `rejectUnauthorized` to false.
+| Can be the relative or the absolute path to the file. Add the SSL Key to the config object, and set `rejectUnauthorized` to false.
 
 | sslCertPath
-| Should be the file path relative to the execution path. Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
+| Can be the relative or the absolute path to the file. Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
 
 | migrationsPath
 | Override the path to the migrations SQL files (setting this will override the configuration file).
