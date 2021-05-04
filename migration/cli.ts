@@ -1,5 +1,6 @@
 import { DatabaseConfig } from "@fwl/database";
 import * as fs from "fs";
+import * as path from "path";
 import * as yargs from "yargs";
 
 import { RunMigrationsConfig, defaultMigrationConfig } from "./config/config";
@@ -59,17 +60,17 @@ const migrateCommand = {
       })
       .option("sslCaPath", {
         describe:
-          "Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Should be the file path relative to the execution path. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslKeyPath", {
         describe:
-          "Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Should be the file path relative to the execution path. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslCertPath", {
         describe:
-          "Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Should be the file path relative to the execution path. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("migrationsPath", {
@@ -93,6 +94,7 @@ const migrateCommand = {
         tableName: argv.migrationsTable,
       },
     };
+    const dirPath = path.join(process.cwd(), argv.sslCaPath);
 
     if (
       overrides.database &&
@@ -102,7 +104,9 @@ const migrateCommand = {
       overrides.database.ssl = {
         ...overrides.database.ssl,
         rejectUnauthorized: false,
-        ca: fs.readFileSync(argv.sslCaPath).toString(),
+        ca: fs
+          .readFileSync(path.join(process.cwd(), argv.sslCaPath))
+          .toString(),
       };
     }
 
@@ -114,7 +118,9 @@ const migrateCommand = {
       overrides.database.ssl = {
         ...overrides.database.ssl,
         rejectUnauthorized: false,
-        key: fs.readFileSync(argv.sslKeyPath).toString(),
+        key: fs
+          .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
+          .toString(),
       };
     }
 
@@ -126,7 +132,9 @@ const migrateCommand = {
       overrides.database.ssl = {
         ...overrides.database.ssl,
         rejectUnauthorized: false,
-        cert: fs.readFileSync(argv.sslCertPath).toString(),
+        cert: fs
+          .readFileSync(path.join(process.cwd(), argv.sslCertPath))
+          .toString(),
       };
     }
 
@@ -190,17 +198,17 @@ const dryRunCommand = {
       })
       .option("sslCaPath", {
         describe:
-          "Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Should be the file path relative to the execution path. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslKeyPath", {
         describe:
-          "Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Should be the file path relative to the execution path. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("sslCertPath", {
         describe:
-          "Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+          "Should be the file path relative to the execution path. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("migrationsPath", {
@@ -233,7 +241,9 @@ const dryRunCommand = {
       overrides.database.ssl = {
         ...overrides.database.ssl,
         rejectUnauthorized: false,
-        ca: fs.readFileSync(argv.sslCaPath).toString(),
+        ca: fs
+          .readFileSync(path.join(process.cwd(), argv.sslCaPath))
+          .toString(),
       };
     }
 
@@ -245,7 +255,9 @@ const dryRunCommand = {
       overrides.database.ssl = {
         ...overrides.database.ssl,
         rejectUnauthorized: false,
-        key: fs.readFileSync(argv.sslKeyPath).toString(),
+        key: fs
+          .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
+          .toString(),
       };
     }
 
@@ -257,7 +269,9 @@ const dryRunCommand = {
       overrides.database.ssl = {
         ...overrides.database.ssl,
         rejectUnauthorized: false,
-        cert: fs.readFileSync(argv.sslCertPath).toString(),
+        cert: fs
+          .readFileSync(path.join(process.cwd(), argv.sslCertPath))
+          .toString(),
       };
     }
 
