@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
   - `sslCaPath`
   - `sslKeyPath`
   - `sslCertPath`
+- Updated the documentation
 - Bumped dependencies
 
 ```sh

@@ -3,7 +3,6 @@ import { DatabaseConfig } from "@fwl/database";
 interface MigrateConfig {
   dirPath: string;
   tableName?: string;
-  sslCertificate?: any;
 }
 
 interface RunMigrationsConfig {

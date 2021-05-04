@@ -1,4 +1,5 @@
-# FWL Migration
+= FWL Migration
+:toc: preamble
 
 **Disclaimer**: this package is made for our internal usage and is only open source for convenience so we might not consider Pull Requests or Issues. Feel free to fork though.
 
@@ -6,23 +7,25 @@ This is part of the Fewlines Web Libraries packages.
 
 It provides a migration tool using SQL files.
 
-## Installation
+== Installation
 
-```shell
+[source, shell]
+----
 yarn add @fwl/migration
-```
+----
 
-## Usage
+== Usage
 
 `migration` is a database migration library written in TypeScript, which can be used as a **CLI** or imported as a npm **package**.
 
 It will look into the migrations folder and execute each SQL queries, in the correct order. If one of the transaction fails, `migration` will keep track of the last successful query through a `migration_schemas` table, so you can safely rerun the migration process.
 
-### `config.json`
+=== As a CLI
 
-To run `migration` as a cli, you can create a `config.json` with the following data structure:
+To run `migration` as a CLI, you can create a `config.json` with the following data structure:
 
-```ts
+[source, typescript]
+----
 {
   "database": {
     "database": string;
@@ -30,20 +33,30 @@ To run `migration` as a cli, you can create a `config.json` with the following d
     "username": string;
     "host": string;
     "port": number;
+    "ssl"?: boolean | {
+      rejectUnauthorized: boolean,
+      ca?: string;
+      key?: string;
+      cert?: string;
+    }
   },
   "migration": {
     "dirPath": string;
+    "tableName"?: string
   }
 }
-```
+----
 
-### CLI
+If you don't, the default config object will be used. The default config values can be override with various flags, listed in the following section.
 
-To use `migration` as a CLI, simply run one of those command, depending on your needs:
+You can then simply run one of those command, depending on your needs:
 
 - `migration migrate`: run the migration process. The following options can be passed to this command:
   - `configPath`: override the path to the configuration file (default: "./config.json").
-  - `databaseURL`: override the database configuration, should be a valid postgres URL (stronger than the configuration file).
+  - `databaseURL`: override the database configuration, should be a valid PostgreSQL URL (stronger than the configuration file).
+  - `sslCaPath`: add the SSL CA to the config object, and set 'rejectUnauthorized' to false.
+  - `sslKeyPath`: add the SSL Key to the config object, and set 'rejectUnauthorized' to false.
+  - `sslCertPath`: add the SSL Cert to the config object, and set 'rejectUnauthorized' to false.
   - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
   - `migrationsTable`: override the table name in which ran migrations are registered (stronger than the configuration file).
 - `migration dryRun path/to/config.json`: run the migration process and rolls it back right away. The following options can be passed to this command:
@@ -55,15 +68,16 @@ To use `migration` as a CLI, simply run one of those command, depending on your 
   - `configPath`: override the path to the configuration file (default: "./config.json").
   - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
 
-### Package
+=== As a Package
 
 If you need more customization and control over the migration process, you can implement your own logic by importing the package, which give you access to two functions.
 
-#### runMigrations
+==== runMigrations
 
-You will have to give a config of `runMigrationsConfig` type as argument but you can also use default settings by using the provided `defaultConfig` for the migrations folder and the database config:
+You can give a config of `runMigrationsConfig` type as argument, or use the default settings by using the provided `defaultConfig` for the migrations folder and the database config:
 
-```ts
+[source, typescript]
+----
 import * as migration from "@fwl/migration";
 import { defaultConfig as databaseDefaultConfig } from "@fwl/database";
 
@@ -71,16 +85,40 @@ migration.runMigrations({
   database: databaseDefaultConfig,
   migration: migration.defaultConfig,
 });
-```
+----
 
-#### createMigrationFile
+==== createMigrationFile
 
 The `createMigrationFile` takes the name of the file as an argument:
 
-```ts
+[source, typescript]
+----
 import * as migration from "@fwl/migration";
 
 migration.createMigrationFile("name_of_the_file");
-```
+----
 
 You can also use it through a custom npm script, and use the corresponding `process.argv` value as arguments.
+
+[source, typescript]
+----
+import * as migration from "@fwl/migration";
+import path from "path";
+
+function createMigrationFile(): void {
+  const [, , ...args] = process.argv;
+  const dirPath = path.resolve("path/");
+
+  if (args.length > 0) {
+    if (args.length === 1) {
+      migration.createMigrationFile(args[0], dirPath);
+    } else {
+      throw new Error("Provide only one file name at a time.");
+    }
+  } else {
+    throw new Error("Provide the name_of_the_file.");
+  }
+}
+
+createMigrationFile();
+----

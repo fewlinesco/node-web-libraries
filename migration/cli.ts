@@ -48,36 +48,38 @@ const migrateCommand = {
     yargs
       .option("configPath", {
         default: "./config.json",
-        describe: "Override the path to the config file",
+        describe:
+          "Override the path to the config file (default: './config.json')",
         type: "string",
       })
       .option("databaseURL", {
         describe:
-          "Override the URL to the database, has a stronger priority than the config file",
-        type: "string",
-      })
-      .option("migrationsPath", {
-        describe:
-          "Override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
-        type: "string",
-      })
-      .option("migrationsTable", {
-        describe: "Override the configured table hosting the migrations",
+          "Override the URL to the database (stronger priority than the config file)",
         type: "string",
       })
       .option("sslCaPath", {
         describe:
-          "Add the SSL CA to the config object, and set 'rejectUnauthorized' to false",
+          "Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file)",
         type: "string",
       })
       .option("sslKeyPath", {
         describe:
-          "Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false",
+          "Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file)",
         type: "string",
       })
       .option("sslCertPath", {
         describe:
-          "Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false",
+          "Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file)",
+        type: "string",
+      })
+      .option("migrationsPath", {
+        describe:
+          "Override the configured path for the folder where migrations files are stored. If no configuration is provided migrations will be written in './migrations'",
+        type: "string",
+      })
+      .option("migrationsTable", {
+        describe:
+          "Override the configured table hosting the migrations (stronger priority than the config file)",
         type: "string",
       })
       .strict(),
