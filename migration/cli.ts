@@ -1,4 +1,5 @@
 import { DatabaseConfig } from "@fwl/database";
+import * as fs from "fs";
 import * as yargs from "yargs";
 
 import { RunMigrationsConfig, defaultMigrationConfig } from "./config/config";
@@ -47,21 +48,36 @@ const migrateCommand = {
     yargs
       .option("configPath", {
         default: "./config.json",
-        describe: "override the path to the config file",
+        describe: "Override the path to the config file",
         type: "string",
       })
       .option("databaseURL", {
         describe:
-          "override the URL to the database, has a stronger priority than the config file",
+          "Override the URL to the database, has a stronger priority than the config file",
         type: "string",
       })
       .option("migrationsPath", {
         describe:
-          "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
+          "Override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
         type: "string",
       })
       .option("migrationsTable", {
-        describe: "override the configured table hosting the migrations",
+        describe: "Override the configured table hosting the migrations",
+        type: "string",
+      })
+      .option("sslCaPath", {
+        describe:
+          "Add the SSL CA to the config object, and set 'rejectUnauthorized' to false",
+        type: "string",
+      })
+      .option("sslKeyPath", {
+        describe:
+          "Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false",
+        type: "string",
+      })
+      .option("sslCertPath", {
+        describe:
+          "Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false",
         type: "string",
       })
       .strict(),
@@ -75,6 +91,42 @@ const migrateCommand = {
         tableName: argv.migrationsTable,
       },
     };
+
+    if (
+      overrides.database &&
+      argv.sslCaPath &&
+      typeof overrides.database.ssl === "object"
+    ) {
+      overrides.database.ssl = {
+        ...overrides.database.ssl,
+        rejectUnauthorized: false,
+        ca: fs.readFileSync(argv.sslCaPath).toString(),
+      };
+    }
+
+    if (
+      overrides.database &&
+      argv.sslKeyPath &&
+      typeof overrides.database.ssl === "object"
+    ) {
+      overrides.database.ssl = {
+        ...overrides.database.ssl,
+        rejectUnauthorized: false,
+        key: fs.readFileSync(argv.sslKeyPath).toString(),
+      };
+    }
+
+    if (
+      overrides.database &&
+      argv.sslCertPath &&
+      typeof overrides.database.ssl === "object"
+    ) {
+      overrides.database.ssl = {
+        ...overrides.database.ssl,
+        rejectUnauthorized: false,
+        cert: fs.readFileSync(argv.sslCertPath).toString(),
+      };
+    }
 
     return _loadConfig(argv.configPath, overrides)
       .then((config) => {

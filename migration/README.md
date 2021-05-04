@@ -14,13 +14,13 @@ yarn add @fwl/migration
 
 ## Usage
 
-`migration` is a database migrations written in TypeScript which can be used as a **CLI** of imported as a **package**.
+`migration` is a database migration library written in TypeScript, which can be used as a **CLI** or imported as a npm **package**.
 
 It will look into the migrations folder and execute each SQL queries, in the correct order. If one of the transaction fails, `migration` will keep track of the last successful query through a `migration_schemas` table, so you can safely rerun the migration process.
 
 ### `config.json`
 
-To run `migration` as a cli, you need to create a `config.json` with the following data structure:
+To run `migration` as a cli, you can create a `config.json` with the following data structure:
 
 ```ts
 {
