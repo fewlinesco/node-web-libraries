@@ -20,7 +20,7 @@ Provides an interface for a simple logger.
 
 Provides a migration tool using SQL files and a CLI.
 
-[Migration documentation](./migration/README.md)
+[Migration documentation](./migration/README.adoc)
 
 ## Tracing
 

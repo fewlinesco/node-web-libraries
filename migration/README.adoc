@@ -95,6 +95,15 @@ Run the migration process and rolls it back right away. The following options ca
 | databaseURL
 | Override the database configuration, should be a valid PostgreSQL URL (stronger than the configuration file).
 
+| sslCaPath
+| Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
+
+| sslKeyPath
+| Add the SSL Key to the config object, and set `rejectUnauthorized` to false.
+
+| sslCertPath
+| Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
+
 | migrationsPath
 | Override the path to the migrations SQL files (stronger than the configuration file).
 
