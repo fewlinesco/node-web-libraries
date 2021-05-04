@@ -22,6 +22,8 @@ It will look into the migrations folder and execute each SQL queries, in the cor
 
 === As a CLI
 
+==== Config object
+
 To run `migration` as a CLI, you can create a `config.json` with the following data structure:
 
 [source, typescript]
@@ -51,28 +53,74 @@ If you don't, the default config object will be used. The default config values 
 
 You can then simply run one of those command, depending on your needs:
 
-- `migration migrate`: run the migration process. The following options can be passed to this command:
-  - `configPath`: override the path to the configuration file (default: "./config.json").
-  - `databaseURL`: override the database configuration, should be a valid PostgreSQL URL (stronger than the configuration file).
-  - `sslCaPath`: add the SSL CA to the config object, and set 'rejectUnauthorized' to false.
-  - `sslKeyPath`: add the SSL Key to the config object, and set 'rejectUnauthorized' to false.
-  - `sslCertPath`: add the SSL Cert to the config object, and set 'rejectUnauthorized' to false.
-  - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
-  - `migrationsTable`: override the table name in which ran migrations are registered (stronger than the configuration file).
-- `migration dryRun path/to/config.json`: run the migration process and rolls it back right away. The following options can be passed to this command:
-  - `configPath`: override the path to the configuration file (default: "./config.json").
-  - `databaseURL`: override the database configuration, should be a valid postgres URL (stronger than the configuration file).
-  - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
-  - `migrationsTable`: override the table name in which ran migrations are registered, (stronger than the configuration file).
-- `migration create name_of_the_file`: create a timestamped migration file in the path set up in `config.json`. The following options can be passed to this command:
-  - `configPath`: override the path to the configuration file (default: "./config.json").
-  - `migrationsPath`: override the path to the migrations SQL files (stronger than the configuration file).
+==== `migration migrate`
+
+Run the database migration process. The following options can be passed to this command:
+
+|===
+| Flag name | Description
+
+| configPath
+| Override the path to the configuration file (default: "./config.json").
+
+| databaseURL
+| Override the database configuration, should be a valid PostgreSQL URL (stronger than the configuration file).
+
+| sslCaPath
+| Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
+
+| sslKeyPath
+| Add the SSL Key to the config object, and set `rejectUnauthorized` to false.
+
+| sslCertPath
+| Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
+
+| migrationsPath
+| Override the path to the migrations SQL files (stronger than the configuration file).
+
+| migrationsTable
+| Override the table name in which ran migrations are registered (stronger than the configuration file).
+|===
+
+==== `migration dryRun`
+
+Run the migration process and rolls it back right away. The following options can be passed to this command:
+
+|===
+| Flag name | Description
+
+| configPath
+| Override the path to the configuration file (default: "./config.json").
+
+| databaseURL
+| Override the database configuration, should be a valid PostgreSQL URL (stronger than the configuration file).
+
+| migrationsPath
+| Override the path to the migrations SQL files (stronger than the configuration file).
+
+| migrationsTable
+| Override the table name in which ran migrations are registered, (stronger than the configuration file).
+|===
+
+==== migration create name_of_the_file`
+
+Create a timestamped migration file in the path set up in `config.json`. The following options can be passed to this command:
+
+|===
+| Flag name | Description
+
+| configPath
+| Override the path to the configuration file (default: "./config.json").
+
+| migrationsPath
+| Override the path to the migrations SQL files (stronger than the configuration file).
+|===
 
 === As a Package
 
 If you need more customization and control over the migration process, you can implement your own logic by importing the package, which give you access to two functions.
 
-==== runMigrations
+==== `runMigrations`
 
 You can give a config of `runMigrationsConfig` type as argument, or use the default settings by using the provided `defaultConfig` for the migrations folder and the database config:
 
@@ -87,7 +135,7 @@ migration.runMigrations({
 });
 ----
 
-==== createMigrationFile
+==== `createMigrationFile`
 
 The `createMigrationFile` takes the name of the file as an argument:
 
