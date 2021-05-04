@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2021-05-04
+
+- Added three new flags to the CLI to pass SSL certificate alongside the DB call for `migrate` and `dryRun`:
+  - `sslCaPath`
+  - `sslKeyPath`
+  - `sslCertPath`
+- Updated the documentation
+- Bumped dependencies
+
+```sh
+  @types/node                       dev    ~3mo  14.14.25  →   15.0.1   ~6d
+  eslint-config-prettier            dev    ~3mo     7.2.0  →    8.3.0   ~9d
+  yargs                             dev    ~5mo    16.2.0  →   17.0.0   ⩽1d
+  @typescript-eslint/eslint-plugin  dev    ~3mo    4.15.0  →   4.22.0  ~21d
+  @typescript-eslint/parser         dev    ~3mo    4.15.0  →   4.22.0  ~21d
+  eslint                            dev    ~3mo    7.19.0  →   7.25.0   ~9d
+  eslint-plugin-prettier            dev    ~4mo     3.3.1  →    3.4.0  ~18d
+  typescript                        dev    ~5mo     4.1.3  →    4.2.4  ~26d
+  @fewlines/eslint-config           dev    ~3mo     3.1.0  →    3.1.2  ~2mo
+  @types/jest                       dev    ~4mo   26.0.20  →  26.0.23   ~7d
+  @types/pg                         dev    ~3mo    7.14.9  →  7.14.11  ~2mo
+  ts-jest                           dev    ~3mo    26.5.1  →   26.5.5  ~18d
+```
+
 ## [0.1.3] - 2021-03-29
 
 - Fixed CLI exit code in case of an exception raised.

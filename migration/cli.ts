@@ -1,4 +1,6 @@
 import { DatabaseConfig } from "@fwl/database";
+import * as fs from "fs";
+import * as path from "path";
 import * as yargs from "yargs";
 
 import { RunMigrationsConfig, defaultMigrationConfig } from "./config/config";
@@ -42,26 +44,43 @@ function _loadConfig(
 
 const migrateCommand = {
   command: "migrate",
-  desc: "run the migration process.",
+  desc: "Run the migration process.",
   builder: (yargs) =>
     yargs
       .option("configPath", {
         default: "./config.json",
-        describe: "override the path to the config file",
+        describe:
+          "Override the path to the config file (default: './config.json').",
         type: "string",
       })
       .option("databaseURL", {
         describe:
-          "override the URL to the database, has a stronger priority than the config file",
+          "Override the URL to the database (stronger priority than the config file).",
+        type: "string",
+      })
+      .option("sslCaPath", {
+        describe:
+          "Can be the relative or the absolute path to the file. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+        type: "string",
+      })
+      .option("sslKeyPath", {
+        describe:
+          "Can be the relative or the absolute path to the file. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+        type: "string",
+      })
+      .option("sslCertPath", {
+        describe:
+          "Can be the relative or the absolute path to the file. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("migrationsPath", {
         describe:
-          "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
+          "Override the configured path for the folder where migrations files are stored. If no configuration is provided migrations will be written in './migrations'.",
         type: "string",
       })
       .option("migrationsTable", {
-        describe: "override the configured table hosting the migrations",
+        describe:
+          "Override the configured table hosting the migrations (stronger priority than the config file).",
         type: "string",
       })
       .strict(),
@@ -75,6 +94,50 @@ const migrateCommand = {
         tableName: argv.migrationsTable,
       },
     };
+
+    if (
+      overrides.database &&
+      (argv.sslCaPath || argv.sslKeyPath || argv.sslCertPath) &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      overrides.database.ssl = { rejectUnauthorized: false };
+    }
+
+    if (
+      overrides.database &&
+      argv.sslCaPath &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      const targetedFile = path.isAbsolute(argv.sslCaPath)
+        ? argv.sslCaPath
+        : path.join(process.cwd(), argv.sslCaPath);
+
+      overrides.database.ssl.ca = fs.readFileSync(targetedFile).toString();
+    }
+
+    if (
+      overrides.database &&
+      argv.sslKeyPath &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      const targetedFile = path.isAbsolute(argv.sslKeyPath)
+        ? argv.sslKeyPath
+        : path.join(process.cwd(), argv.sslKeyPath);
+
+      overrides.database.ssl.key = fs.readFileSync(targetedFile).toString();
+    }
+
+    if (
+      overrides.database &&
+      argv.sslCertPath &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      const targetedFile = path.isAbsolute(argv.sslCertPath)
+        ? argv.sslCertPath
+        : path.join(process.cwd(), argv.sslCertPath);
+
+      overrides.database.ssl.cert = fs.readFileSync(targetedFile).toString();
+    }
 
     return _loadConfig(argv.configPath, overrides)
       .then((config) => {
@@ -91,17 +154,17 @@ const migrateCommand = {
 const createCommand = {
   command: "create [name]",
   desc:
-    "create a timestamped migration file in the path set up in config.json.",
+    "Create a timestamped migration file in the path set up in config.json.",
   builder: (yargs) =>
     yargs
       .option("configPath", {
         default: "./config.json",
-        describe: "override the path to the config file",
+        describe: "Override the path to the config file.",
         type: "string",
       })
       .option("migrationsPath", {
         describe:
-          "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
+          "Override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'.",
         type: "string",
       })
       .strict(),
@@ -125,21 +188,38 @@ const dryRunCommand = {
     yargs
       .option("configPath", {
         default: "./config.json",
-        describe: "override the path to the config file",
+        describe:
+          "Override the path to the config file (default: './config.json').",
         type: "string",
       })
       .option("databaseURL", {
         describe:
-          "override the URL to the database, has a stronger priority than the config file",
+          "Override the URL to the database (stronger priority than the config file).",
+        type: "string",
+      })
+      .option("sslCaPath", {
+        describe:
+          "Can be the relative or the absolute path to the file. Add the SSL CA to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+        type: "string",
+      })
+      .option("sslKeyPath", {
+        describe:
+          "Can be the relative or the absolute path to the file. Add the SSL KEY to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
+        type: "string",
+      })
+      .option("sslCertPath", {
+        describe:
+          "Can be the relative or the absolute path to the file. Add the SSL CERT to the config object, and set 'rejectUnauthorized' to false (stronger priority than the config file).",
         type: "string",
       })
       .option("migrationsPath", {
         describe:
-          "override the configured path for the folder where migrations files are stored, if no configuration is provided migrations will be written in './migrations'",
+          "Override the configured path for the folder where migrations files are stored. If no configuration is provided migrations will be written in './migrations'.",
         type: "string",
       })
       .option("migrationsTable", {
-        describe: "override the configured table hosting the migrations",
+        describe:
+          "Override the configured table hosting the migrations (stronger priority than the config file).",
         type: "string",
       })
       .strict(),
@@ -153,6 +233,51 @@ const dryRunCommand = {
         tableName: argv.migrationsTable,
       },
     };
+
+    if (
+      overrides.database &&
+      (argv.sslCaPath || argv.sslKeyPath || argv.sslCertPath) &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      overrides.database.ssl = { rejectUnauthorized: false };
+    }
+
+    if (
+      overrides.database &&
+      argv.sslCaPath &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      const targetedFile = path.isAbsolute(argv.sslCaPath)
+        ? argv.sslCaPath
+        : path.join(process.cwd(), argv.sslCaPath);
+
+      overrides.database.ssl.ca = fs.readFileSync(targetedFile).toString();
+    }
+
+    if (
+      overrides.database &&
+      argv.sslKeyPath &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      const targetedFile = path.isAbsolute(argv.sslKeyPath)
+        ? argv.sslKeyPath
+        : path.join(process.cwd(), argv.sslKeyPath);
+
+      overrides.database.ssl.key = fs.readFileSync(targetedFile).toString();
+    }
+
+    if (
+      overrides.database &&
+      argv.sslCertPath &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      const targetedFile = path.isAbsolute(argv.sslCertPath)
+        ? argv.sslCertPath
+        : path.join(process.cwd(), argv.sslCertPath);
+
+      overrides.database.ssl.cert = fs.readFileSync(targetedFile).toString();
+    }
+
     return _loadConfig(argv.configPath, overrides)
       .then((config) => dryRunPendingMigrations(config))
       .then(() => {
@@ -162,7 +287,7 @@ const dryRunCommand = {
   },
 };
 
-export async function runCLI(args: string[]): Promise<void> {
+async function runCLI(args: string[]): Promise<void> {
   await yargs
     .command(migrateCommand)
     .command(createCommand)
@@ -171,3 +296,5 @@ export async function runCLI(args: string[]): Promise<void> {
     .help("help")
     .parse(args);
 }
+
+export { runCLI };
