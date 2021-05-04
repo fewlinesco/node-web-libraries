@@ -49,7 +49,7 @@ To run `migration` as a CLI, you can create a `config.json` with the following d
 }
 ----
 
-If you don't, the default config object will be used. The default config values can be override with various flags, listed in the following section.
+If you don't, the default config object will be used. The default config values can be overridden with various flags, listed in the following section.
 
 You can then simply run one of those command, depending on your needs:
 
@@ -64,7 +64,7 @@ Run the database migration process. The following options can be passed to this 
 | Override the path to the configuration file (default: "./config.json").
 
 | databaseURL
-| Override the database configuration, should be a valid PostgreSQL URL (stronger than the configuration file).
+| Override the database configuration, should be a valid PostgreSQL URL (setting this will override the configuration file).
 
 | sslCaPath
 | Should be the file path relative to the execution path. Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
@@ -76,10 +76,10 @@ Run the database migration process. The following options can be passed to this 
 | Should be the file path relative to the execution path. Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
 
 | migrationsPath
-| Override the path to the migrations SQL files (stronger than the configuration file).
+| Override the path to the migrations SQL files (setting this will override the configuration file).
 
 | migrationsTable
-| Override the table name in which ran migrations are registered (stronger than the configuration file).
+| Override the table name in which ran migrations are registered (setting this will override the configuration file).
 |===
 
 ==== `migration dryRun`
@@ -93,7 +93,7 @@ Run the migration process and rolls it back right away. The following options ca
 | Override the path to the configuration file (default: "./config.json").
 
 | databaseURL
-| Override the database configuration, should be a valid PostgreSQL URL (stronger than the configuration file).
+| Override the database configuration, should be a valid PostgreSQL URL (setting this will override the configuration file).
 
 | sslCaPath
 | Should be the file path relative to the execution path. Add the SSL CA to the config object, and set `rejectUnauthorized` to false.
@@ -105,10 +105,10 @@ Run the migration process and rolls it back right away. The following options ca
 | Should be the file path relative to the execution path. Add the SSL Cert to the config object, and set `rejectUnauthorized` to false.
 
 | migrationsPath
-| Override the path to the migrations SQL files (stronger than the configuration file).
+| Override the path to the migrations SQL files (setting this will override the configuration file).
 
 | migrationsTable
-| Override the table name in which ran migrations are registered, (stronger than the configuration file).
+| Override the table name in which ran migrations are registered, (setting this will override the configuration file).
 |===
 
 ==== migration create name_of_the_file`
@@ -122,7 +122,7 @@ Create a timestamped migration file in the path set up in `config.json`. The fol
 | Override the path to the configuration file (default: "./config.json").
 
 | migrationsPath
-| Override the path to the migrations SQL files (stronger than the configuration file).
+| Override the path to the migrations SQL files (setting this will override the configuration file).
 |===
 
 === As a Package
