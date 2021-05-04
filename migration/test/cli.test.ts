@@ -69,6 +69,7 @@ describe("runCLI", () => {
 
     it("can override the database config with a database url passed as an option", async (done) => {
       expect.assertions(2);
+
       const spyMigrate = jest
         .spyOn(migration, "runMigrations")
         .mockImplementation((config: RunMigrationsConfig) => {
@@ -91,11 +92,174 @@ describe("runCLI", () => {
       } catch (error) {
         fail(error);
       }
+
       // Don't remove, this is a mysterious magic trick without it, tests do not pass
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       expect(spyMigrate).toHaveBeenCalled();
       done();
+    });
+
+    describe("SSL certificate", () => {
+      it("can override the database config with a SSL CA passed as an option, and a database URL is provided", async (done) => {
+        expect.assertions(2);
+
+        const spyMigrate = jest
+          .spyOn(migration, "runMigrations")
+          .mockImplementation((config: RunMigrationsConfig) => {
+            expect(config.database).toEqual({
+              database: "database",
+              host: "host",
+              password: "password",
+              port: 7777,
+              username: "user",
+              ssl: {
+                rejectUnauthorized: false,
+                ca: "fake-root.crt",
+              },
+            });
+
+            return Promise.resolve();
+          });
+        try {
+          await runCLI([
+            "migrate",
+            "--databaseURL",
+            "postgres://user:password@host:7777/database",
+            "--sslCaPath",
+            "./test/ssl-certs/fake-root.crt",
+          ]);
+        } catch (error) {
+          fail(error);
+        }
+
+        // Don't remove, this is a mysterious magic trick without it, tests do not pass
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        expect(spyMigrate).toHaveBeenCalled();
+        done();
+      });
+
+      it("can override the database config with a SSL Key passed as an option, and a database URL is provided", async (done) => {
+        expect.assertions(2);
+
+        const spyMigrate = jest
+          .spyOn(migration, "runMigrations")
+          .mockImplementation((config: RunMigrationsConfig) => {
+            expect(config.database).toEqual({
+              database: "database",
+              host: "host",
+              password: "password",
+              port: 7777,
+              username: "user",
+              ssl: {
+                rejectUnauthorized: false,
+                key: "fake-postgresql.key",
+              },
+            });
+
+            return Promise.resolve();
+          });
+        try {
+          await runCLI([
+            "migrate",
+            "--databaseURL",
+            "postgres://user:password@host:7777/database",
+            "--sslKeyPath",
+            "./test/ssl-certs/fake-postgresql.key",
+          ]);
+        } catch (error) {
+          fail(error);
+        }
+
+        // Don't remove, this is a mysterious magic trick without it, tests do not pass
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        expect(spyMigrate).toHaveBeenCalled();
+        done();
+      });
+      it("can override the database config with a SSL Cert passed as an option, and a database URL is provided", async (done) => {
+        expect.assertions(2);
+
+        const spyMigrate = jest
+          .spyOn(migration, "runMigrations")
+          .mockImplementation((config: RunMigrationsConfig) => {
+            expect(config.database).toEqual({
+              database: "database",
+              host: "host",
+              password: "password",
+              port: 7777,
+              username: "user",
+              ssl: {
+                rejectUnauthorized: false,
+                cert: "fake-postgresql.crt",
+              },
+            });
+
+            return Promise.resolve();
+          });
+        try {
+          await runCLI([
+            "migrate",
+            "--databaseURL",
+            "postgres://user:password@host:7777/database",
+            "--sslCertPath",
+            "./test/ssl-certs/fake-postgresql.crt",
+          ]);
+        } catch (error) {
+          fail(error);
+        }
+
+        // Don't remove, this is a mysterious magic trick without it, tests do not pass
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        expect(spyMigrate).toHaveBeenCalled();
+        done();
+      });
+
+      it("can takes multiple SSL flags", async (done) => {
+        expect.assertions(2);
+        const spyMigrate = jest
+          .spyOn(migration, "runMigrations")
+          .mockImplementation((config: RunMigrationsConfig) => {
+            expect(config.database).toEqual({
+              database: "database",
+              host: "host",
+              password: "password",
+              port: 7777,
+              username: "user",
+              ssl: {
+                rejectUnauthorized: false,
+                ca: "fake-postgresql.key",
+                key: "fake-postgresql.key",
+                cert: "fake-postgresql.crt",
+              },
+            });
+
+            return Promise.resolve();
+          });
+        try {
+          await runCLI([
+            "migrate",
+            "--databaseURL",
+            "postgres://user:password@host:7777/database",
+            "--sslCaPath",
+            "./test/ssl-certs/fake-postgresql.key",
+            "--sslKeyPath",
+            "./test/ssl-certs/fake-postgresql.key",
+            "--sslCertPath",
+            "./test/ssl-certs/fake-postgresql.crt",
+          ]);
+        } catch (error) {
+          fail(error);
+        }
+
+        // Don't remove, this is a mysterious magic trick without it, tests do not pass
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        expect(spyMigrate).toHaveBeenCalled();
+        done();
+      });
     });
 
     it("can override the migrations table with the right option", async (done) => {

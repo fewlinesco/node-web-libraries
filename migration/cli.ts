@@ -94,48 +94,43 @@ const migrateCommand = {
         tableName: argv.migrationsTable,
       },
     };
-    const dirPath = path.join(process.cwd(), argv.sslCaPath);
+
+    if (
+      overrides.database &&
+      (argv.sslCaPath || argv.sslKeyPath || argv.sslCertPath) &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      overrides.database.ssl = { rejectUnauthorized: false };
+    }
 
     if (
       overrides.database &&
       argv.sslCaPath &&
-      typeof overrides.database.ssl === "object"
+      typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl = {
-        ...overrides.database.ssl,
-        rejectUnauthorized: false,
-        ca: fs
-          .readFileSync(path.join(process.cwd(), argv.sslCaPath))
-          .toString(),
-      };
+      overrides.database.ssl.ca = fs
+        .readFileSync(path.join(process.cwd(), argv.sslCaPath))
+        .toString();
     }
 
     if (
       overrides.database &&
       argv.sslKeyPath &&
-      typeof overrides.database.ssl === "object"
+      typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl = {
-        ...overrides.database.ssl,
-        rejectUnauthorized: false,
-        key: fs
-          .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
-          .toString(),
-      };
+      overrides.database.ssl.key = fs
+        .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
+        .toString();
     }
 
     if (
       overrides.database &&
       argv.sslCertPath &&
-      typeof overrides.database.ssl === "object"
+      typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl = {
-        ...overrides.database.ssl,
-        rejectUnauthorized: false,
-        cert: fs
-          .readFileSync(path.join(process.cwd(), argv.sslCertPath))
-          .toString(),
-      };
+      overrides.database.ssl.cert = fs
+        .readFileSync(path.join(process.cwd(), argv.sslCertPath))
+        .toString();
     }
 
     return _loadConfig(argv.configPath, overrides)
@@ -235,44 +230,40 @@ const dryRunCommand = {
 
     if (
       overrides.database &&
-      argv.sslCaPath &&
-      typeof overrides.database.ssl === "object"
+      (argv.sslCaPath || argv.sslKeyPath || argv.sslCertPath) &&
+      typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl = {
-        ...overrides.database.ssl,
-        rejectUnauthorized: false,
-        ca: fs
-          .readFileSync(path.join(process.cwd(), argv.sslCaPath))
-          .toString(),
-      };
+      overrides.database.ssl = { rejectUnauthorized: false };
+    }
+
+    if (
+      overrides.database &&
+      argv.sslCaPath &&
+      typeof overrides.database.ssl !== "boolean"
+    ) {
+      overrides.database.ssl.ca = fs
+        .readFileSync(path.join(process.cwd(), argv.sslCaPath))
+        .toString();
     }
 
     if (
       overrides.database &&
       argv.sslKeyPath &&
-      typeof overrides.database.ssl === "object"
+      typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl = {
-        ...overrides.database.ssl,
-        rejectUnauthorized: false,
-        key: fs
-          .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
-          .toString(),
-      };
+      overrides.database.ssl.key = fs
+        .readFileSync(path.join(process.cwd(), argv.sslKeyPath))
+        .toString();
     }
 
     if (
       overrides.database &&
       argv.sslCertPath &&
-      typeof overrides.database.ssl === "object"
+      typeof overrides.database.ssl !== "boolean"
     ) {
-      overrides.database.ssl = {
-        ...overrides.database.ssl,
-        rejectUnauthorized: false,
-        cert: fs
-          .readFileSync(path.join(process.cwd(), argv.sslCertPath))
-          .toString(),
-      };
+      overrides.database.ssl.cert = fs
+        .readFileSync(path.join(process.cwd(), argv.sslCertPath))
+        .toString();
     }
 
     return _loadConfig(argv.configPath, overrides)
