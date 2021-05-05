@@ -25,26 +25,23 @@ interface DatabaseBaseQueryRunner {
   transaction: (txFunc: TransactionFunction) => Promise<any>;
 }
 
-export type DatabaseQueryRunner =
+type DatabaseQueryRunner =
   | DatabaseQueryRunnerWithoutTracing
   | DatabaseQueryRunnerSandbox
   | DatabaseQueryRunnerWithTracing;
-
-export interface DatabaseQueryRunnerWithTracing
-  extends DatabaseBaseQueryRunner {
+interface DatabaseQueryRunnerWithTracing extends DatabaseBaseQueryRunner {
   _type?: "DatabaseQueryRunnerWithTracing";
 }
 
-export interface DatabaseQueryRunnerWithoutTracing
-  extends DatabaseBaseQueryRunner {
+interface DatabaseQueryRunnerWithoutTracing extends DatabaseBaseQueryRunner {
   _type?: "DatabaseQueryRunnerWithoutTracing";
 }
 
-export interface DatabaseQueryRunnerSandbox extends DatabaseBaseQueryRunner {
+interface DatabaseQueryRunnerSandbox extends DatabaseBaseQueryRunner {
   _type?: "DatabaseQueryRunnerSandbox";
 }
 
-export class TransactionError extends Error {
+class TransactionError extends Error {
   public PGError: Error;
   constructor(error: Error) {
     super(error.message); // 'Error' breaks prototype chain here
@@ -58,7 +55,7 @@ export class TransactionError extends Error {
   }
 }
 
-export class DuplicateEntryError extends Error {
+class DuplicateEntryError extends Error {
   public PGError: Error;
   constructor(error: Error) {
     super(error.message);
@@ -71,7 +68,7 @@ export class DuplicateEntryError extends Error {
   }
 }
 
-export class BadUUIDError extends Error {
+class BadUUIDError extends Error {
   public PGError: Error;
   constructor(error: Error) {
     super(error.message);
@@ -237,7 +234,7 @@ function checkDatabaseError(error: any): void {
   }
 }
 
-export function connect(
+function connect(
   tracer: Tracer,
   options?: DatabaseConfig,
 ): DatabaseQueryRunner {
@@ -254,7 +251,7 @@ export function connect(
   return queryRunner(pool, tracer);
 }
 
-export function connectWithoutTracing(
+function connectWithoutTracing(
   options?: DatabaseConfig,
 ): DatabaseQueryRunnerWithoutTracing {
   const config = getConfig(options);
@@ -270,7 +267,7 @@ export function connectWithoutTracing(
   return queryRunnerWithoutTracing(pool);
 }
 
-export async function connectInSandbox(
+async function connectInSandbox(
   options?: DatabaseConfig,
 ): Promise<DatabaseQueryRunnerSandbox> {
   const config = getConfig(options);
@@ -288,7 +285,7 @@ export async function connectInSandbox(
   return queryRunnerSandbox(pool, client);
 }
 
-export function convertUrl(databaseUrl: string): DatabaseConfigWithObject {
+function convertUrl(databaseUrl: string): DatabaseConfigWithObject {
   const { hostname, port, password, username, pathname } = new URL(databaseUrl);
   return {
     host: hostname,
@@ -314,3 +311,17 @@ function getConfig(options?: DatabaseConfig): DatabaseConfigWithObject {
   }
   return config;
 }
+
+export {
+  BadUUIDError,
+  connect,
+  connectInSandbox,
+  connectWithoutTracing,
+  convertUrl,
+  DatabaseQueryRunner,
+  DatabaseQueryRunnerSandbox,
+  DatabaseQueryRunnerWithoutTracing,
+  DatabaseQueryRunnerWithTracing,
+  DuplicateEntryError,
+  TransactionError,
+};
