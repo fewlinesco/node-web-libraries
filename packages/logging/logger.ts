@@ -2,12 +2,12 @@ import logfmt from "logfmt";
 
 import { LoggerConfig, EncoderTypeEnum } from "./config/config";
 
-export interface Logger {
+interface Logger {
   log: (message: string, metadata?: Metadata) => void;
   withMeta: (metadata: Metadata) => Logger;
 }
 
-export type Metadata = Record<string, string | number>;
+type Metadata = Record<string, string | number>;
 
 class KVLogger implements Logger {
   private service: string;
@@ -44,10 +44,13 @@ class JSONLogger implements Logger {
   }
 }
 
-export function createLogger(config: LoggerConfig): Logger {
+function createLogger(config: LoggerConfig): Logger {
   if (config.encoder === EncoderTypeEnum.KV) {
     return new KVLogger(config.service);
   } else if (config.encoder === EncoderTypeEnum.JSON) {
     return new JSONLogger(config.service);
   }
 }
+
+export type { Metadata };
+export { createLogger, Logger };
