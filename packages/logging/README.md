@@ -61,3 +61,29 @@ const myProcessJSONLogger = JSONLogger.withMeta({ process: "my-process" });
 myProcessJSONLogger.log("this is a log");
 // {"message":"this is a log","service":"service-name","process":"my-process"}
 ```
+
+## Logging during tests
+
+If you need to use the logger in a testing environment, we provide an `InMemoryLogger` class that act as a regular logger, except it will only store the logs. Logs can be accessed using the `getLog` method, which takes the log index as parameter. The usage is the same, you just need to initialize `InMemoryLogger` instead of using `createLogger()`.
+
+Here is an example of use in a test file using `jest`:
+
+```ts
+import { InMemoryTracer } from "@fwl/tracing";
+
+let logger: InMemoryLogger;
+
+beforeEach(() => {
+  logger = new InMemoryLogger();
+});
+
+test("verify log entry", () => {
+  expect.assertions(1);
+
+  // Call the code that is using a logger.
+
+  const log = logger.getLog(0);
+
+  expect(log).toBe({ your: "log" });
+});
+```
