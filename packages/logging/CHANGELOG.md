@@ -8,7 +8,6 @@
 ```sh
   @types/node                       dev    ~5mo  14.14.14  →   15.6.1   ⩽1d
   eslint-config-prettier            dev    ~5mo     7.1.0  →    8.3.0  ~1mo
-  jest                              dev    ~7mo    26.6.3  →   27.0.0   ⩽1d
   ts-node                           dev    ~6mo     9.1.1  →   10.0.0   ~2d
   @typescript-eslint/eslint-plugin  dev    ~5mo    4.11.0  →   4.25.0   ⩽1d
   @typescript-eslint/parser         dev    ~5mo    4.11.0  →   4.25.0   ⩽1d
