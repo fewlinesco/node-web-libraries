@@ -3,10 +3,9 @@ import { getTracer, startTracer } from "@fwl/tracing";
 import express from "express";
 
 startTracer({
-  lightstepPublicSatelliteCollector: {
+  simpleCollector: {
     serviceName: "express-server",
-    accessToken: "",
-    url: "http://localhost:8360/api/v2/otel/trace",
+    url: "http://localhost:21098/v1/traces",
   },
 });
 

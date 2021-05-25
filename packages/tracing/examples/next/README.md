@@ -27,4 +27,4 @@ Call the API page with a trace
 curl http://localhost:3000/api/hell
 ```
 
-Go see the result on [Jaeger](http://localhost:16686).
+Go see the result on [Jaeger](http://localhost:29797/search).
