@@ -1,12 +1,16 @@
-import * as types from "@opentelemetry/api";
-import { Attributes, TimeInput } from "@opentelemetry/api";
+import {
+  SpanAttributes,
+  TimeInput,
+  Event,
+  SpanAttributeValue,
+} from "@opentelemetry/api";
 
 import { Span as FwlSpan, Tracer } from "./tracer";
 
 interface Span extends FwlSpan {
   id: string;
   name: string;
-  attributes: types.Attributes;
+  attributes: SpanAttributes;
   parent?: InMemorySpan;
 }
 
@@ -15,8 +19,8 @@ class InMemorySpan implements Span {
   public id: string;
   public name: string;
   public parent?: InMemorySpan;
-  public attributes: types.Attributes;
-  public events: types.Event[];
+  public attributes: SpanAttributes;
+  public events: Event[];
 
   constructor(
     id: string,
@@ -34,10 +38,10 @@ class InMemorySpan implements Span {
 
   addEvent(
     name: string,
-    attributesOrStartTime?: TimeInput | Attributes,
+    attributesOrStartTime?: TimeInput | SpanAttributes,
     startTime?: TimeInput,
   ): this {
-    const event: types.Event = { name, attributes: {} };
+    const event: Event = { name, attributes: {} };
     if (startTime) {
       event.attributes.startTime = startTime.toString();
     } else if (
@@ -64,12 +68,12 @@ class InMemorySpan implements Span {
     return this.parent ? this.parent.getTraceId() : this.id;
   }
 
-  setAttribute(key: string, _value: types.AttributeValue): this {
+  setAttribute(key: string, _value: SpanAttributeValue): this {
     this.attributes[key] = "[REDACTED]";
     return this;
   }
 
-  setDisclosedAttribute(key: string, value: types.AttributeValue): this {
+  setDisclosedAttribute(key: string, value: SpanAttributeValue): this {
     this.attributes[key] = value;
     return this;
   }

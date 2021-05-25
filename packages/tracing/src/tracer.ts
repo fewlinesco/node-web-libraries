@@ -6,11 +6,10 @@ import {
   Span as OpenTelemetrySpan,
   Tracer as OpenTelemetryTracer,
   TimeInput,
-  AttributeValue,
-  Attributes,
+  SpanAttributeValue,
+  SpanAttributes,
 } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
-import { LogLevel } from "@opentelemetry/core";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import {
@@ -20,22 +19,7 @@ import {
 
 import type { TracingConfig } from "./config";
 
-const provider: BasicTracerProvider = new NodeTracerProvider({
-  logLevel: LogLevel.INFO,
-  plugins: {
-    express: { enabled: false },
-    pg: { enabled: false },
-    "pg-pool": { enabled: false },
-    http: {
-      enabled: true,
-      path: "@opentelemetry/plugin-http",
-    },
-    https: {
-      enabled: true,
-      path: "@opentelemetry/plugin-https",
-    },
-  },
-});
+const provider: BasicTracerProvider = new NodeTracerProvider();
 
 let isTracerStarted = false;
 
@@ -164,7 +148,10 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
     otSpan.setAttribute(key, "[REDACTED]");
     return this;
   };
-  const setDisclosedAttribute = (key: string, value: AttributeValue): Span => {
+  const setDisclosedAttribute = (
+    key: string,
+    value: SpanAttributeValue,
+  ): Span => {
     otSpan.setAttribute(key, value);
     return this;
   };
@@ -173,7 +160,7 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
 
   const addEvent = (
     name: string,
-    attributesOrStartTime?: TimeInput | Attributes,
+    attributesOrStartTime?: TimeInput | SpanAttributes,
     startTime?: TimeInput,
   ): Span => {
     otSpan.addEvent(name, attributesOrStartTime, startTime);
@@ -194,7 +181,7 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
 interface Span {
   addEvent(
     name: string,
-    attributesOrStartTime?: TimeInput | Attributes,
+    attributesOrStartTime?: TimeInput | SpanAttributes,
     startTime?: TimeInput,
   ): Span;
   getTraceId(): string;
