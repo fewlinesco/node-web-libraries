@@ -84,6 +84,6 @@ test("verify log entry", () => {
 
   const log = logger.getLog(0);
 
-  expect(log).toBe({ your: "log" });
+  expect(log).toBe("Your log");
 });
 ```

@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.2.0 - 2021-05-25
+## 0.1.2 - 2021-05-25
 
 - The package now exports an `InMemoryLogger` to help with tests.
 - Bumped the dependencies:
