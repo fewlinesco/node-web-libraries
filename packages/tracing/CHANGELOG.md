@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## 0.10.0 - 2021-05-25
+
+- Major bumps:
+
+```sh
+  @types/node                         dev     ⩽1d  14.17.1  →  15.6.1   ⩽1d
+  eslint-config-prettier              dev    ~4mo    7.2.0  →   8.3.0  ~1mo
+  ts-node                             dev    ~6mo    9.1.1  →  10.0.0   ~2d
+```
+
+- Minor bumps:
+
+```sh
+  @types/node                       dev    ~4mo  14.14.25  →  14.17.1   ⩽1d
+  @typescript-eslint/eslint-plugin  dev    ~4mo    4.14.2  →   4.25.0   ⩽1d
+  @typescript-eslint/parser         dev    ~4mo    4.14.2  →   4.25.0   ⩽1d
+  eslint                            dev    ~4mo    7.19.0  →   7.27.0   ~3d
+  eslint-plugin-import              dev    ~8mo    2.22.1  →   2.23.3   ~4d
+  eslint-plugin-prettier            dev    ~5mo     3.3.1  →    3.4.0  ~1mo
+  prettier                          dev    ~6mo     2.2.1  →    2.3.0  ~16d
+  typescript                        dev    ~5mo     4.1.3  →    4.2.4  ~2mo
+  @fwl/logging                             ~9mo     0.1.1  →    0.1.2   ⩽1d
+  @fewlines/eslint-config           dev    ~4mo     3.1.0  →    3.1.2  ~3mo
+  @types/jest                       dev    ~5mo   26.0.20  →  26.0.23  ~29d
+  ts-jest                           dev    ~4mo    26.5.0  →   26.5.6  ~20d
+```
+
 ## 0.9.0 - 2021-02-09
 
 - `tracer.withSpan` is now parameterizable and returns whatever the callback returns.
