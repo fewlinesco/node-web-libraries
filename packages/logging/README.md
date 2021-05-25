@@ -24,8 +24,14 @@ You first need to create the Logger:
 ```typescript
 import { createLogger, EncoderTypeEnum } from "@fwl/logging";
 
-const KVLogger = createLogger({service: "service-name", encoder: EncoderTypeEnum.KV});
-const JSONLogger = createLogger({service: "service-name", encoder: EncoderTypeEnum.JSON});
+const KVLogger = createLogger({
+  service: "service-name",
+  encoder: EncoderTypeEnum.KV,
+});
+const JSONLogger = createLogger({
+  service: "service-name",
+  encoder: EncoderTypeEnum.JSON,
+});
 ```
 
 After that you make a simple log with the `.log` function with or without arguments:
