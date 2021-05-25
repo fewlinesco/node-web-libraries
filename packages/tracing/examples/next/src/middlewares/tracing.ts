@@ -30,7 +30,7 @@ export function withTracing<T = unknown>(
     try {
       const method = request.method;
       rootSpan = tracer.createSpan(`${method} ${request.url}`);
-
+      console.log(rootSpan);
       const nextHandler = await handler(request, response);
       rootSpan.end();
       return nextHandler;

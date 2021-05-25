@@ -24,7 +24,7 @@ yarn dev
 Call the API page with a trace
 
 ```bash
-curl http://localhost:3000/api/hell
+curl http://localhost:3000/api/hello
 ```
 
 Go see the result on [Jaeger](http://localhost:29797/search).
