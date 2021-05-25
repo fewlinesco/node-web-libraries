@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@fwl/tracing": "0.9.0",
+    "@fwl/tracing": "0.0.0-experimental-ab9f3e6",
     "express": "4.17.1"
   },
   "devDependencies": {

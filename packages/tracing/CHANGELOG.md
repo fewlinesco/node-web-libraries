@@ -2,6 +2,21 @@
 
 ## 0.10.0 - 2021-05-25
 
+- Improved OpenTelemetry configs for the example repos.
+- OpenTelemetry bumps:
+
+```sh
+  @opentelemetry/api                         ~4mo  0.16.0  →  0.17.0  ~1d
+  @opentelemetry/context-async-hooks         ~4mo  0.16.0  →  0.17.0  ~1mo
+  @opentelemetry/core                        ~4mo  0.16.0  →  0.17.0  ~1mo
+  @opentelemetry/exporter-collector          ~4mo  0.16.0  →  0.17.0  ~1mo
+  @opentelemetry/exporter-zipkin             ~4mo  0.16.0  →  0.17.0  ~1mo
+  @opentelemetry/node                        ~4mo  0.16.0  →  0.17.0  ~1mo
+  @opentelemetry/plugin-http                 ~4mo  0.16.0  →  0.17.0  ~2mo
+  @opentelemetry/plugin-https                ~4mo  0.16.0  →  0.17.0  ~2mo
+  @opentelemetry/tracing                     ~4mo  0.16.0  →  0.17.0  ~1mo
+```
+
 - Major bumps:
 
 ```sh
