@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.0 - 2021-05-25
+
+- The package now exports an `InMemoryLogger` to help with tests.
+
 ## 0.1.1 - 2020-08-19
 
 - Moved all logic to `logger.ts` and `index.ts` is now just used for exports
