@@ -15,13 +15,13 @@ import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
 // import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import {
-  BasicTracerProvider,
+  // BasicTracerProvider,
   SimpleSpanProcessor,
 } from "@opentelemetry/tracing";
 
 import type { TracingConfig } from "./config";
 
-const provider: BasicTracerProvider = new NodeTracerProvider();
+const provider = new NodeTracerProvider();
 // registerInstrumentations({
 //   logLevel: DiagLogLevel.INFO,
 //   plugins: {
