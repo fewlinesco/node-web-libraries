@@ -9,8 +9,8 @@
     "@opentelemetry/exporter-collector": "0.17.0",
     "@opentelemetry/exporter-zipkin": "0.17.0",
     "@opentelemetry/node": "0.17.0",
-    "@opentelemetry/plugin-http": "0.17.0",
-    "@opentelemetry/plugin-https": "0.17.0",
+    "@opentelemetry/plugin-http": "0.18.2",
+    "@opentelemetry/plugin-https": "0.18.2",
     "@opentelemetry/tracing": "0.17.0"
   },
   "devDependencies": {
