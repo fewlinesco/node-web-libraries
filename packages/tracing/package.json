@@ -61,5 +61,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.0.0-experimental-b54d281"
+  "version": "0.0.0-experimental-21768af"
 }
