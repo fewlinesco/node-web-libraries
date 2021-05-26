@@ -9,13 +9,13 @@
   dependencies:
     logfmt "1.3.2"
 
-"@fwl/tracing@0.0.0-experimental-0d950f9":
-  version "0.0.0-experimental-0d950f9"
-  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.0.0-experimental-0d950f9.tgz#b06838201233d5718e146db2b68d3366a077c92b"
-  integrity sha512-LWnbSZW4XJlYLOU5vcYzMgfvl6GaVPpuSiuMiqKucMySPwOZ5Z1xxaK5TdH0EGqWg8OyEmDH0otLUdZBabhdhQ==
+"@fwl/tracing@0.0.0-experimental-21768af":
+  version "0.0.0-experimental-21768af"
+  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.0.0-experimental-21768af.tgz#2cd216c2a7d23ea236a6b5db1dd78b04cea288e5"
+  integrity sha512-um0d3usdIvXeWThM8ZjlgXIw6JWaQ6DzWadpnpr52gqjPSA0UNc9FxuYv5mhHAU7T7kt0m4EiIsLI8n3R0NEoA==
   dependencies:
     "@fwl/logging" "0.1.2"
-    "@opentelemetry/api" "0.18.0"
+    "@opentelemetry/api" "1.0.0-rc.3"
     "@opentelemetry/context-async-hooks" "0.19.0"
     "@opentelemetry/core" "0.19.0"
     "@opentelemetry/exporter-collector" "0.19.0"
@@ -30,10 +30,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/api-metrics/-/api-metrics-0.19.0.tgz#3b5944ce86f4551cbff1afdc1d064adf18a2db68"
   integrity sha512-1JpnkwCkYgZvbcHkF0nNK6RkMqoEx7zxM3oyMEkFNT7F4nh4tFMDHJ+BRelMk8kzeYtnyZ0YCshhO9xS3SXSHQ==
 
-"@opentelemetry/api@0.18.0":
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-0.18.0.tgz#4641879f16de9784bb00023ab0de5ca219ced765"
-  integrity sha512-KczG0mtyH2UQLeFDYC+atGXfS/MfttynmHblJUsOnIgfI0Ohn0nJOgNjKwJlHk6/9Q61CBTxzSs/268TDaopVw==
+"@opentelemetry/api@1.0.0-rc.3":
+  version "1.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.0.0-rc.3.tgz#903ef6dddf04410d09072d43a060b87ccc162545"
+  integrity sha512-3PlJD9uN5iZrKmX054vOifGxZ/iH24+UFD5eW8Vyz08GUU7SdW8PNu4VSpTixWeuWo+Q6TELfSv7vVu43t+tbA==
 
 "@opentelemetry/api@^0.18.1":
   version "0.18.1"

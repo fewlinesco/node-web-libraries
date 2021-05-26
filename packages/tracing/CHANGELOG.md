@@ -6,15 +6,15 @@
 - OpenTelemetry bumps:
 
 ```sh
-  @opentelemetry/api                         ~4mo  0.16.0  →  0.17.0  ~1d
-  @opentelemetry/context-async-hooks         ~4mo  0.16.0  →  0.17.0  ~1mo
-  @opentelemetry/core                        ~4mo  0.16.0  →  0.17.0  ~1mo
-  @opentelemetry/exporter-collector          ~4mo  0.16.0  →  0.17.0  ~1mo
-  @opentelemetry/exporter-zipkin             ~4mo  0.16.0  →  0.17.0  ~1mo
-  @opentelemetry/node                        ~4mo  0.16.0  →  0.17.0  ~1mo
-  @opentelemetry/plugin-http                 ~4mo  0.16.0  →  0.17.0  ~2mo
-  @opentelemetry/plugin-https                ~4mo  0.16.0  →  0.17.0  ~2mo
-  @opentelemetry/tracing                     ~4mo  0.16.0  →  0.17.0  ~1mo
+  @opentelemetry/api                         ~4mo  0.16.0  →  1.0.0-rc.3  ~1d
+  @opentelemetry/context-async-hooks         ~4mo  0.16.0  →  0.19.0  ~1mo
+  @opentelemetry/core                        ~4mo  0.16.0  →  0.19.0  ~1mo
+  @opentelemetry/exporter-collector          ~4mo  0.16.0  →  0.19.0  ~1mo
+  @opentelemetry/exporter-zipkin             ~4mo  0.16.0  →  0.19.0  ~1mo
+  @opentelemetry/node                        ~4mo  0.16.0  →  0.19.0  ~1mo
+  @opentelemetry/plugin-http                 ~4mo  0.16.0  →  0.18.2  ~2mo
+  @opentelemetry/plugin-https                ~4mo  0.16.0  →  0.18.2  ~2mo
+  @opentelemetry/tracing                     ~4mo  0.16.0  →  0.19.0  ~1mo
 ```
 
 - Major bumps:
