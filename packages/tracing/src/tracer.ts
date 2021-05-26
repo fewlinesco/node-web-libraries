@@ -1,29 +1,27 @@
 import { Logger } from "@fwl/logging";
 import {
   context,
-  getSpan,
-  setSpan,
   Span as OpenTelemetrySpan,
   Tracer as OpenTelemetryTracer,
   TimeInput,
   SpanAttributeValue,
-  SpanAttributes,
-  // DiagLogLevel,
+  getSpan,
+  setSpan,
 } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
 // import { registerInstrumentations } from "@opentelemetry/instrumentation";
-// import { NodeTracerProvider } from "@opentelemetry/node";
+import { NodeTracerProvider } from "@opentelemetry/node";
 import {
-  BasicTracerProvider,
+  // BasicTracerProvider,
   SimpleSpanProcessor,
 } from "@opentelemetry/tracing";
 
 import type { TracingConfig } from "./config";
 
-const provider = new BasicTracerProvider();
+const provider = new NodeTracerProvider();
 
-// const provider = new NodeTracerProvider();
+// const provider = new BasicTracerProvider();
 // registerInstrumentations({
 //   logLevel: DiagLogLevel.INFO,
 //   plugins: {
@@ -178,19 +176,9 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
 
   const getTraceId = (): string => otSpan.context().traceId;
 
-  const addEvent = (
-    name: string,
-    attributesOrStartTime?: TimeInput | SpanAttributes,
-    startTime?: TimeInput,
-  ): Span => {
-    otSpan.addEvent(name, attributesOrStartTime, startTime);
-    return this;
-  };
-
   const end = otSpan.end.bind(otSpan);
 
   return {
-    addEvent,
     getTraceId,
     setAttribute,
     setDisclosedAttribute,
@@ -199,11 +187,6 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
 }
 
 interface Span {
-  addEvent(
-    name: string,
-    attributesOrStartTime?: TimeInput | SpanAttributes,
-    startTime?: TimeInput,
-  ): Span;
   getTraceId(): string;
   setAttribute(key: string, value: unknown): this;
   setDisclosedAttribute(key: string, value: unknown): this;

@@ -9,10 +9,10 @@
   dependencies:
     logfmt "1.3.2"
 
-"@fwl/tracing@0.0.0-experimental-ef5b6e1":
-  version "0.0.0-experimental-ef5b6e1"
-  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.0.0-experimental-ef5b6e1.tgz#b753ac3733505a184f1b3b544ae59c6c2810f64d"
-  integrity sha512-vCVXnuCYpDA9c+LbZbcpeIAYTBjy2hI64OIVB7MC2p7O3wnIjYuHTX58ntgE90iTwMeeSHOwbJbrxaAt+nhdgw==
+"@fwl/tracing@0.0.0-experimental-0d950f9":
+  version "0.0.0-experimental-0d950f9"
+  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.0.0-experimental-0d950f9.tgz#b06838201233d5718e146db2b68d3366a077c92b"
+  integrity sha512-LWnbSZW4XJlYLOU5vcYzMgfvl6GaVPpuSiuMiqKucMySPwOZ5Z1xxaK5TdH0EGqWg8OyEmDH0otLUdZBabhdhQ==
   dependencies:
     "@fwl/logging" "0.1.2"
     "@opentelemetry/api" "0.18.0"

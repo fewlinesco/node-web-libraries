@@ -1,9 +1,4 @@
-import {
-  SpanAttributes,
-  TimeInput,
-  Event,
-  SpanAttributeValue,
-} from "@opentelemetry/api";
+import { SpanAttributes, SpanAttributeValue } from "@opentelemetry/api";
 
 import { Span as FwlSpan, Tracer } from "./tracer";
 
@@ -20,7 +15,6 @@ class InMemorySpan implements Span {
   public name: string;
   public parent?: InMemorySpan;
   public attributes: SpanAttributes;
-  public events: Event[];
 
   constructor(
     id: string,
@@ -32,32 +26,7 @@ class InMemorySpan implements Span {
     this.tracer = tracer;
     this.name = name;
     this.attributes = {};
-    this.events = [];
     this.parent = parent;
-  }
-
-  addEvent(
-    name: string,
-    attributesOrStartTime?: TimeInput | SpanAttributes,
-    startTime?: TimeInput,
-  ): this {
-    const event: Event = { name, attributes: {} };
-    if (startTime) {
-      event.attributes.startTime = startTime.toString();
-    } else if (
-      typeof attributesOrStartTime === "number" ||
-      attributesOrStartTime instanceof Date ||
-      attributesOrStartTime instanceof Array
-    ) {
-      event.attributes.startTime = attributesOrStartTime.toString();
-    } else if (attributesOrStartTime) {
-      event.attributes = attributesOrStartTime;
-    } else {
-      event.attributes.startTime = new Date().toString();
-    }
-
-    this.events.push(event);
-    return this;
   }
 
   end(): void {
