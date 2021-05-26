@@ -4,7 +4,7 @@
   "dependencies": {
     "@fwl/logging": "0.1.2",
     "@opentelemetry/api": "0.18.0",
-    "@opentelemetry/context-async-hooks": "0.17.0",
+    "@opentelemetry/context-async-hooks": "0.19.0",
     "@opentelemetry/core": "0.17.0",
     "@opentelemetry/exporter-collector": "0.19.0",
     "@opentelemetry/exporter-zipkin": "0.19.0",
