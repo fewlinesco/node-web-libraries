@@ -825,20 +825,20 @@
     "@opentelemetry/context-base" "^0.16.0"
     semver "^7.1.3"
 
-"@opentelemetry/core@0.17.0", "@opentelemetry/core@^0.17.0":
+"@opentelemetry/core@0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/core/-/core-0.19.0.tgz#5018e16d1d3081da0657476e58d9c2dce7c511a2"
+  integrity sha512-t83FleVbHH6SWdUegclZbsnHn0OaHjq17Hd1zsJIRMM6WNuVzbXWA+3V6LCKXqUYyu3qwtZ/w45u/Nqfr5mEeQ==
+  dependencies:
+    semver "^7.1.3"
+
+"@opentelemetry/core@^0.17.0":
   version "0.17.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/core/-/core-0.17.0.tgz#3e57a3bfd45fe8634ede81a90266ff415f39e24e"
   integrity sha512-jRM0Ydcb98a1ejrShqJIhnc2qqPJI2SJfHDRsFeWCj/q6LIlPo7yRl9msIndUQjRTHHvLdIKBGclNvqoXRyXTA==
   dependencies:
     "@opentelemetry/api" "^0.17.0"
     "@opentelemetry/context-base" "^0.17.0"
-    semver "^7.1.3"
-
-"@opentelemetry/core@0.19.0":
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/@opentelemetry/core/-/core-0.19.0.tgz#5018e16d1d3081da0657476e58d9c2dce7c511a2"
-  integrity sha512-t83FleVbHH6SWdUegclZbsnHn0OaHjq17Hd1zsJIRMM6WNuVzbXWA+3V6LCKXqUYyu3qwtZ/w45u/Nqfr5mEeQ==
-  dependencies:
     semver "^7.1.3"
 
 "@opentelemetry/core@^0.18.2":
