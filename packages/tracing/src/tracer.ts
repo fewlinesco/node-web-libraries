@@ -8,11 +8,11 @@ import {
   TimeInput,
   SpanAttributeValue,
   SpanAttributes,
-  DiagLogLevel,
+  // DiagLogLevel,
 } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
-import { registerInstrumentations } from "@opentelemetry/instrumentation";
+// import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import {
   BasicTracerProvider,
@@ -22,22 +22,22 @@ import {
 import type { TracingConfig } from "./config";
 
 const provider: BasicTracerProvider = new NodeTracerProvider();
-registerInstrumentations({
-  logLevel: DiagLogLevel.INFO,
-  plugins: {
-    express: { enabled: false },
-    pg: { enabled: false },
-    "pg-pool": { enabled: false },
-    http: {
-      enabled: true,
-      path: "@opentelemetry/plugin-http",
-    },
-    https: {
-      enabled: true,
-      path: "@opentelemetry/plugin-https",
-    },
-  },
-});
+// registerInstrumentations({
+//   logLevel: DiagLogLevel.INFO,
+//   plugins: {
+//     express: { enabled: false },
+//     pg: { enabled: false },
+//     "pg-pool": { enabled: false },
+//     http: {
+//       enabled: true,
+//       path: "@opentelemetry/plugin-http",
+//     },
+//     https: {
+//       enabled: true,
+//       path: "@opentelemetry/plugin-https",
+//     },
+//   },
+// });
 
 let isTracerStarted = false;
 
