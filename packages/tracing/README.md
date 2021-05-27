@@ -30,6 +30,33 @@ startTracer({
 const tracer = getTracer();
 ```
 
+### Configure several exporters
+
+```typescript
+import { getTracer, startTracer } from "@fwl/tracing";
+
+startTracer({
+  collectors: [
+    {
+      type: "otel",
+      serviceName: "serviceName",
+      url: "http://localhost:29799/v1/traces",
+    },
+    {
+      type: "otel",
+      serviceName: "serviceName",
+      url: "http://localhost:8360/api/v2/otel/trace",
+      authorizationHeader: {
+        key: "Lightstep-Access-Token",
+        value: "developer",
+      },
+    },
+  ],
+});
+```
+
+### Lightstep
+
 And an example with a Lightstep public satellite:
 
 ```typescript

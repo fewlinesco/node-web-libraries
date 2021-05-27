@@ -10,9 +10,11 @@ async function handler(
 ): Promise<void> {
   const tracer = getTracer();
 
-  tracer.span("hello handler", async () => {
+  tracer.span("hello handler", async (span) => {
     response.statusCode = 200;
-    response.end(JSON.stringify({ name: "John Doe" }));
+    response.end(
+      `See the trace at http://localhost:29797/trace/${span.getTraceId()}\n`,
+    );
   });
 }
 

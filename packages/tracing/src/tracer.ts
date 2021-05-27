@@ -9,7 +9,10 @@ import {
   setSpan,
 } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
-import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
+import {
+  CollectorTraceExporter,
+  CollectorExporterNodeConfigBase,
+} from "@opentelemetry/exporter-collector";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 
@@ -24,6 +27,27 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
     return;
   }
 
+  if (options.collectors) {
+    for (const collector of options.collectors) {
+      if (collector.type === "otel") {
+        const collectorOptions: CollectorExporterNodeConfigBase = {
+          attributes: options.attributes,
+          serviceName: collector.serviceName,
+          url: collector.url,
+        };
+        if (collector.authorizationHeader) {
+          const { key, value } = collector.authorizationHeader;
+          collectorOptions.headers = {
+            [key]: value,
+          };
+        }
+        const exporter = new CollectorTraceExporter(collectorOptions);
+
+        const spanProcessor = new SimpleSpanProcessor(exporter);
+        provider.addSpanProcessor(spanProcessor);
+      }
+    }
+  }
   if (options.simpleCollector) {
     const collector = new CollectorTraceExporter({
       attributes: options.attributes,
