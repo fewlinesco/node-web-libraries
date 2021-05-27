@@ -113,26 +113,4 @@ describe("InMemorySpan:", () => {
       expect(spanAttributes).toStrictEqual(expectedAttributes);
     });
   });
-
-  describe("addEvent function:", () => {
-    test("it should add events to the span", async () => {
-      expect.assertions(5);
-      const expectedTime = new Date();
-
-      await tracer.span("test-span", async (span) => {
-        expect(span.addEvent("event")).toBe(span);
-        span.addEvent("event2", expectedTime);
-      });
-
-      const spanEvents = tracer.searchSpanByName("test-span")[0].events;
-
-      expect(spanEvents.length).toBe(2);
-      expect(spanEvents[0]).toMatchObject({ name: "event" });
-      expect(spanEvents[0].attributes.startTime).toBeDefined();
-      expect(spanEvents[1]).toMatchObject({
-        name: "event2",
-        attributes: { startTime: expectedTime.toString() },
-      });
-    });
-  });
 });

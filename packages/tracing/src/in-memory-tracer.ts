@@ -1,12 +1,11 @@
-import * as types from "@opentelemetry/api";
-import { Attributes, TimeInput } from "@opentelemetry/api";
+import { SpanAttributes, SpanAttributeValue } from "@opentelemetry/api";
 
 import { Span as FwlSpan, Tracer } from "./tracer";
 
 interface Span extends FwlSpan {
   id: string;
   name: string;
-  attributes: types.Attributes;
+  attributes: SpanAttributes;
   parent?: InMemorySpan;
 }
 
@@ -15,8 +14,7 @@ class InMemorySpan implements Span {
   public id: string;
   public name: string;
   public parent?: InMemorySpan;
-  public attributes: types.Attributes;
-  public events: types.Event[];
+  public attributes: SpanAttributes;
 
   constructor(
     id: string,
@@ -28,32 +26,7 @@ class InMemorySpan implements Span {
     this.tracer = tracer;
     this.name = name;
     this.attributes = {};
-    this.events = [];
     this.parent = parent;
-  }
-
-  addEvent(
-    name: string,
-    attributesOrStartTime?: TimeInput | Attributes,
-    startTime?: TimeInput,
-  ): this {
-    const event: types.Event = { name, attributes: {} };
-    if (startTime) {
-      event.attributes.startTime = startTime.toString();
-    } else if (
-      typeof attributesOrStartTime === "number" ||
-      attributesOrStartTime instanceof Date ||
-      attributesOrStartTime instanceof Array
-    ) {
-      event.attributes.startTime = attributesOrStartTime.toString();
-    } else if (attributesOrStartTime) {
-      event.attributes = attributesOrStartTime;
-    } else {
-      event.attributes.startTime = new Date().toString();
-    }
-
-    this.events.push(event);
-    return this;
   }
 
   end(): void {
@@ -64,12 +37,12 @@ class InMemorySpan implements Span {
     return this.parent ? this.parent.getTraceId() : this.id;
   }
 
-  setAttribute(key: string, _value: types.AttributeValue): this {
+  setAttribute(key: string, _value: SpanAttributeValue): this {
     this.attributes[key] = "[REDACTED]";
     return this;
   }
 
-  setDisclosedAttribute(key: string, value: types.AttributeValue): this {
+  setDisclosedAttribute(key: string, value: SpanAttributeValue): this {
     this.attributes[key] = value;
     return this;
   }

@@ -1,41 +1,21 @@
 import { Logger } from "@fwl/logging";
 import {
   context,
-  getSpan,
-  setSpan,
   Span as OpenTelemetrySpan,
   Tracer as OpenTelemetryTracer,
   TimeInput,
-  AttributeValue,
-  Attributes,
+  SpanAttributeValue,
+  getSpan,
+  setSpan,
 } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
-import { LogLevel } from "@opentelemetry/core";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
 import { NodeTracerProvider } from "@opentelemetry/node";
-import {
-  BasicTracerProvider,
-  SimpleSpanProcessor,
-} from "@opentelemetry/tracing";
+import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 
 import type { TracingConfig } from "./config";
 
-const provider: BasicTracerProvider = new NodeTracerProvider({
-  logLevel: LogLevel.INFO,
-  plugins: {
-    express: { enabled: false },
-    pg: { enabled: false },
-    "pg-pool": { enabled: false },
-    http: {
-      enabled: true,
-      path: "@opentelemetry/plugin-http",
-    },
-    https: {
-      enabled: true,
-      path: "@opentelemetry/plugin-https",
-    },
-  },
-});
+const provider = new NodeTracerProvider();
 
 let isTracerStarted = false;
 
@@ -43,6 +23,7 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
   if (isTracerStarted) {
     return;
   }
+
   if (options.simpleCollector) {
     const collector = new CollectorTraceExporter({
       attributes: options.attributes,
@@ -51,9 +32,9 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
     });
 
     const spanProcessor = new SimpleSpanProcessor(collector);
-
     provider.addSpanProcessor(spanProcessor);
   }
+
   if (options.lightstepPublicSatelliteCollector) {
     const collector = new CollectorTraceExporter({
       attributes: options.attributes,
@@ -83,6 +64,7 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
       tracingUrl: options.simpleCollector.url,
     });
   }
+
   if (logger && options.lightstepPublicSatelliteCollector) {
     logger.log("Lightstep tracing initialized", {
       tracingServiceName: options.lightstepPublicSatelliteCollector.serviceName,
@@ -164,26 +146,19 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
     otSpan.setAttribute(key, "[REDACTED]");
     return this;
   };
-  const setDisclosedAttribute = (key: string, value: AttributeValue): Span => {
+  const setDisclosedAttribute = (
+    key: string,
+    value: SpanAttributeValue,
+  ): Span => {
     otSpan.setAttribute(key, value);
     return this;
   };
 
   const getTraceId = (): string => otSpan.context().traceId;
 
-  const addEvent = (
-    name: string,
-    attributesOrStartTime?: TimeInput | Attributes,
-    startTime?: TimeInput,
-  ): Span => {
-    otSpan.addEvent(name, attributesOrStartTime, startTime);
-    return this;
-  };
-
   const end = otSpan.end.bind(otSpan);
 
   return {
-    addEvent,
     getTraceId,
     setAttribute,
     setDisclosedAttribute,
@@ -192,11 +167,6 @@ function spanFactory(otSpan: OpenTelemetrySpan): Span {
 }
 
 interface Span {
-  addEvent(
-    name: string,
-    attributesOrStartTime?: TimeInput | Attributes,
-    startTime?: TimeInput,
-  ): Span;
   getTraceId(): string;
   setAttribute(key: string, value: unknown): this;
   setDisclosedAttribute(key: string, value: unknown): this;
