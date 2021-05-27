@@ -54,8 +54,8 @@ function convertMiddleware<T extends IncomingMessage, U extends ServerResponse>(
         const span = tracer.getCurrentSpan();
 
         middleware(
-          (request as unknown) as Request,
-          (response as unknown) as Response,
+          request as unknown as Request,
+          response as unknown as Response,
           async () => {
             try {
               const result = await handler(request, response);

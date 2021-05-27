@@ -5,7 +5,7 @@ import { Handler } from "./typings/handler";
 
 class Endpoint<
   T extends IncomingMessage = IncomingMessage,
-  U extends ServerResponse = ServerResponse
+  U extends ServerResponse = ServerResponse,
 > {
   private handlers: {
     get?: Handler<T, U>;
