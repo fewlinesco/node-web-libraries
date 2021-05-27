@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## 0.5.2 - 2021-05-27
+
+- Bumped major:
+
+```sh
+  @types/node             dev     ~2d  14.17.1  →  15.6.1   ~2d
+  @types/pg               dev    ~3mo  7.14.11  →   8.6.0   ~9d
+  eslint-config-prettier  dev    ~4mo    7.2.0  →   8.3.0  ~1mo
+  jest                    dev    ~7mo   26.6.3  →  27.0.1   ~2d
+  ts-jest                 dev    ~22d   26.5.6  →  27.0.1   ⩽1d
+  ts-node                 dev    ~6mo    9.1.1  →  10.0.0   ~4d
+  @fwl/tracing                   ~4mo    0.9.0  →  0.10.0   ⩽1d
+```
+
+- Bumped minor:
+
+```sh
+  pg                                       ~6mo     8.5.1  →    8.6.0  ~1mo
+  @types/node                       dev    ~5mo  14.14.20  →  14.17.1   ~2d  (15.6.1 avaliable)
+  @typescript-eslint/eslint-plugin  dev    ~5mo    4.12.0  →   4.25.0   ~3d
+  @typescript-eslint/parser         dev    ~5mo    4.12.0  →   4.25.0   ~3d
+  eslint                            dev    ~5mo    7.17.0  →   7.27.0   ~5d
+  eslint-config-prettier            dev    ~5mo     7.1.0  →    7.2.0  ~4mo  (8.3.0 avaliable)
+  eslint-plugin-prettier            dev    ~5mo     3.3.1  →    3.4.0  ~1mo
+  prettier                          dev    ~6mo     2.2.1  →    2.3.0  ~18d
+  ts-jest                           dev    ~7mo    26.4.4  →   26.5.6  ~22d  (27.0.1 avaliable)
+  typescript                        dev    ~6mo     4.1.3  →    4.3.2   ⩽1d
+  @types/jest                       dev    ~6mo   26.0.19  →  26.0.23  ~1mo
+  @types/pg                         dev    ~6mo    7.14.7  →  7.14.11  ~3mo  (8.6.0 avaliable)
+```
+
 ## 0.5.1 - 2021-02-09
 
 - Bump `@fwl/tracing`.
@@ -39,7 +70,6 @@
 
 - Added new `Error` types -> `BadUUIDError` and `DuplicateEntryError`
 
-
 ## 0.1.3 - 2020-08-19
 
 - Moved all logic from `index.ts` to `database.ts`, `index.ts` is now only used for exports
@@ -60,7 +90,6 @@
 - Package renamed from `@fewlines/fwl-database` to `@fwl/database` and resetted the version
 - Enabled basic tracing on `queryRunner` functions
 - `connect` now takes a required tracer argument, `connectWithoutTracing` is now the way to generate a `queryRunner` without tracing enabled
-
 
 ## 1.1.1 - 2020-07-27
 
