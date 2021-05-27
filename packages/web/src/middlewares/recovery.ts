@@ -6,7 +6,7 @@ import { Middleware } from "../typings/middleware";
 
 function recoveryMiddleware<
   T extends IncomingMessage,
-  U extends ServerResponse
+  U extends ServerResponse,
 >(tracer: Tracer): Middleware<T, U> {
   return function withFwlRecoveryErrorHandler(handler) {
     return async function (request: T, response: U) {
