@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## 0.11.4 - 2021-05-27
+
+- Bumped major deps:
+
+```sh
+  @types/node             dev     ~2d  14.17.1  →  15.6.1   ~2d
+  eslint-config-prettier  dev    ~4mo    7.2.0  →   8.3.0  ~1mo
+  jest                    dev    ~7mo   26.6.3  →  27.0.1   ~2d
+  ts-jest                 dev    ~22d   26.5.6  →  27.0.1   ⩽1d
+  ts-node                 dev    ~6mo    9.1.1  →  10.0.0   ~4d
+  @fwl/tracing                   ~4mo    0.9.0  →  0.10.0   ⩽1d
+```
+
+- Bumped minor deps:
+
+```sh
+  qs                                        ~4mo     6.9.6  →   6.10.1  ~2mo
+  @types/node                       dev     ~4mo  14.14.22  →  14.17.1   ~2d  (15.6.1 avaliable)
+  @typescript-eslint/eslint-plugin  dev     ~4mo    4.14.0  →   4.25.0   ~3d
+  @typescript-eslint/parser         dev     ~4mo    4.14.0  →   4.25.0   ~3d
+  eslint                            dev     ~4mo    7.18.0  →   7.27.0   ~5d
+  eslint-plugin-import              dev     ~8mo    2.22.1  →   2.23.3   ~6d
+  eslint-plugin-prettier            dev     ~5mo     3.3.1  →    3.4.0  ~1mo
+  next                              dev     ~5mo    10.0.5  →   10.2.3   ~3d
+  prettier                          dev     ~6mo     2.2.1  →    2.3.0  ~18d
+  ts-jest                           dev     ~7mo    26.4.4  →   26.5.6  ~22d  (27.0.1 avaliable)
+  typescript                        dev     ~6mo     4.1.3  →    4.3.2   ⩽1d
+  @fwl/logging                              ~9mo     0.1.1  →    0.1.2   ~2d
+  @types/express                    dev     ~4mo   4.17.11  →  4.17.12   ~2d
+  @types/jest                       dev     ~5mo   26.0.20  →  26.0.23  ~1mo
+  @types/memjs                      dev    ~2.3y     1.2.1  →    1.2.2  ~2mo
+  @types/qs                         dev     ~8mo     6.9.5  →    6.9.6  ~3mo
+  @types/send                       dev     ~4mo    0.14.6  →   0.14.7  ~2mo
+```
+
 ## 0.11.3 - 2021-03-19
 
 - Added an `id` field in the `AlertMessage` type to help with filtering.

@@ -261,9 +261,11 @@ async function setServerSideCookies(
         updatedSetCookieValue = [currentSetCookieValue, newCookie];
       }
 
-      return response.setHeader("Set-Cookie", updatedSetCookieValue);
+      response.setHeader("Set-Cookie", updatedSetCookieValue);
+      return;
     } else {
-      return response.setHeader("Set-Cookie", newCookie);
+      response.setHeader("Set-Cookie", newCookie);
+      return;
     }
   } else {
     const newCookie = cookie.serialize(
@@ -281,9 +283,11 @@ async function setServerSideCookies(
         updatedSetCookieValue = [currentSetCookieValue, newCookie];
       }
 
-      return response.setHeader("Set-Cookie", updatedSetCookieValue);
+      response.setHeader("Set-Cookie", updatedSetCookieValue);
+      return
     } else {
-      return response.setHeader("Set-Cookie", newCookie);
+       response.setHeader("Set-Cookie", newCookie);
+       return
     }
   }
 }
@@ -341,7 +345,8 @@ function setAlertMessagesCookie(
   }
 
   if (!currentSetCookieValue) {
-    return response.setHeader("Set-Cookie", newCookie);
+    response.setHeader("Set-Cookie", newCookie);
+    return;
   }
 
   let updatedSetCookieValue: string[];
@@ -352,7 +357,8 @@ function setAlertMessagesCookie(
     updatedSetCookieValue = [currentSetCookieValue, newCookie];
   }
 
-  return response.setHeader("Set-Cookie", updatedSetCookieValue);
+  response.setHeader("Set-Cookie", updatedSetCookieValue);
+  return;
 }
 
 export {
