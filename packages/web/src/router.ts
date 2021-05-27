@@ -14,7 +14,7 @@ type pathHandlers<T extends IncomingMessage, U extends ServerResponse> = {
 
 class Router<
   T extends IncomingMessage = IncomingMessage,
-  U extends ServerResponse = ServerResponse
+  U extends ServerResponse = ServerResponse,
 > {
   private middlewares: Middleware<T, U>[];
   private paths: Record<string, pathHandlers<T, U>>;

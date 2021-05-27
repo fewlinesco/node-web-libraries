@@ -110,7 +110,7 @@ function getExpirationTime(options: Options): number {
 
 function rateLimitingMiddleware<
   T extends IncomingMessage,
-  U extends ServerResponse
+  U extends ServerResponse,
 >(tracer: Tracer, logger: Logger, options: Options): Middleware<T, U> {
   let store: Store;
   const expiration = getExpirationTime(options);
