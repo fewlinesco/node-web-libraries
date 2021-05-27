@@ -6,7 +6,7 @@ let db: database.DatabaseQueryRunner;
 let tracer: InMemoryTracer;
 beforeAll(async () => {
   tracer = new InMemoryTracer();
-  db = database.connect(tracer, {
+  db = await database.connectInSandbox({
     username: process.env.DATABASE_SQL_USERNAME || "fwl_db",
     host: process.env.DATABASE_SQL_HOST || "localhost",
     password: process.env.DATABASE_SQL_PASSWORD || "fwl_db",
@@ -18,12 +18,12 @@ beforeAll(async () => {
   );
 });
 beforeEach(async () => {
-  await db.query("TRUNCATE fwl");
+  // await db.query("TRUNCATE fwl");
   tracer.spans = [];
 });
 
 afterAll(async () => {
-  await db.query("DROP TABLE fwl");
+  // await db.query("DROP TABLE fwl");
   await db.close();
 });
 
@@ -75,8 +75,8 @@ describe("transactions", () => {
     }
   });
 
-  test("we should be able to manually rollback a transaction", async () => {
-    expect.assertions(3);
+  test.only("we should be able to manually rollback a transaction", async () => {
+    expect.assertions(2);
     try {
       await db.transaction(async (client) => {
         await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [
@@ -87,6 +87,7 @@ describe("transactions", () => {
         return Promise.reject(Error("rollbacked"));
       });
     } catch (error) {
+      console.log("✅", error);
       expect(error).toBeInstanceOf(database.TransactionError);
       expect(error.message).toBe("rollbacked");
     }

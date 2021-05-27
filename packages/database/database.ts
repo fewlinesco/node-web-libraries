@@ -9,6 +9,7 @@ import {
 } from "./config/config";
 
 function close(pool: Pool): Promise<void> {
+  console.log("✅");
   return pool.end();
 }
 
@@ -181,13 +182,26 @@ function queryRunnerSandbox(
 ): DatabaseQueryRunnerSandbox {
   return {
     close: async (): Promise<void> => {
-      await txClient.query("ROLLBACK");
-      close(pool);
+      try {
+        await txClient.query("ROLLBACK");
+        txClient.release();
+        close(pool);
+      } catch (error) {
+        return close(pool);
+      }
     },
     query: async (query, values = []): Promise<QueryArrayResult<any>> => {
       try {
-        return await txClient.query(query, values);
+        if (query.toUpperCase() === "ROLLBACK") {
+          return await txClient.query(
+            "ROLLBACK TO SAVEPOINT fwl_database_sandbox_savepoint;",
+          );
+        } else {
+          await txClient.query("SAVEPOINT fwl_database_sandbox_savepoint;");
+          return await txClient.query(query, values);
+        }
       } catch (error) {
+        console.log("🔴", error);
         checkDatabaseError(error);
       }
     },
@@ -198,7 +212,7 @@ function queryRunnerSandbox(
         );
       }
       try {
-        await txClient.query("SAVEPOINT fwl_database_sandbox_savepoint;");
+        await txClient.query("SAVEPOINT fwl_database_sandbox_savepoint_;");
         return transactionFunction(queryRunnerSandbox(pool, txClient, true));
       } catch (error) {
         await txClient.query(

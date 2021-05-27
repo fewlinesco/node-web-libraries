@@ -15,19 +15,17 @@ const databaseConfig = {
 
 beforeAll(async () => {
   tracer = new InMemoryTracer();
-  db = database.connect(tracer, databaseConfig);
+  db = await database.connectInSandbox(databaseConfig);
   await db.query(
     "CREATE TABLE IF NOT EXISTS fwl (id UUID PRIMARY KEY, name varchar(32) NOT NULL)",
   );
 });
 
 beforeEach(async () => {
-  await db.query("TRUNCATE fwl");
   tracer.spans = [];
 });
 
 afterAll(async () => {
-  await db.query("DROP TABLE fwl");
   await db.close();
 });
 
