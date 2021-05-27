@@ -33,6 +33,7 @@ export function withTracing<T = unknown>(
 
       const nextHandler = await handler(request, response);
       rootSpan.end();
+
       return nextHandler;
     } catch (error) {
       rootSpan.end();
