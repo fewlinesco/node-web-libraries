@@ -284,10 +284,10 @@ async function setServerSideCookies(
       }
 
       response.setHeader("Set-Cookie", updatedSetCookieValue);
-      return
+      return;
     } else {
-       response.setHeader("Set-Cookie", newCookie);
-       return
+      response.setHeader("Set-Cookie", newCookie);
+      return;
     }
   }
 }
