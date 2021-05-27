@@ -10,34 +10,12 @@ import {
 } from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
-// import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { NodeTracerProvider } from "@opentelemetry/node";
-import {
-  // BasicTracerProvider,
-  SimpleSpanProcessor,
-} from "@opentelemetry/tracing";
+import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 
 import type { TracingConfig } from "./config";
 
 const provider = new NodeTracerProvider();
-
-// const provider = new BasicTracerProvider();
-// registerInstrumentations({
-//   logLevel: DiagLogLevel.INFO,
-//   plugins: {
-//     express: { enabled: false },
-//     pg: { enabled: false },
-//     "pg-pool": { enabled: false },
-//     http: {
-//       enabled: true,
-//       path: "@opentelemetry/plugin-http",
-//     },
-//     https: {
-//       enabled: true,
-//       path: "@opentelemetry/plugin-https",
-//     },
-//   },
-// });
 
 let isTracerStarted = false;
 
@@ -45,6 +23,7 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
   if (isTracerStarted) {
     return;
   }
+
   if (options.simpleCollector) {
     const collector = new CollectorTraceExporter({
       attributes: options.attributes,
@@ -53,9 +32,9 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
     });
 
     const spanProcessor = new SimpleSpanProcessor(collector);
-
     provider.addSpanProcessor(spanProcessor);
   }
+
   if (options.lightstepPublicSatelliteCollector) {
     const collector = new CollectorTraceExporter({
       attributes: options.attributes,
@@ -85,6 +64,7 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
       tracingUrl: options.simpleCollector.url,
     });
   }
+
   if (logger && options.lightstepPublicSatelliteCollector) {
     logger.log("Lightstep tracing initialized", {
       tracingServiceName: options.lightstepPublicSatelliteCollector.serviceName,
