@@ -12,6 +12,7 @@ function tracingMiddleware<T extends IncomingMessage, U extends ServerResponse>(
         ? handler["__route"]
         : request.url;
       const spanName = `${request.method || "GET"} ${displayedName}`;
+      
       return tracer.withSpan(spanName, async (span) => {
         const result = await handler(request, response);
         span.setDisclosedAttribute("http.status_code", response.statusCode);
