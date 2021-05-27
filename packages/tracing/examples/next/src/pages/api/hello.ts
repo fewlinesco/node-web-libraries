@@ -5,7 +5,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { withTracing } from "../../middlewares/tracing";
 
 async function handler(
-  request: IncomingMessage,
+  _request: IncomingMessage,
   response: ServerResponse,
 ): Promise<void> {
   const tracer = getTracer();
