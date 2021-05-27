@@ -1,6 +1,15 @@
 import { SpanAttributes } from "@opentelemetry/api";
 
 type TracingConfig = {
+  collectors?: {
+    type: "otel";
+    serviceName: string;
+    authorizationHeader?: {
+      key: string;
+      value: string;
+    };
+    url: string;
+  }[];
   simpleCollector?: {
     serviceName: string;
     url: string;

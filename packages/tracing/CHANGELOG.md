@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.10.1 - 2021-05-27
+
+- Added a `collectors` key to the Config to allow configuring several OpenTelemetry exporters
+
 ## 0.10.0 - 2021-05-25
 
 - Improved OpenTelemetry configs for the example repos.
