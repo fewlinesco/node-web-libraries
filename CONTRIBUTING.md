@@ -19,3 +19,12 @@ cd node-web-libraries
 asdf install
 yarn install
 ```
+
+## Development instructions
+
+For further information about how to setup and test projects, please have a read at the dedicated Contributing file:
+- [Migration](./migration/CONTRIBUTING.md)
+- [Database](./packages/database/CONTRIBUTING.md)
+- [Logging](./packages/logging/CONTRIBUTING.md)
+- [Tracing](./packages/tracing/CONTRIBUTING.md)
+- [Web](./packages/web/CONTRIBUTING.md)
