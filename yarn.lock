@@ -366,6 +366,22 @@
   resolved "https://registry.yarnpkg.com/@fewlines/eslint-config/-/eslint-config-3.1.2.tgz#14e9bbc8c6027a118e1fc4135827b2f028dfc87f"
   integrity sha512-JDSQ4FR4MDf6KaOSLinP+9S212BFRiYKo2GTk9OfjzJg+5CXajIilJKfpehIiCnzi2Ptcj7+Xr88njOspPid2Q==
 
+"@fwl/tracing@0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@fwl/tracing/-/tracing-0.10.0.tgz#cd8e36ff11a9b891d0f650c3e36aa13aa7ace173"
+  integrity sha512-zJWO8nrDuEFu6j3YS64NIvMgEJunFrTC7sHOe5CDfZpp7Pcatntbu5f8r8RFvs+sRmR9EdXVV+U4vEUegnMBjw==
+  dependencies:
+    "@fwl/logging" "0.1.2"
+    "@opentelemetry/api" "1.0.0-rc.3"
+    "@opentelemetry/context-async-hooks" "0.19.0"
+    "@opentelemetry/core" "0.19.0"
+    "@opentelemetry/exporter-collector" "0.19.0"
+    "@opentelemetry/exporter-zipkin" "0.19.0"
+    "@opentelemetry/node" "0.19.0"
+    "@opentelemetry/plugin-http" "0.18.2"
+    "@opentelemetry/plugin-https" "0.18.2"
+    "@opentelemetry/tracing" "0.19.0"
+
 "@hapi/accept@5.0.2":
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/@hapi/accept/-/accept-5.0.2.tgz#ab7043b037e68b722f93f376afb05e85c0699523"

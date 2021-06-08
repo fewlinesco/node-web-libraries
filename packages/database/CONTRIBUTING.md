@@ -2,7 +2,7 @@
 
 We welcome Pull Requests from anyone 👐
 
-By participating in this project, you agree to abide by its [Code of Conduct](CODE_OF_CONDUCT.md).
+By participating in this project, you agree to abide by its [Code of Conduct](../../CODE_OF_CONDUCT.md).
 
 Before submitting a Pull Request, please ensure the following:
 
@@ -13,9 +13,17 @@ Before submitting a Pull Request, please ensure the following:
 
 ## Setup
 
-```
+```bash
 git clone git@github.com:fewlinesco/node-web-libraries.git
 cd node-web-libraries
 asdf install
 yarn install
+cd cd packages/database
+```
+
+## Tests
+
+```bash
+docker-compose up
+yarn test
 ```
