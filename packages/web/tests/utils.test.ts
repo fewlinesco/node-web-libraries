@@ -226,7 +226,7 @@ describe("Server side cookies", () => {
         },
       ]);
       expect(mockedResponse.getHeader("set-cookie")).toBe(
-        `alert-messages=%5B%7B%22text%22%3A%22foo%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
+        `alert-messages=%5B%7B%22id%22%3A%2225c8c95c-0b7c-4b30-8d1e-e93e450dea32%22%2C%22text%22%3A%22foo%22%2C%22expiresAt%22%3A${currentTime}%7D%5D; Max-Age=86400; Path=/`,
       );
 
       deleteServerSideCookie(mockedResponse, "alert-messages");

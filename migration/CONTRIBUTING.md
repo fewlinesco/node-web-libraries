@@ -2,7 +2,7 @@
 
 We welcome Pull Requests from anyone, but please start by opening a "discussion" issue first to ensure that your proposal aligns with the Fewlines team's goals.
 
-By participating in this project, you agree to abide by its [Code of Conduct](CODE_OF_CONDUCT.md).
+By participating in this project, you agree to abide by its [Code of Conduct](../CODE_OF_CONDUCT.md).
 
 Before submitting a Pull Request, please ensure the following:
 
@@ -13,18 +13,16 @@ Before submitting a Pull Request, please ensure the following:
 
 ## Setup
 
-```
+```bash
 git clone git@github.com:fewlinesco/node-web-libraries.git
-cd node-web-libraries
+cd node-web-libraries/migration
 asdf install
 yarn install
 ```
 
-## Development instructions
+## Tests
 
-For further information about how to setup and test projects, please have a read at the dedicated Contributing file:
-- [Migration](./migration/CONTRIBUTING.md)
-- [Database](./packages/database/CONTRIBUTING.md)
-- [Logging](./packages/logging/CONTRIBUTING.md)
-- [Tracing](./packages/tracing/CONTRIBUTING.md)
-- [Web](./packages/web/CONTRIBUTING.md)
+```bash
+docker-compose up
+yarn test
+```
