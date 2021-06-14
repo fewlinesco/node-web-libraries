@@ -72,5 +72,5 @@
     ]
   },
   "types": "dist/index.d.ts",
-  "version": "0.0.0-experimental-27fb19b"
+  "version": "0.11.5"
 }
