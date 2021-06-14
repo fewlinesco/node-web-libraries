@@ -54,6 +54,7 @@ function redirect(
 ): void {
   response.statusCode = status;
   response.setHeader("Location", path);
+  response.end();
 }
 
 function isAbsolute(path: string): boolean {
