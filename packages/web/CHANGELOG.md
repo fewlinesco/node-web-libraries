@@ -1,10 +1,10 @@
 # CHANGELOG
 
-
 ## 0.11.5 - 2021-06-14
 
 - Fix the `redirect` function by closing the response afterward.
 - Add a `httpsRedirectMiddleware` to automatically redirect `http` requests to the same url in `https` when not on a local server.
+
 ## 0.11.4 - 2021-05-27
 
 - Bumped major deps:
