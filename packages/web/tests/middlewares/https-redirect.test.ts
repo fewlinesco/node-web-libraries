@@ -133,36 +133,3 @@ test("Do not redirect when the scheme is https", async () => {
 
   expect(response.statusCode).toBe(HttpStatus.OK);
 });
-
-test("Transfers the body on redirection", async () => {
-  expect.assertions(2);
-
-  const tracer = new InMemoryTracer();
-  const middleware = errorMiddleware(tracer);
-  const handler = (): void => {
-    response.end("OK");
-  };
-  const wrappedhandler = wrapMiddlewares(
-    [httpsRedirectMiddleware(tracer), middleware],
-    handler,
-  );
-
-  const body = { test: "test" };
-  const host = "test.test";
-  const url = "/test";
-  const response = new httpMock.Response();
-  const request = new httpMock.Request({
-    url,
-    headers: {
-      host,
-    },
-    buffer: Buffer.from(JSON.stringify(body)),
-  });
-
-  await wrappedhandler(request, response);
-
-  const requestBody = JSON.parse(await readBody(request));
-
-  expect(requestBody).toMatchObject(body);
-  expect(response.statusCode).toBe(HttpStatus.PERMANENT_REDIRECT);
-});
