@@ -7,7 +7,6 @@ import {
   errorMiddleware,
   httpsRedirectMiddleware,
 } from "../../src/middlewares";
-import { readBody } from "../../src/utils";
 
 test("Redirects to https with permanent redirect code when host is not localhost and specified scheme is http", async () => {
   expect.assertions(2);
