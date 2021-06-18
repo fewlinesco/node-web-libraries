@@ -326,6 +326,10 @@ If you don't want to use `WebError`, you can either don't use it or recode your 
 > ⚠️ If you use both `errorMiddleware` and `loggingMiddleware` the order must be error, then logging.
 > Otherwise, the error message will not be logged.
 
+#### Https Redirect Middleware
+
+This middleware will redirect requests to the `https` version of the url if the host is not `localhost` or `127.0.0.1`.
+
 #### Recovery Middleware
 
 This middleware only goal is to catch errors and return a 500 Internal Server Error.
