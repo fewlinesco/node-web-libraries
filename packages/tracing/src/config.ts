@@ -2,7 +2,7 @@ import { SpanAttributes } from "@opentelemetry/api";
 
 type TracingConfig = {
   collectors?: {
-    type: "otel";
+    type: string;
     serviceName: string;
     authorizationHeader?: {
       key: string;
