@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## 0.10.2 - 2021-06-21
+
+- Changed collector type to `string`.
+
 ## 0.10.1 - 2021-05-27
 
-- Added a `collectors` key to the Config to allow configuring several OpenTelemetry exporters
+- Added a `collectors` key to the Config to allow configuring several OpenTelemetry exporters.
 
 ## 0.10.0 - 2021-05-25
 
