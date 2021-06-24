@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.13.0 - 2021-06-24
+
+- 💥 [breaking change] String values are no longer stringified when used as a cookie value.
+
 ## 0.12.0 - 2021-06-14
 
 - 💥 [breaking change] Fix the `redirect` function by closing the response afterward.

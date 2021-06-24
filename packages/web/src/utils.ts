@@ -271,7 +271,9 @@ async function setServerSideCookies(
   } else {
     const newCookie = cookie.serialize(
       cookieName,
-      JSON.stringify(cookieValue),
+      typeof cookieValue === "string"
+        ? cookieValue
+        : JSON.stringify(cookieValue),
       setCookieOptions,
     );
 
