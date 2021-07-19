@@ -3,17 +3,17 @@
   "description": "Tracing part of Fewlines Web Libraries",
   "dependencies": {
     "@fwl/logging": "0.1.2",
-    "@opentelemetry/api": "0.21.0",
-    "@opentelemetry/context-async-hooks": "0.21.0",
-    "@opentelemetry/core": "0.21.0",
-    "@opentelemetry/exporter-collector": "0.21.0",
-    "@opentelemetry/exporter-zipkin": "0.21.0",
-    "@opentelemetry/node": "0.21.0",
+    "@opentelemetry/api": "0.20.0",
+    "@opentelemetry/context-async-hooks": "0.20.0",
+    "@opentelemetry/core": "0.20.0",
+    "@opentelemetry/exporter-collector": "0.20.0",
+    "@opentelemetry/exporter-zipkin": "0.20.0",
+    "@opentelemetry/node": "0.20.0",
     "@opentelemetry/plugin-http": "0.18.2",
     "@opentelemetry/plugin-https": "0.18.2",
-    "@opentelemetry/resources": "0.21.0",
-    "@opentelemetry/semantic-conventions": "0.21.0",
-    "@opentelemetry/tracing": "0.21.0"
+    "@opentelemetry/resources": "0.20.0",
+    "@opentelemetry/semantic-conventions": "0.20.0",
+    "@opentelemetry/tracing": "0.20.0"
   },
   "devDependencies": {
     "@fewlines/eslint-config": "3.1.2",
@@ -63,5 +63,5 @@
     "test": "jest"
   },
   "types": "dist/index.d.ts",
-  "version": "0.0.0-experimental-f91b8a5"
+  "version": "0.0.0-experimental-5b4af6e"
 }
