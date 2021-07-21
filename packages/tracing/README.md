@@ -55,6 +55,8 @@ startTracer({
 });
 ```
 
+> Note that if you configure several exporters, the `serviceName` property that will be used to define the service name of all exporters will be the first one.
+
 ### Lightstep
 
 And an example with a Lightstep public satellite:
