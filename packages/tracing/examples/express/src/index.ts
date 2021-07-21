@@ -1,4 +1,3 @@
-import "./tracing";
 import { getTracer, startTracer } from "@fwl/tracing";
 import express from "express";
 
@@ -12,7 +11,7 @@ startTracer({
     // activate the lightstep developer mode to see this trace
     {
       type: "otel",
-      serviceName: "next-app",
+      serviceName: "express-server",
       url: "http://localhost:8360/api/v2/otel/trace",
       authorizationHeader: {
         key: "Lightstep-Access-Token",

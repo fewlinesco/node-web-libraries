@@ -28,14 +28,17 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
     return;
   }
 
-  if (options.collectors) {
-    for (const collector of options.collectors) {
-      provider = new NodeTracerProvider({
-        resource: new Resource({
-          [ResourceAttributes.SERVICE_NAME]: collector.serviceName,
-        }),
-      });
+  if (provider) {
+    return;
+  }
 
+  if (options.collectors) {
+    provider = new NodeTracerProvider({
+      resource: new Resource({
+        [ResourceAttributes.SERVICE_NAME]: options.collectors[0].serviceName,
+      }),
+    });
+    for (const collector of options.collectors) {
       if (collector.type === "otel") {
         const collectorOptions: CollectorExporterNodeConfigBase = {
           attributes: options.attributes,
@@ -54,6 +57,7 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
       }
     }
   }
+
   if (options.simpleCollector) {
     provider = new NodeTracerProvider({
       resource: new Resource({
