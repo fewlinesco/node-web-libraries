@@ -28,10 +28,6 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
     return;
   }
 
-  if (provider) {
-    return;
-  }
-
   if (options.collectors) {
     provider = new NodeTracerProvider({
       resource: new Resource({
