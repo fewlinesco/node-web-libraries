@@ -11,6 +11,7 @@ async function handler(
   const tracer = getTracer();
 
   tracer.span("hello handler", async (span) => {
+    span.setDisclosedAttribute("attribute", "value");
     response.statusCode = 200;
     response.end(
       `See the trace at http://localhost:29797/trace/${span.getTraceId()}\n`,
