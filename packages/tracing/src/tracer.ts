@@ -28,12 +28,13 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
     return;
   }
 
+  provider = new NodeTracerProvider({
+    resource: new Resource({
+      [ResourceAttributes.SERVICE_NAME]: getServiceName(options),
+    }),
+  });
+
   if (options.collectors) {
-    provider = new NodeTracerProvider({
-      resource: new Resource({
-        [ResourceAttributes.SERVICE_NAME]: options.collectors[0].serviceName,
-      }),
-    });
     for (const collector of options.collectors) {
       if (collector.type === "otel") {
         const collectorOptions: CollectorExporterNodeConfigBase = {
@@ -55,12 +56,6 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
   }
 
   if (options.simpleCollector) {
-    provider = new NodeTracerProvider({
-      resource: new Resource({
-        [ResourceAttributes.SERVICE_NAME]: options.simpleCollector.serviceName,
-      }),
-    });
-
     const collector = new CollectorTraceExporter({
       attributes: options.attributes,
       url: options.simpleCollector.url,
@@ -71,13 +66,6 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
   }
 
   if (options.lightstepPublicSatelliteCollector) {
-    provider = new NodeTracerProvider({
-      resource: new Resource({
-        [ResourceAttributes.SERVICE_NAME]:
-          options.lightstepPublicSatelliteCollector.serviceName,
-      }),
-    });
-
     const collector = new CollectorTraceExporter({
       attributes: options.attributes,
       headers: {
@@ -212,6 +200,18 @@ interface Span {
   setAttribute(key: string, value: unknown): this;
   setDisclosedAttribute(key: string, value: unknown): this;
   end(endTime?: TimeInput): void;
+}
+
+function getServiceName(options: TracingConfig): string {
+  if (options.collectors) {
+    return options.collectors[0].serviceName;
+  } else if (options.simpleCollector) {
+    return options.simpleCollector.serviceName;
+  } else if (options.lightstepPublicSatelliteCollector) {
+    return options.lightstepPublicSatelliteCollector.serviceName;
+  } else {
+    return "default_service_name";
+  }
 }
 
 export { getTracer, startTracer, Span, Tracer };
