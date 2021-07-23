@@ -2,7 +2,7 @@
 
 ## 0.10.3 - 2021-07-21
 
-- Fixed internal breaking changes introduced by OT packages bumps, these doesn't not impact the lib usage.
+- Fixed internal breaking changes introduced by OT packages bumps, these does not impact the lib usage.
 - OpenTelemetry bumps:
 
 ```sh
