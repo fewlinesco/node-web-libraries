@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## 0.10.3 - 2021-07-21
+
+- Fixed internal breaking changes introduced by OT packages bumps, these does not impact the lib usage.
+- OpenTelemetry bumps:
+
+```sh
+  @opentelemetry/api                           1.0.0-rc.3  →  1.0.1
+  @opentelemetry/context-async-hooks           0.19.0  →  0.23.0
+  @opentelemetry/core                          0.19.0  →  0.23.0
+  @opentelemetry/exporter-collector            0.19.0  →  0.23.0
+  @opentelemetry/exporter-zipkin               0.19.0  →  0.23.0
+  @opentelemetry/node                          0.19.0  →  0.23.0
+  @opentelemetry/tracing                       0.19.0  →  0.23.0
+```
+
+- Added new OpenTelemetry dependencies:
+
+```sh
+  @opentelemetry/resources@0.23.0
+  @opentelemetry/semantic-conventions@0.23.0
+```
+
 ## 0.10.2 - 2021-06-21
 
 - Changed collector type to `string`.
