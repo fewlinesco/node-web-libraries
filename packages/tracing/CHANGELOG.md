@@ -4,6 +4,7 @@
 
 - Dev dependancies bump.
 - OpenTelemetry bumps:
+
 ```sh
 @opentelemetry/api                           1.0.1  →  1.0.2
 @opentelemetry/context-async-hooks           0.23.0  →  0.25.0
