@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 0.10.4 - 2021-08-26
+
+- Dev dependancies bump.
+- OpenTelemetry bumps:
+
+```sh
+@opentelemetry/api                           1.0.1  →  1.0.2
+@opentelemetry/context-async-hooks           0.23.0  →  0.25.0
+@opentelemetry/core                          0.23.0  →  0.25.0
+@opentelemetry/exporter-collector            0.23.0  →  0.25.0
+@opentelemetry/exporter-zipkin               0.23.0  →  0.25.0
+@opentelemetry/node                          0.23.0  →  0.24.0
+@opentelemetry/resources                     0.23.0  →  0.25.0
+@opentelemetry/semantic-conventions          0.23.0  →  0.25.0
+@opentelemetry/tracing                       0.23.0  →  0.24.0
+```
+
 ## 0.10.3 - 2021-07-21
 
 - Fixed internal breaking changes introduced by OT packages bumps, these does not impact the lib usage.

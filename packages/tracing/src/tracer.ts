@@ -14,7 +14,7 @@ import {
 } from "@opentelemetry/exporter-collector";
 import { NodeTracerProvider } from "@opentelemetry/node";
 import { Resource } from "@opentelemetry/resources";
-import { ResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 
 import type { TracingConfig } from "./config";
@@ -30,7 +30,7 @@ function startTracer(options: TracingConfig, logger?: Logger): void {
 
   provider = new NodeTracerProvider({
     resource: new Resource({
-      [ResourceAttributes.SERVICE_NAME]: getServiceName(options),
+      [SemanticResourceAttributes.SERVICE_NAME]: getServiceName(options),
     }),
   });
 
