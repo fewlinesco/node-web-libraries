@@ -71,7 +71,7 @@ const { rows } = await databaseQueryRunner.transaction((client) => {
 // rows contains [{id: "10f9a111-bf5c-4e73-96ac-5de87d962929"}]
 ```
 
-If you need to manually rollback a transaction, this is just another query:
+If you need to manually rollback a transaction, you can either use the `rollback()` function or throw an error:
 
 ```typescript
 try {
@@ -82,7 +82,24 @@ try {
     ]);
     const result = await callFromAnotherService();
     if (result.error) {
-      await client.query("ROLLBACK");
+      await client.rollback(); // ⚠️ don't forget to await
+    }
+  });
+} catch (error) {
+  // typeof error === TransactionError
+  // error.message === "transaction rolled back manually"
+}
+```
+
+```typescript
+try {
+  await databaseQueryRunner.transaction(async (client) => {
+    await client.query("INSERT INTO my_table (id, name) VALUES ($1, $2)", [
+      "10f9a111-bf5c-4e73-96ac-5de87d962929",
+      "in-transaction",
+    ]);
+    const result = await callFromAnotherService();
+    if (result.error) {
       return Promise.reject(new Error("anotherService failed"));
     }
   });
@@ -90,4 +107,32 @@ try {
   // typeof error === TransactionError
   // error.message === "anotherService failed"
 }
+```
+
+> ⚠️ To avoid calling several times the `ROLLBACK` query, you can't make a query to rollback your transaction directly, it would result in an error.
+
+## Testing
+
+If you want to test your code without having to `TRUNCATE` everything between each tests (and be able to run tests concurrently), you can create a connection with `database.connectInSandbox(options)`.
+
+The client will work like the others but every queries will be run inside of a transaction that will be rolled back when the connection is closed:
+
+```typescript
+import * as database from "@fwl/database";
+
+let dbClient: database.DatabaseQueryRunner;
+
+beforeEach(async () => {
+  dbClient = await database.connectInSandbox({
+    username: `${process.env.DATABASE_SQL_USERNAME}`,
+    host: `${process.env.DATABASE_SQL_HOST}`,
+    password: `${process.env.DATABASE_SQL_PASSWORD}`,
+    database: `${process.env.DATABASE_SQL_DATABASE}`,
+    port: parseFloat(`${process.env.DATABASE_SQL_PORT}`),
+  });
+});
+
+afterEach(async () => {
+  await dbClient.close();
+});
 ```

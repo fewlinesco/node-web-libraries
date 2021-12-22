@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Tracer, Span } from "@fwl/tracing";
 import { Pool, QueryArrayResult, PoolClient } from "pg";
+import { v4 as uuid } from "uuid";
 
 import {
   DatabaseConfig,
@@ -22,6 +23,7 @@ type TransactionFunction = (
 interface DatabaseBaseQueryRunner {
   query: (query: string, values?: any[]) => Promise<QueryArrayResult<any>>;
   close: () => Promise<void>;
+  rollback: () => Promise<void>;
   transaction: (txFunc: TransactionFunction) => Promise<any>;
 }
 
@@ -41,6 +43,18 @@ interface DatabaseQueryRunnerSandbox extends DatabaseBaseQueryRunner {
   _type?: "DatabaseQueryRunnerSandbox";
 }
 
+class FWLDatabaseError extends Error {
+  constructor(message: string) {
+    super(message); // 'Error' breaks prototype chain here
+    Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
+    this.name = "FWLDatabaseError";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, FWLDatabaseError);
+    }
+  }
+}
+
 class TransactionError extends Error {
   public PGError: Error;
   constructor(error: Error) {
@@ -54,6 +68,8 @@ class TransactionError extends Error {
     }
   }
 }
+
+class ManualRollbackError extends Error {}
 
 class DuplicateEntryError extends Error {
   public PGError: Error;
@@ -99,24 +115,33 @@ function queryRunner(
         return withoutTracing.query(query, values);
       });
     },
+    rollback: async () => {
+      return withoutTracing.rollback();
+    },
     transaction: async (transactionFunction): Promise<any> => {
       return tracer.span("db-transaction", async () => {
         if (txClient) {
           throw new TransactionError(
-            new Error("Can't run a transaction inside another transaction"),
+            new FWLDatabaseError(
+              "Can't run a transaction inside another transaction",
+            ),
           );
         }
         const newTxClient: PoolClient = await pool.connect();
         try {
           await newTxClient.query("BEGIN");
+
           const result = await transactionFunction(
             queryRunner(pool, tracer, newTxClient),
           );
           await newTxClient.query("COMMIT");
+
           return result;
         } catch (error) {
-          await newTxClient.query("ROLLBACK");
-          throw new TransactionError(error);
+          if (!(error instanceof ManualRollbackError)) {
+            await newTxClient.query("ROLLBACK");
+            throw new TransactionError(error);
+          }
         } finally {
           newTxClient.release();
         }
@@ -133,7 +158,7 @@ function queryRunnerWithoutTracing(
     close: async (): Promise<void> => {
       if (txClient) {
         throw new TransactionError(
-          new Error("Can't close a connection inside a transaction"),
+          new FWLDatabaseError("Can't close a connection inside a transaction"),
         );
       } else {
         close(pool);
@@ -142,6 +167,11 @@ function queryRunnerWithoutTracing(
     query: async (query, values = []): Promise<QueryArrayResult<any>> => {
       try {
         if (txClient) {
+          if (query === "ROLLBACK" || query.includes("ROLLBACK;")) {
+            throw new FWLDatabaseError(
+              "Can't query ROLLBACK inside of a `transaction` function, please throw an error or use transactionClient.rollback()",
+            );
+          }
           return await txClient.query(query, values);
         } else {
           return await pool.query(query, values);
@@ -150,10 +180,19 @@ function queryRunnerWithoutTracing(
         checkDatabaseError(error);
       }
     },
+    rollback: async () => {
+      if (!txClient) {
+        throw new FWLDatabaseError("Can't ROLLBACK outside of a transaction");
+      }
+      await txClient.query("ROLLBACK");
+      throw new ManualRollbackError("transaction rolled back manually");
+    },
     transaction: async (transactionFunction): Promise<any> => {
       if (txClient) {
         throw new TransactionError(
-          new Error("Can't run a transaction inside another transaction"),
+          new FWLDatabaseError(
+            "Can't run a transaction inside another transaction",
+          ),
         );
       }
       const newTxClient: PoolClient = await pool.connect();
@@ -165,8 +204,10 @@ function queryRunnerWithoutTracing(
         await newTxClient.query("COMMIT");
         return result;
       } catch (error) {
-        await newTxClient.query("ROLLBACK");
-        throw new TransactionError(error);
+        if (!(error instanceof ManualRollbackError)) {
+          await newTxClient.query("ROLLBACK");
+          throw new TransactionError(error);
+        }
       } finally {
         newTxClient.release();
       }
@@ -177,37 +218,72 @@ function queryRunnerWithoutTracing(
 function queryRunnerSandbox(
   pool: Pool,
   txClient: PoolClient,
-  insideTransaction = false,
+  savepointId = undefined,
 ): DatabaseQueryRunnerSandbox {
+  let currentSavepointId: string;
   return {
     close: async (): Promise<void> => {
+      if (savepointId) {
+        throw new TransactionError(
+          new FWLDatabaseError("Can't close a connection inside a transaction"),
+        );
+      }
       await txClient.query("ROLLBACK");
+      txClient.release();
       close(pool);
     },
     query: async (query, values = []): Promise<QueryArrayResult<any>> => {
       try {
+        if (
+          savepointId &&
+          (query === "ROLLBACK" || query.includes("ROLLBACK;"))
+        ) {
+          throw new FWLDatabaseError(
+            "Can't query ROLLBACK inside of a `transaction` function, please throw an error or use transactionClient.rollback()",
+          );
+        }
+
         return await txClient.query(query, values);
       } catch (error) {
         checkDatabaseError(error);
       }
     },
+    rollback: async () => {
+      if (!savepointId) {
+        throw new FWLDatabaseError("Can't ROLLBACK outside of a transaction");
+      }
+
+      await txClient.query(
+        `ROLLBACK TO SAVEPOINT fwl_database_sandbox_savepoint_${savepointId};`,
+      );
+      throw new ManualRollbackError("transaction rolled back manually");
+    },
     transaction: async (transactionFunction): Promise<any> => {
-      if (insideTransaction) {
+      if (savepointId) {
         throw new TransactionError(
-          new Error("Can't run a transaction inside another transaction"),
+          new FWLDatabaseError(
+            "Can't run a transaction inside another transaction",
+          ),
         );
       }
       try {
-        await txClient.query("SAVEPOINT fwl_database_sandbox_savepoint;");
-        return transactionFunction(queryRunnerSandbox(pool, txClient, true));
-      } catch (error) {
+        currentSavepointId = uuid().replace(/-/g, "_");
         await txClient.query(
-          "ROLLBACK TO SAVEPOINT fwl_database_sandbox_savepoint;",
+          `SAVEPOINT fwl_database_sandbox_savepoint_${currentSavepointId};`,
         );
-        throw new TransactionError(error);
+        return await transactionFunction(
+          queryRunnerSandbox(pool, txClient, currentSavepointId),
+        );
+      } catch (error) {
+        if (!(error instanceof ManualRollbackError)) {
+          await txClient.query(
+            `ROLLBACK TO SAVEPOINT fwl_database_sandbox_savepoint_${currentSavepointId};`,
+          );
+          throw new TransactionError(error);
+        }
       } finally {
         await txClient.query(
-          "RELEASE SAVEPOINT fwl_database_sandbox_savepoint;",
+          `RELEASE SAVEPOINT fwl_database_sandbox_savepoint_${currentSavepointId};`,
         );
       }
     },
@@ -313,11 +389,11 @@ function getConfig(options?: DatabaseConfig): DatabaseConfigWithObject {
 }
 
 export {
-  BadUUIDError,
   connect,
   connectInSandbox,
   connectWithoutTracing,
   convertUrl,
+  BadUUIDError,
   DatabaseQueryRunner,
   DatabaseQueryRunnerSandbox,
   DatabaseQueryRunnerWithoutTracing,

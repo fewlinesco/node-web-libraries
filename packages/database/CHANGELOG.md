@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.6.0 - 2021-08-11
+
+- Breaking Change: it is now forbidden to make a `client.query("ROLLBACK")` inside of a `transaction` callback since it could result in several `ROLLBACK` calls.
+- the client inside of a transaction has now access to a `rollback()` function to trigger the rollback.
+- For testing purposes, there is now a `database.connectInSandbox(options)` method that will do all queries inside of a transaction.
+
 ## 0.5.2 - 2021-05-27
 
 - Bumped major:
