@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.10.5 - 2022-04-15
+
+- [fix] move all dependencies from `devDependencies` to `dependencies` to make `@fwl/tracing` work in any project.
+
 ## 0.10.4 - 2021-08-26
 
 - Dev dependancies bump.

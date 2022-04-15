@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.1 - 2022-04-15
+
+- [fix] move all dependencies from `devDependencies` to `dependencies` to make `@fwl/database` work in any project.
+
 ## 0.6.0 - 2021-08-11
 
 - Breaking Change: it is now forbidden to make a `client.query("ROLLBACK")` inside of a `transaction` callback since it could result in several `ROLLBACK` calls.

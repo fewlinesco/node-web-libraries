@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.14.0 - 2022-04-15
+
+- [fix] move all dependencies from `devDependencies` to `dependencies` to make `@fwl/web` work in any project.
+
 ## 0.13.0 - 2021-06-24
 
 - 💥 [breaking change] String values are no longer stringified when used as a cookie value.

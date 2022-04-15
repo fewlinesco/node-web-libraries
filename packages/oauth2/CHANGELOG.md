@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.9] - 2022-04-15
+
+- [fix] move all dependencies from `devDependencies` to `dependencies` to make `@fwl/oauth2` work in any project.
+
 ## [0.1.8] - 2020-12-14
 
 - Moved all exported objects and functions to `src` to prevent import issues.
