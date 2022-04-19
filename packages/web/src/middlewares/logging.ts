@@ -8,8 +8,8 @@ import { Middleware } from "../typings/middleware";
 function getAddr(request: IncomingMessage): string {
   if (request.headers["x-forwarded-for"]) {
     return request.headers["x-forwarded-for"].toString();
-  } else if (request.connection.remoteAddress) {
-    return request.connection.remoteAddress.toString();
+  } else if (request.socket.remoteAddress) {
+    return request.socket.remoteAddress.toString();
   }
   return "";
 }

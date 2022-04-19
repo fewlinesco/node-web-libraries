@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3 - 2022-04-15
+
+- [fix] move all dependencies from `devDependencies` to `dependencies` to make `@fwl/logging` work in any project.
+
 ## 0.1.2 - 2021-05-25
 
 - The package now exports an `InMemoryLogger` to help with tests.
