@@ -1,6 +1,8 @@
 # CHANGELOG
 
-All notable changes to this project will be documented in this file.
+## [0.2.0] - 2022-04-25
+
+- [fix] add repository key in `package.json` to trigger the changelog in `dependabot`'s PRs description
 
 ## [0.1.9] - 2022-04-15
 

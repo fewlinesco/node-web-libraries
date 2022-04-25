@@ -1,6 +1,31 @@
 {
+  "name": "@fwl/tracing",
   "author": "Fewlines",
   "description": "Tracing part of Fewlines Web Libraries",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.10.6",
+  "files": [
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fewlinesco/node-web-libraries",
+    "directory": "packages/tracing"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
+    "prelint": "prettier --trailing-comma all --write './**/*.md'",
+    "lint": "eslint --ext ts --ignore-pattern dist .",
+    "prebuild": "yarn clean",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn lint",
+    "preversion": "yarn lint",
+    "test": "jest"
+  },
   "dependencies": {
     "@fwl/logging": "0.1.2",
     "@opentelemetry/api": "1.0.2",
@@ -37,31 +62,11 @@
       "@fewlines/eslint-config/typescript"
     ]
   },
-  "files": [
-    "dist/**/*"
-  ],
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "dist/"
     ]
-  },
-  "license": "MIT",
-  "main": "dist/index.js",
-  "name": "@fwl/tracing",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
-    "prelint": "prettier --trailing-comma all --write './**/*.md'",
-    "lint": "eslint --ext ts --ignore-pattern dist .",
-    "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn lint",
-    "preversion": "yarn lint",
-    "test": "jest"
-  },
-  "types": "dist/index.d.ts",
-  "version": "0.10.5"
+  }
 }

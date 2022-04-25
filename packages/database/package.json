@@ -6,6 +6,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "version": "0.6.2",
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/fewlinesco/node-web-libraries",
@@ -49,8 +52,5 @@
       "@fewlines/eslint-config/node",
       "@fewlines/eslint-config/typescript"
     ]
-  },
-  "files": [
-    "dist/**/*"
-  ]
+  }
 }
