@@ -1,6 +1,27 @@
 {
+  "name": "@fwl/database",
   "author": "Fewlines",
   "description": "Database part of Fewlines Web Libraries",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.6.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fewlinesco/node-web-libraries",
+    "directory": "packages/database"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
+    "lint": "eslint --ext ts --ignore-pattern dist .",
+    "prebuild": "yarn clean",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn lint",
+    "preversion": "yarn lint",
+    "test": "jest --runInBand --verbose"
+  },
   "dependencies": {
     "@fwl/tracing": "0.10.0",
     "@types/node": "15.6.1",
@@ -31,21 +52,5 @@
   },
   "files": [
     "dist/**/*"
-  ],
-  "license": "MIT",
-  "main": "dist/index.js",
-  "name": "@fwl/database",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
-    "lint": "eslint --ext ts --ignore-pattern dist .",
-    "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn lint",
-    "preversion": "yarn lint",
-    "test": "jest --runInBand --verbose"
-  },
-  "types": "dist/index.d.ts",
-  "version": "0.6.1"
+  ]
 }

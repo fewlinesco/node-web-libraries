@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.2 - 2022-04-22
+
+- Bump version to see if dependabot shows the release note.
+
 ## 0.6.1 - 2022-04-15
 
 - [fix] move all dependencies from `devDependencies` to `dependencies` to make `@fwl/database` work in any project.
