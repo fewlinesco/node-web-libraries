@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.4 - 2022-04-25
+
+- [fix] add repository key in `package.json` to trigger the changelog in `dependabot`'s PRs description
+
 ## 0.1.3 - 2022-04-15
 
 - [fix] move all dependencies from `devDependencies` to `dependencies` to make `@fwl/logging` work in any project.

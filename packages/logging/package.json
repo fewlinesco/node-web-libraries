@@ -1,6 +1,30 @@
 {
   "author": "Fewlines",
   "description": "Logging part of Fewlines Web Libraries",
+  "types": "dist/index.d.ts",
+  "version": "0.1.4",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "name": "@fwl/logging",
+  "files": [
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fewlinesco/node-web-libraries",
+    "directory": "packages/logging"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prelint": "prettier --trailing-comma all --write './**/*.md'",
+    "lint": "eslint --ext ts --ignore-pattern dist .",
+    "prebuild": "yarn clean",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test && yarn lint",
+    "preversion": "yarn lint",
+    "test": "jest"
+  },
   "dependencies": {
     "@types/logfmt": "1.2.1",
     "@types/node": "15.6.1",
@@ -26,24 +50,5 @@
       "@fewlines/eslint-config/node",
       "@fewlines/eslint-config/typescript"
     ]
-  },
-  "files": [
-    "dist/**/*"
-  ],
-  "license": "MIT",
-  "main": "dist/index.js",
-  "name": "@fwl/logging",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "prelint": "prettier --trailing-comma all --write './**/*.md'",
-    "lint": "eslint --ext ts --ignore-pattern dist .",
-    "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn test && yarn lint",
-    "preversion": "yarn lint",
-    "test": "jest"
-  },
-  "types": "dist/index.d.ts",
-  "version": "0.1.3"
+  }
 }

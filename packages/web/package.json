@@ -1,6 +1,31 @@
 {
+  "name": "@fwl/web",
   "author": "Fewlines",
   "description": "Web part of Fewlines Web Libraries",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.14.1",
+  "files": [
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fewlinesco/node-web-libraries",
+    "directory": "packages/web"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prelint": "prettier --trailing-comma all --write './**/*.md'",
+    "lint": "eslint --ext ts --ignore-pattern dist .",
+    "prebuild": "yarn clean",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn lint",
+    "preversion": "yarn lint",
+    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
+    "test": "jest --runInBand"
+  },
   "dependencies": {
     "@fwl/logging": "0.1.2",
     "@fwl/tracing": "0.10.0",
@@ -46,31 +71,11 @@
       "@fewlines/eslint-config/typescript"
     ]
   },
-  "files": [
-    "dist/**/*"
-  ],
-  "license": "MIT",
-  "main": "dist/index.js",
-  "name": "@fwl/web",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "prelint": "prettier --trailing-comma all --write './**/*.md'",
-    "lint": "eslint --ext ts --ignore-pattern dist .",
-    "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn lint",
-    "preversion": "yarn lint",
-    "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
-    "test": "jest --runInBand"
-  },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "dist/"
     ]
-  },
-  "types": "dist/index.d.ts",
-  "version": "0.14.0"
+  }
 }

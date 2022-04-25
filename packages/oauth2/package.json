@@ -1,6 +1,30 @@
 {
+  "name": "@fwl/oauth2",
   "author": "Fewlines",
   "description": "OAuth2 part of Fewlines Web Libraries",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.2.0",
+  "files": [
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fewlinesco/node-web-libraries",
+    "directory": "packages/oauth2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prelint": "prettier --trailing-comma all --write './**/*.md'",
+    "lint": "eslint --ext ts --ignore-pattern dist .",
+    "prebuild": "yarn clean",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn lint",
+    "preversion": "yarn lint",
+    "test": "jest"
+  },
   "dependencies": {
     "@types/jsonwebtoken": "8.5.0",
     "@types/node-fetch": "2.5.7",
@@ -32,34 +56,11 @@
       "@fewlines/eslint-config/typescript"
     ]
   },
-  "files": [
-    "dist/**/*"
-  ],
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "dist/"
     ]
-  },
-  "license": "MIT",
-  "main": "dist/index.js",
-  "name": "@fwl/oauth2",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "prelint": "prettier --trailing-comma all --write './**/*.md'",
-    "lint": "eslint --ext ts --ignore-pattern dist .",
-    "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn lint",
-    "preversion": "yarn lint",
-    "test": "jest"
-  },
-  "types": "dist/index.d.ts",
-  "version": "0.1.9",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fewlinesco/node-web-libraries/tree/master/packages/oauth2"
   }
 }
