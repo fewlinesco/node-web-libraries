@@ -36,15 +36,12 @@
 - [ ] Chore (non-breaking change which refactors / improves the existing code base)
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to 
+- [ ] Breaking change (fix or feature that would cause existing functionality to
   change)
 
-## Checklist:
+## Checklist
 
-<!--- Go over all the following points, and replace the `:red_circle:` in all -->
-<!--- the lines with a :white_check_mark: when relevant. -->
-<!--- If you're unsure about any of these, don't hesitate to ask. We're -->
-<!--- here to help! -->
+<!--- What types of changes does your code introduce? Stroke -->
 - [ ] My code follows the code style of this project.
 - [ ] My change requires a change to the documentation.
 - [ ] I have updated the documentation accordingly.
