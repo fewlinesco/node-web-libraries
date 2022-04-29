@@ -1,0 +1,61 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/packages/database"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 10
+    reviewers:
+    - "TheRealAstoo"
+    - "Fenntasy"
+    - "GrosboillotFlo"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/logging"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 10
+    reviewers:
+    - "TheRealAstoo"
+    - "Fenntasy"
+    - "GrosboillotFlo"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/oauth2"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 10
+    reviewers:
+    - "TheRealAstoo"
+    - "Fenntasy"
+    - "GrosboillotFlo"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/tracing"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 10
+    reviewers:
+    - "TheRealAstoo"
+    - "Fenntasy"
+    - "GrosboillotFlo"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/web"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 10
+    reviewers:
+    - "TheRealAstoo"
+    - "Fenntasy"
+    - "GrosboillotFlo"
