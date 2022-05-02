@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.2.2] - 2022-05-02
+
+- Bump node-fetch to the latest version of the 2.x branch
+
 ## [0.2.1] - 2022-05-02
 
 - Bump all dependencies

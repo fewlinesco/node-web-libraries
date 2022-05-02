@@ -23,7 +23,7 @@ gitCommit=${4:?"git commit SHA is required as fourth argument"};
 gitBranch=${3:?"git branch is required as third argument"};
 
 gitShortCommit=$(echo $CIRCLE_SHA1 | cut -c -7)
-releaseName=$(echo ${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/')
+releaseName=$(echo ${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/' | sed 's/\//-/g')
 
 environment=$(_appEnvironment $gitBranch)
 dockerTag=${environment}_${gitCommit}

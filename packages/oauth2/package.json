@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "files": [
     "dist/**/*"
   ],
@@ -31,7 +31,7 @@
     "@types/node-fetch": "2.6.1",
     "@types/node-jose": "1.1.10",
     "jsonwebtoken": "8.5.1",
-    "node-fetch": "2.6.1",
+    "node-fetch": "2.6.7",
     "node-jose": "2.1.1"
   },
   "devDependencies": {
