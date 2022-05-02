@@ -1,4 +1,4 @@
-FROM node:12.16.2-alpine as deps
+FROM node:16.15.0-alpine as deps
 
 WORKDIR /opt/app
 

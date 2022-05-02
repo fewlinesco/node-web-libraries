@@ -23,9 +23,8 @@ type SchemaMigrationsRow = {
 };
 
 async function runMigrations(config: RunMigrationsConfig): Promise<void> {
-  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
-    config.database,
-  );
+  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing =
+    database.connectWithoutTracing(config.database);
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
   const tableName = config.migration.tableName || "schema_migrations";
@@ -52,7 +51,7 @@ async function runMigrations(config: RunMigrationsConfig): Promise<void> {
           [uuidv4(), timestamp, fileName, query],
         );
       } catch (error) {
-        client.query("ROLLBACK");
+        await client.rollback();
         throw error;
       }
     });
@@ -91,9 +90,8 @@ async function createMigrationFile(
 async function dryRunPendingMigrations(
   config: RunMigrationsConfig,
 ): Promise<void> {
-  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing = database.connectWithoutTracing(
-    config.database,
-  );
+  const databaseQueryRunner: database.DatabaseQueryRunnerWithoutTracing =
+    database.connectWithoutTracing(config.database);
 
   const sqlMigrationsFolder = config.migration.dirPath || "./migrations";
   const tableName = config.migration.tableName || "schema_migrations";
@@ -113,21 +111,16 @@ async function dryRunPendingMigrations(
 
     await databaseQueryRunner.transaction(async (client) => {
       for await (const { timestamp, fileName, query } of pendingMigrations) {
-        try {
-          await client.query(query);
+        await client.query(query);
 
-          await client.query(
-            `
+        await client.query(
+          `
             INSERT INTO ${tableName} (id, version, file_name, query) VALUES ($1, $2, $3, $4)`,
-            [uuidv4(), timestamp, fileName, query],
-          );
-        } catch (error) {
-          client.query("ROLLBACK");
-          throw error;
-        }
+          [uuidv4(), timestamp, fileName, query],
+        );
       }
 
-      await client.query("ROLLBACK");
+      await client.rollback();
       console.log("Migration dry run success!");
     });
   } catch (error) {
