@@ -27,7 +27,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@fwl/logging": "0.1.4",
+    "@fwl/logging": "0.1.5",
     "@opentelemetry/api": "1.1.0",
     "@opentelemetry/context-async-hooks": "1.2.0",
     "@opentelemetry/core": "1.2.0",
