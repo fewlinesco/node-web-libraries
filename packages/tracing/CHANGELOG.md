@@ -1,5 +1,10 @@
 # CHANGELOG
 
+
+## 0.10.7 - 2022-05-02
+
+- Bump all dependencies
+
 ## 0.10.6 - 2022-04-15
 
 - [fix] add repository key in `package.json` to trigger the changelog in `dependabot`'s PRs description
@@ -10,7 +15,7 @@
 
 ## 0.10.4 - 2021-08-26
 
-- Dev dependancies bump.
+- Dev dependencies bump.
 - OpenTelemetry bumps:
 
 ```sh
