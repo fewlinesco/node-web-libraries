@@ -7,7 +7,7 @@ import {
   defaultSecret,
 } from "./defaultObjects";
 
-export function generateHS256JWS(
+function generateHS256JWS(
   customPayload?: CustomPayload,
   secret?: string,
 ): string {
@@ -20,7 +20,7 @@ export function generateHS256JWS(
   );
 }
 
-export function generateRS256JWS(
+function generateRS256JWS(
   customPayload?: CustomPayload,
   privateKey?: string,
 ): string {
@@ -32,3 +32,5 @@ export function generateRS256JWS(
     },
   );
 }
+
+export { generateRS256JWS, generateHS256JWS };

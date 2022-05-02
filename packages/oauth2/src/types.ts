@@ -1,4 +1,4 @@
-export type OpenIDConfiguration = {
+type OpenIDConfiguration = {
   userinfo_signing_alg_values_supported: string[];
   userinfo_endpoint: string;
   token_endpoint_auth_signing_alg_values_supported: ("HS256" | "RS256")[];
@@ -18,7 +18,7 @@ export type OpenIDConfiguration = {
   authorization_endpoint: string;
 };
 
-export type OAuth2ClientConstructor = {
+type OAuth2ClientConstructor = {
   openIDConfigurationURL: string;
   clientID: string;
   clientSecret: string;
@@ -28,7 +28,7 @@ export type OAuth2ClientConstructor = {
   fetch?: any;
 };
 
-export type JWKSDT = {
+type JWKSDT = {
   keys: {
     use: string;
     n: string;
@@ -39,13 +39,13 @@ export type JWKSDT = {
   }[];
 };
 
-export type OAuth2Tokens = {
+type OAuth2Tokens = {
   refresh_token: string;
   access_token: string;
   id_token?: string;
 };
 
-export type JWTPayload = {
+type JWTPayload = {
   aud: string | string[];
   exp: number;
   iss: string;
@@ -53,4 +53,13 @@ export type JWTPayload = {
   sub: string;
 };
 
-export type CustomPayload = Record<string, unknown>;
+type CustomPayload = Record<string, unknown>;
+
+export {
+  OpenIDConfiguration,
+  OAuth2ClientConstructor,
+  JWKSDT,
+  OAuth2Tokens,
+  JWTPayload,
+  CustomPayload,
+};

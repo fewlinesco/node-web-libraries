@@ -1,11 +1,20 @@
-export class MissingJWKSURI extends Error {}
+class MissingJWKSURI extends Error {}
 
-export class InvalidKeyIDRS256 extends Error {}
+class InvalidKeyIDRS256 extends Error {}
 
-export class MissingKeyIDHS256 extends Error {}
+class MissingKeyIDHS256 extends Error {}
 
-export class AlgoNotSupported extends Error {}
+class AlgoNotSupported extends Error {}
 
-export class InvalidAudience extends Error {}
+class InvalidAudience extends Error {}
 
-export class ScopesNotSupported extends Error {}
+class ScopesNotSupported extends Error {}
+
+export {
+  MissingJWKSURI,
+  InvalidKeyIDRS256,
+  MissingKeyIDHS256,
+  AlgoNotSupported,
+  InvalidAudience,
+  ScopesNotSupported,
+};
