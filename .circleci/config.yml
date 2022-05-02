@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   setup:
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.13.1
     steps:
       - checkout
       - restore_cache:
@@ -19,7 +19,7 @@ jobs:
           key: yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
   test-database:
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.13.1
         environment:
           DATABASE_SQL_HOST: localhost
           DATABASE_SQL_USERNAME: fwl_db
@@ -47,7 +47,7 @@ jobs:
           working_directory: packages/database
   test-logging:
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.13.1
     steps:
       - checkout
       - restore_cache:
@@ -68,7 +68,7 @@ jobs:
           working_directory: packages/logging
   test-migration:
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.13.1
         environment:
           DATABASE_SQL_HOST: localhost
           DATABASE_SQL_USERNAME: fwl_db
@@ -97,7 +97,7 @@ jobs:
           working_directory: migration
   test-tracing:
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.13.1
     steps:
       - checkout
       - restore_cache:
@@ -118,7 +118,7 @@ jobs:
           working_directory: packages/tracing
   test-web:
     docker:
-      - image: circleci/node:12.16.2
+      - image: circleci/node:16.13.1
     steps:
       - checkout
       - restore_cache:
