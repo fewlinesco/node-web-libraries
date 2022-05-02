@@ -31,7 +31,7 @@
     "@types/node-fetch": "2.6.1",
     "@types/node-jose": "1.1.10",
     "jsonwebtoken": "8.5.1",
-    "node-fetch": "2.6.1",
+    "node-fetch": "2.6.7",
     "node-jose": "2.1.1"
   },
   "devDependencies": {
