@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.2.1] - 2022-05-02
+
+- Bump all dependencies
+
 ## [0.2.0] - 2022-04-25
 
 - [fix] add repository key in `package.json` to trigger the changelog in `dependabot`'s PRs description
