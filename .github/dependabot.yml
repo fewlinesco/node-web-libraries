@@ -59,3 +59,15 @@ updates:
     - "TheRealAstoo"
     - "Fenntasy"
     - "GrosboillotFlo"
+
+  - package-ecosystem: "npm"
+    directory: "/migration"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 10
+    reviewers:
+    - "TheRealAstoo"
+    - "Fenntasy"
+    - "GrosboillotFlo"
