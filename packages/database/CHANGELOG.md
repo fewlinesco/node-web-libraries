@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.3 - 2022-05-02
+
+- Bummp all dependencies
+
 ## 0.6.2 - 2022-04-22
 
 - Bump version to see if dependabot shows the release note.

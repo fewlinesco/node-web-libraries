@@ -8,7 +8,7 @@ import * as migration from "../migration";
 import { getConfig } from "../utils/getConfig";
 
 describe("runCLI", () => {
-  it("handles no arguments", async (done) => {
+  it("handles no arguments", async () => {
     expect.assertions(6);
 
     const mockExit = jest
@@ -35,11 +35,10 @@ describe("runCLI", () => {
 
     mockExit.mockRestore();
     mockLog.mockRestore();
-    done();
   });
 
   describe("migrate", () => {
-    it("handles too many arguments", async (done) => {
+    it("handles too many arguments", async () => {
       expect.assertions(6);
 
       const spyMigrate = jest.spyOn(migration, "runMigrations");
@@ -63,11 +62,9 @@ describe("runCLI", () => {
 
       mockExit.mockRestore();
       mockLog.mockRestore();
-
-      done();
     });
 
-    it("can override the database config with a database url passed as an option", async (done) => {
+    it("can override the database config with a database url passed as an option", async () => {
       expect.assertions(2);
 
       const spyMigrate = jest
@@ -97,11 +94,10 @@ describe("runCLI", () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       expect(spyMigrate).toHaveBeenCalled();
-      done();
     });
 
     describe("SSL certificate", () => {
-      it("can override the database config with a SSL CA passed as an option, and a database URL is provided", async (done) => {
+      it("can override the database config with a SSL CA passed as an option, and a database URL is provided", async () => {
         expect.assertions(2);
 
         const spyMigrate = jest
@@ -138,10 +134,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyMigrate).toHaveBeenCalled();
-        done();
       });
 
-      it("can override the database config with a SSL Key passed as an option, and a database URL is provided", async (done) => {
+      it("can override the database config with a SSL Key passed as an option, and a database URL is provided", async () => {
         expect.assertions(2);
 
         const spyMigrate = jest
@@ -178,10 +173,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyMigrate).toHaveBeenCalled();
-        done();
       });
 
-      it("can override the database config with a SSL Cert passed as an option, and a database URL is provided", async (done) => {
+      it("can override the database config with a SSL Cert passed as an option, and a database URL is provided", async () => {
         expect.assertions(2);
 
         const spyMigrate = jest
@@ -218,10 +212,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyMigrate).toHaveBeenCalled();
-        done();
       });
 
-      it("can takes multiple SSL flags", async (done) => {
+      it("can takes multiple SSL flags", async () => {
         expect.assertions(2);
 
         const spyMigrate = jest
@@ -264,10 +257,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyMigrate).toHaveBeenCalled();
-        done();
       });
 
-      it("should work both with absolute or relative path", async (done) => {
+      it("should work both with absolute or relative path", async () => {
         expect.assertions(2);
 
         const spyDryRun = jest
@@ -310,11 +302,10 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyDryRun).toHaveBeenCalled();
-        done();
       });
     });
 
-    it("can override the migrations table with the right option", async (done) => {
+    it("can override the migrations table with the right option", async () => {
       expect.assertions(2);
 
       const spyMigrate = jest
@@ -333,39 +324,43 @@ describe("runCLI", () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       expect(spyMigrate).toHaveBeenCalled();
-      done();
     });
   });
 
   describe("create", () => {
     const createArgs = ["create", "foo"];
 
-    it("creates a timestamped migration file", async (done) => {
+    it("creates a timestamped migration file", async () => {
       const spyLog = jest.spyOn(console, "log").mockImplementation(jest.fn());
       expect.assertions(1);
 
       process.argv = [...createArgs];
 
       const config = await getConfig("./test/config.json");
-      const createdMigrationFile = await createMigrationFile(
-        "foo",
-        config.migration.dirPath,
-      );
+      try {
+        const createdMigrationFile = await createMigrationFile(
+          "foo",
+          config.migration.dirPath,
+        );
 
-      const migrationsDirPath = path.join(process.cwd(), "/test/migrations");
+        const migrationsDirPath = path.join(process.cwd(), "/test/migrations");
 
-      const migrationFiles = await fs.promises.readdir(migrationsDirPath);
+        const migrationFiles = await fs.promises.readdir(migrationsDirPath);
 
-      expect(createdMigrationFile).toBe(
-        migrationFiles[migrationFiles.length - 1],
-      );
+        expect(createdMigrationFile).toBe(
+          migrationFiles[migrationFiles.length - 1],
+        );
+        await fs.promises.unlink(
+          `${migrationsDirPath}/${createdMigrationFile}`,
+        );
+      } catch (error) {
+        console.error(error);
+      }
 
-      await fs.promises.unlink(`${migrationsDirPath}/${createdMigrationFile}`);
       spyLog.mockRestore();
-      done();
     });
 
-    it("handles too many arguments", async (done) => {
+    it("handles too many arguments", async () => {
       expect.assertions(6);
 
       const argv = [...createArgs, "foo", "bar", "braz"];
@@ -394,15 +389,13 @@ describe("runCLI", () => {
         expect(mockExit).not.toHaveBeenCalledWith(0);
         expect(mockLog).not.toHaveBeenCalled();
       }
-
-      done();
     });
   });
 
   describe("dryRun", () => {
     const migrateArgs = ["dryRun", "path/migration/dir"];
 
-    it("handles too many arguments", async (done) => {
+    it("handles too many arguments", async () => {
       expect.assertions(6);
 
       const argv = [...migrateArgs, "foo", "bar", "braz"];
@@ -431,12 +424,10 @@ describe("runCLI", () => {
         expect(mockExit).not.toHaveBeenCalledWith(0);
         expect(mockLog).not.toHaveBeenCalled();
       }
-
-      done();
     });
 
     describe("SSL certificate", () => {
-      it("can override the database config with a SSL CA passed as an option, and a database URL is provided", async (done) => {
+      it("can override the database config with a SSL CA passed as an option, and a database URL is provided", async () => {
         expect.assertions(2);
 
         const spyDryRun = jest
@@ -473,10 +464,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyDryRun).toHaveBeenCalled();
-        done();
       });
 
-      it("can override the database config with a SSL Key passed as an option, and a database URL is provided", async (done) => {
+      it("can override the database config with a SSL Key passed as an option, and a database URL is provided", async () => {
         expect.assertions(2);
 
         const spyDryRun = jest
@@ -513,10 +503,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyDryRun).toHaveBeenCalled();
-        done();
       });
 
-      it("can override the database config with a SSL Cert passed as an option, and a database URL is provided", async (done) => {
+      it("can override the database config with a SSL Cert passed as an option, and a database URL is provided", async () => {
         expect.assertions(2);
 
         const spyDryRun = jest
@@ -553,10 +542,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyDryRun).toHaveBeenCalled();
-        done();
       });
 
-      it("can takes multiple SSL flags", async (done) => {
+      it("can takes multiple SSL flags", async () => {
         expect.assertions(2);
 
         const spyDryRun = jest
@@ -599,10 +587,9 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyDryRun).toHaveBeenCalled();
-        done();
       });
 
-      it("should work both with absolute or relative path", async (done) => {
+      it("should work both with absolute or relative path", async () => {
         expect.assertions(2);
 
         const spyDryRun = jest
@@ -645,7 +632,6 @@ describe("runCLI", () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         expect(spyDryRun).toHaveBeenCalled();
-        done();
       });
     });
   });

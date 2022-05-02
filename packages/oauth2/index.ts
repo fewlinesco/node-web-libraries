@@ -85,10 +85,8 @@ class OAuth2Client {
   async getAuthorizationURL(state?: string): Promise<URL> {
     await this.setOpenIDConfiguration();
 
-    const {
-      authorization_endpoint,
-      scopes_supported,
-    } = this.openIDConfiguration;
+    const { authorization_endpoint, scopes_supported } =
+      this.openIDConfiguration;
 
     const areScopesSupported = this.scopes.every((scope) =>
       scopes_supported.includes(scope),
@@ -241,7 +239,7 @@ class OAuth2Client {
     const { payload } = decryptedJWEToken;
 
     if (isSigned) {
-      return (payload.toString() as unknown) as T;
+      return payload.toString() as unknown as T;
     } else {
       return JSON.parse(payload.toString()) as T;
     }

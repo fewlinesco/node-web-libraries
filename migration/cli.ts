@@ -153,8 +153,7 @@ const migrateCommand = {
 
 const createCommand = {
   command: "create [name]",
-  desc:
-    "Create a timestamped migration file in the path set up in config.json.",
+  desc: "Create a timestamped migration file in the path set up in config.json.",
   builder: (yargs) =>
     yargs
       .option("configPath", {
@@ -175,7 +174,7 @@ const createCommand = {
       : {};
     const config = await _loadConfig(argv.configPath, overrides);
     return createMigrationFile(
-      (name as unknown) as string,
+      name as unknown as string,
       config.migration.dirPath,
     );
   },

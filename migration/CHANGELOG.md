@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2022-05-02
+
+- Bump all dependencies.
+
 ## [0.2.0] - 2021-05-04
 
 - Added three new flags to the CLI to pass SSL certificate alongside the DB call for `migrate` and `dryRun`:
