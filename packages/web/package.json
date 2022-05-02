@@ -27,7 +27,7 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@fwl/logging": "0.1.4",
+    "@fwl/logging": "0.1.5",
     "@fwl/tracing": "0.10.6",
     "@hapi/iron": "6.0.0",
     "@types/cookie": "0.5.1",
