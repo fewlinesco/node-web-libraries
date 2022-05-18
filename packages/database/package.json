@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@fwl/tracing": "0.10.7",
-    "@types/node": "17.0.32",
+    "@types/node": "17.0.34",
     "@types/pg": "8.6.5",
     "@types/uuid": "8.3.4",
     "pg": "8.7.3",
