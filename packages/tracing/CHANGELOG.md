@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.10.8 - 2022-05-24
+
+- Bump node types & eslint.
 
 ## 0.10.7 - 2022-05-02
 

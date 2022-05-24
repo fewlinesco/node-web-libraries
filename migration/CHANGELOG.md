@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2022-05-24
+
+- Bump node types & eslint.
+
 ## [0.2.1] - 2022-05-02
 
 - Bump all dependencies.
