@@ -2,7 +2,7 @@
   "author": "Fewlines",
   "description": "Migration part of Fewlines Web Libraries",
   "dependencies": {
-    "@fwl/database": "0.6.3",
+    "@fwl/database": "0.6.4",
     "uuid": "8.3.2"
   },
   "devDependencies": {
