@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.6 - 2022-05-24
+
+- Bump node types & eslint.
+
 ## 0.1.5 - 2022-05-02
 
 - Bump all dependencies

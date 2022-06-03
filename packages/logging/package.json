@@ -2,7 +2,7 @@
   "author": "Fewlines",
   "description": "Logging part of Fewlines Web Libraries",
   "types": "dist/index.d.ts",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "license": "MIT",
   "main": "dist/index.js",
   "name": "@fwl/logging",

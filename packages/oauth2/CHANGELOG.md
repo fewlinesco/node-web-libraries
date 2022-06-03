@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.2.3] - 2022-05-24
+
+- Bump node types & eslint.
+
 ## [0.2.2] - 2022-05-02
 
 - Bump node-fetch to the latest version of the 2.x branch
