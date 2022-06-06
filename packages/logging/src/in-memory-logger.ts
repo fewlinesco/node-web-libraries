@@ -1,4 +1,4 @@
-import { Logger, Metadata } from "@fwl/logging";
+import { Logger, Metadata } from "./logger";
 
 type Log = Metadata & { message: string };
 

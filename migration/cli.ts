@@ -173,7 +173,7 @@ const createCommand = {
       ? { migration: { dirPath: argv.migrationPath } }
       : {};
     const config = await _loadConfig(argv.configPath, overrides);
-    return createMigrationFile(
+    await createMigrationFile(
       name as unknown as string,
       config.migration.dirPath,
     );

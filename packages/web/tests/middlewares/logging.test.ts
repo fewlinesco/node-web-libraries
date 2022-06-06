@@ -38,7 +38,6 @@ test("logs a good result", async () => {
   expect(logger.getLog(0)).toMatchObject({
     message: "",
     path: "/test",
-    remoteaddr: "127.0.0.1",
     statusCode: 200,
     traceid: "1",
   });
@@ -76,7 +75,6 @@ test("logs the error message with the right statusCode when a WebError is thrown
     expect(log).toMatchObject({
       message: "Error: something wrong happened",
       path: "/test",
-      remoteaddr: "127.0.0.1",
       statusCode: HttpStatus.NOT_FOUND,
       traceid: "1",
     });
@@ -110,7 +108,6 @@ test("should log a 500 when an unknown error is thrown", async () => {
     expect(log).toMatchObject({
       message: "Error: something wrong happened",
       path: "/test",
-      remoteaddr: "127.0.0.1",
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       traceid: "1",
     });

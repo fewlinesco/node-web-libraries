@@ -28,7 +28,7 @@ describe("Server side cookies", () => {
         secure: true,
       });
       expect(firstMockedResponse.getHeader("set-cookie")).toBe(
-        "string=%22foo%22; Max-Age=86400; Path=/; HttpOnly; Secure",
+        "string=foo; Max-Age=86400; Path=/; HttpOnly; Secure",
       );
 
       const secondMockedResponse = new httpMock.Response();
@@ -104,7 +104,7 @@ describe("Server side cookies", () => {
         secure: true,
       });
       expect(mockedResponse.getHeader("set-cookie")).toBe(
-        "string=%22foo%22; Max-Age=86400; Path=/; HttpOnly; Secure",
+        "string=foo; Max-Age=86400; Path=/; HttpOnly; Secure",
       );
 
       await setServerSideCookies(
@@ -121,7 +121,7 @@ describe("Server side cookies", () => {
       );
       expect(mockedResponse.getHeader("set-cookie")).toBeInstanceOf(Array);
       expect(mockedResponse.getHeader("set-cookie")).toStrictEqual([
-        "string=%22foo%22; Max-Age=86400; Path=/; HttpOnly; Secure",
+        "string=foo; Max-Age=86400; Path=/; HttpOnly; Secure",
         "object=%7B%22key%22%3A%22value%22%7D; Max-Age=86400; Path=/; HttpOnly; Secure",
       ]);
     });

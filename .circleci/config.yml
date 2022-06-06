@@ -1,22 +1,5 @@
 version: 2.1
 jobs:
-  setup:
-    docker:
-      - image: circleci/node:16.13.1
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-packages-v1-{{ .Branch }}-
-            - yarn-packages-v1-
-      - run:
-          name: yarn-install
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-      - save_cache:
-          paths:
-            - ~/.cache/yarn
-          key: yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
   test-database:
     docker:
       - image: circleci/node:16.13.1
@@ -35,15 +18,18 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-packages-v1-{{ .Branch }}-
-            - yarn-packages-v1-
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/database/yarn.lock" }}
       - run:
           name: yarn-install
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+          command: yarn install --frozen-lockfile
+          working_directory: packages/database
+      - save_cache:
+          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/database/yarn.lock" }}
+          paths:
+            - "packages/database/node_modules"
       - run:
           name: database-tests
-          command: yarn --cache-folder ~/.cache/yarn test
+          command: yarn test
           working_directory: packages/database
   test-logging:
     docker:
@@ -52,19 +38,22 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-packages-v1-{{ .Branch }}-
-            - yarn-packages-v1-
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/logging/yarn.lock" }}
       - run:
           name: yarn-install
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+          command: yarn install --frozen-lockfile
+          working_directory: packages/logging
+      - save_cache:
+          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/logging/yarn.lock" }}
+          paths:
+            - "packages/logging/node_modules"
       - run:
           name: logging-tests
-          command: yarn --cache-folder ~/.cache/yarn test
+          command: yarn test
           working_directory: packages/logging
       - run:
           name: logging-lint
-          command: yarn --cache-folder ~/.cache/yarn lint
+          command: yarn lint
           working_directory: packages/logging
   test-migration:
     docker:
@@ -84,16 +73,18 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - migrations-yarn-packages-v1-{{ .Branch }}-{{ checksum "migrations/yarn.lock" }}
-            - migrations-yarn-packages-v1-{{ .Branch }}-
-            - migrations-yarn-packages-v1-
+            - migrations-yarn-packages-v2-{{ .Branch }}-{{ checksum "migrations/yarn.lock" }}
       - run:
           name: yarn-install
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+          command: yarn install --frozen-lockfile
           working_directory: migration
+      - save_cache:
+          key: migrations-yarn-packages-v2-{{ .Branch }}-{{ checksum "migrations/yarn.lock" }}
+          paths:
+            - "migrations/node_modules"
       - run:
           name: migrate-tests
-          command: yarn --cache-folder ~/.cache/yarn test
+          command: yarn test
           working_directory: migration
   test-tracing:
     docker:
@@ -102,19 +93,22 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-packages-v1-{{ .Branch }}-
-            - yarn-packages-v1-
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/tracing/yarn.lock" }}
       - run:
           name: yarn-install
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+          command: yarn install --frozen-lockfile
+          working_directory: packages/tracing
+      - save_cache:
+          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/tracing/yarn.lock" }}
+          paths:
+            - "packages/tracing/node_modules"
       - run:
           name: tracing-tests
-          command: yarn --cache-folder ~/.cache/yarn test
+          command: yarn test
           working_directory: packages/tracing
       - run:
           name: tracing-lint
-          command: yarn --cache-folder ~/.cache/yarn lint
+          command: yarn lint
           working_directory: packages/tracing
   test-web:
     docker:
@@ -123,15 +117,18 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-packages-v1-{{ .Branch }}-
-            - yarn-packages-v1-
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/web/yarn.lock" }}
       - run:
           name: yarn-install
-          command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
+          command: yarn install --frozen-lockfile
+          working_directory: packages/web
+      - save_cache:
+          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/web/yarn.lock" }}
+          paths:
+            - "packages/web/node_modules"
       - run:
           name: web-lint
-          command: yarn --cache-folder ~/.cache/yarn lint
+          command: yarn lint
           working_directory: packages/web
   build-migration-image:
     machine:
@@ -150,22 +147,11 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - setup
-      - test-database:
-          requires:
-            - setup
-      - test-logging:
-          requires:
-            - setup
-      - test-migration:
-          requires:
-            - setup
-      - test-tracing:
-          requires:
-            - setup
-      - test-web:
-          requires:
-            - setup
+      - test-database
+      - test-logging
+      - test-migration
+      - test-tracing
+      - test-web
       - build-migration-image:
           requires:
             - test-migration
