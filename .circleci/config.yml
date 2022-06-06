@@ -1,5 +1,20 @@
 version: 2.1
 jobs:
+  setup:
+    docker:
+      - image: circleci/node:16.13.1
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: yarn-install
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - "node_modules"
   test-database:
     docker:
       - image: circleci/node:16.13.1
@@ -19,6 +34,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/database/yarn.lock" }}
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile
@@ -39,6 +55,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/logging/yarn.lock" }}
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile
@@ -74,6 +91,7 @@ jobs:
       - restore_cache:
           keys:
             - migrations-yarn-packages-v2-{{ .Branch }}-{{ checksum "migrations/yarn.lock" }}
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile
@@ -94,6 +112,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/tracing/yarn.lock" }}
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile
@@ -118,6 +137,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/web/yarn.lock" }}
+            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile
@@ -147,11 +167,22 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - test-database
-      - test-logging
-      - test-migration
-      - test-tracing
-      - test-web
+      - setup
+      - test-database:
+          requires:
+            - setup
+      - test-logging:
+          requires:
+            - setup
+      - test-migration:
+          requires:
+            - setup
+      - test-tracing:
+          requires:
+            - setup
+      - test-web:
+          requires:
+            - setup
       - build-migration-image:
           requires:
             - test-migration
