@@ -1,5 +1,9 @@
 {
   "packages": ["packages/*", "migration"],
   "npmClient": "yarn",
-  "version": "independent"
+  "version": "independent",
+  "useWorkspaces": true,
+  "publishConfig": {
+    "directory": "dist"
+  }
 }

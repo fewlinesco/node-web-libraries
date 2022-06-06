@@ -22,6 +22,7 @@
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
     "prepare": "yarn build",
+    "postinstall": "yarn build",
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
     "test": "jest"

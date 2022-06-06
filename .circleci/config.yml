@@ -7,14 +7,15 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile
       - save_cache:
-          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - "node_modules"
+
   test-database:
     docker:
       - image: circleci/node:16.13.1
@@ -33,20 +34,11 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/database/yarn.lock" }}
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: yarn-install
-          command: yarn install --frozen-lockfile
-          working_directory: packages/database
-      - save_cache:
-          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/database/yarn.lock" }}
-          paths:
-            - "packages/database/node_modules"
+            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: database-tests
-          command: yarn test
-          working_directory: packages/database
+          command: yarn lerna run --scope @fwl/database test
+
   test-logging:
     docker:
       - image: circleci/node:16.13.1
@@ -54,24 +46,15 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/logging/yarn.lock" }}
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: yarn-install
-          command: yarn install --frozen-lockfile
-          working_directory: packages/logging
-      - save_cache:
-          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/logging/yarn.lock" }}
-          paths:
-            - "packages/logging/node_modules"
+            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: logging-tests
-          command: yarn test
+          command: yarn lerna run --scope @fwl/logging test
           working_directory: packages/logging
       - run:
           name: logging-lint
-          command: yarn lint
-          working_directory: packages/logging
+          command: yarn lerna run --scope @fwl/logging lint
+
   test-migration:
     docker:
       - image: circleci/node:16.13.1
@@ -90,20 +73,11 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - migrations-yarn-packages-v2-{{ .Branch }}-{{ checksum "migrations/yarn.lock" }}
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: yarn-install
-          command: yarn install --frozen-lockfile
-          working_directory: migration
-      - save_cache:
-          key: migrations-yarn-packages-v2-{{ .Branch }}-{{ checksum "migrations/yarn.lock" }}
-          paths:
-            - "migrations/node_modules"
+            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: migrate-tests
-          command: yarn test
-          working_directory: migration
+          command: yarn lerna run --scope @fwl/migration test
+
   test-tracing:
     docker:
       - image: circleci/node:16.13.1
@@ -111,24 +85,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/tracing/yarn.lock" }}
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: yarn-install
-          command: yarn install --frozen-lockfile
-          working_directory: packages/tracing
-      - save_cache:
-          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/tracing/yarn.lock" }}
-          paths:
-            - "packages/tracing/node_modules"
+            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: tracing-tests
-          command: yarn test
-          working_directory: packages/tracing
+          command: yarn lerna run --scope @fwl/tracing test
       - run:
           name: tracing-lint
-          command: yarn lint
-          working_directory: packages/tracing
+          command: yarn lerna run --scope @fwl/tracing lint
+
   test-web:
     docker:
       - image: circleci/node:16.13.1
@@ -136,20 +100,11 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/web/yarn.lock" }}
-            - yarn-packages-v2-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: yarn-install
-          command: yarn install --frozen-lockfile
-          working_directory: packages/web
-      - save_cache:
-          key: yarn-packages-v2-{{ .Branch }}-{{ checksum "packages/web/yarn.lock" }}
-          paths:
-            - "packages/web/node_modules"
+            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: web-lint
-          command: yarn lint
-          working_directory: packages/web
+          command: yarn lerna run --scope @fwl/web lint
+
   build-migration-image:
     machine:
         image: ubuntu-2204:2022.04.1
@@ -160,8 +115,6 @@ jobs:
       - run:
           command: ../bin/build-and-push.sh fwl-migration $CIRCLE_REPOSITORY_URL $CIRCLE_BRANCH $CIRCLE_SHA1
           working_directory: migration
-
-
 
 workflows:
   version: 2

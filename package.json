@@ -30,5 +30,10 @@
     "@fwl/oauth2": "file:packages/oauth2",
     "@fwl/tracing": "file:packages/tracing",
     "@fwl/web": "file:packages/web"
-  }
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "migration"
+  ]
 }
