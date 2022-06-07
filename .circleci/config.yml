@@ -113,8 +113,7 @@ jobs:
       - checkout
       - run: docker login -u ${DOCKER_USERNAME} -p $(echo ${DOCKER_PASSWORD} | base64 --decode)
       - run:
-          command: ../bin/build-and-push.sh fwl-migration $CIRCLE_REPOSITORY_URL $CIRCLE_BRANCH $CIRCLE_SHA1
-          working_directory: migration
+          command: ./bin/build-and-push.sh fwl-migration $CIRCLE_REPOSITORY_URL $CIRCLE_BRANCH $CIRCLE_SHA1
 
 workflows:
   version: 2

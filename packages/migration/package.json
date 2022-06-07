@@ -2,8 +2,14 @@
   "author": "Fewlines",
   "description": "Migration part of Fewlines Web Libraries",
   "dependencies": {
-    "@fwl/database": "file:../packages/database",
-    "uuid": "8.3.2"
+    "@fwl/database": "file:../database",
+    "uuid": "8.3.2",
+    "yargs": "17.5.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fewlinesco/node-web-libraries",
+    "directory": "packages/migration"
   },
   "eslintConfig": {
     "extends": [
