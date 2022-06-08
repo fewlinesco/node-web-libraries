@@ -29,8 +29,7 @@
     "experimental-publish": "yarn publish --new-version \"0.0.0-experimental-$(git rev-parse --short HEAD)\" --access public --tag experimental",
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn lint",
+    "prepublishOnly": "yarn lint && yarn build",
     "preversion": "yarn lint",
     "test": "jest --runInBand --verbose"
   },
@@ -38,5 +37,5 @@
     "migration": "dist/runCli.js"
   },
   "types": "dist/index.d.ts",
-  "version": "0.2.3"
+  "version": "0.2.4"
 }

@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.10.8",
+  "version": "0.10.9",
   "files": [
     "dist/**/*"
   ],
@@ -21,9 +21,7 @@
     "prelint": "prettier --trailing-comma all --write './**/*.md'",
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "postinstall": "yarn build",
-    "prepublishOnly": "yarn lint",
+    "prepublishOnly": "yarn lint && yarn build",
     "preversion": "yarn lint",
     "test": "jest"
   },

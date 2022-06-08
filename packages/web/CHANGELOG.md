@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.14.4 - 2022-06-08
+
+- Removed the `"prepare"` script to avoid failing installation
+
 ## 0.14.3 - 2022-06-08
 
 - Removed development dependencies from the package to be leveraged by Lerna

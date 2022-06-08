@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2022-06-08
+
+- Removed the `"prepare"` script to avoid failing installation
+
 ## [0.2.3] - 2022-06-08
 
 - Added `yargs` as a dependency
