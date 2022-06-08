@@ -22,7 +22,7 @@ RUN yarn global add lerna
 
 COPY packages packages
 
-RUN lerna bootstrap --include-dependents --include-dependencies --scope @fwl/migration
+RUN lerna bootstrap --scope @fwl/migration
 
 FROM node:16.15.0-alpine
 
