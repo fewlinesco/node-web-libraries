@@ -7,12 +7,21 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: yarn-install
           command: yarn install --frozen-lockfile
+      - run:
+          name: yarn-build
+          command: yarn workspaces run build
+      - run:
+          name: refresh-node-modules
+          command: rm -rf "node_modules"
+      - run:
+          name: yarn-install-with-dist-folders
+          command: yarn install --frozen-lockfile
       - save_cache:
-          key: yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-packages-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - "node_modules"
 
@@ -34,10 +43,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: bootstrap
-          command: yarn lerna bootstrap --scope @fwl/database
+            - yarn-packages-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: database-tests
           command: yarn lerna run --scope @fwl/database test
@@ -49,7 +55,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: logging-tests
           command: yarn lerna run --scope @fwl/logging test
@@ -76,7 +82,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: migrate-tests
           command: yarn lerna run --scope @fwl/migration test
@@ -88,7 +94,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: tracing-tests
           command: yarn lerna run --scope @fwl/tracing test
@@ -103,7 +109,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: web-lint
           command: yarn lerna run --scope @fwl/web lint
