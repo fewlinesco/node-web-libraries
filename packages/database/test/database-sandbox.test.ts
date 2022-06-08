@@ -88,7 +88,7 @@ describe("transactions", () => {
     expect(rows.length).toBe(0);
   });
 
-  test.only("we should be able to manually rollback a transaction using the rollback function", async () => {
+  test("we should be able to manually rollback a transaction using the rollback function", async () => {
     expect.assertions(1);
     await db.transaction(async (client) => {
       await client.query("INSERT INTO fwl (id, name) VALUES ($1, $2)", [

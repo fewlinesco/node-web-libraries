@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "files": [
     "dist/**/*"
   ],
@@ -21,31 +21,18 @@
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
     "prepare": "yarn build",
+    "postinstall": "yarn build",
     "prepublishOnly": "yarn lint",
     "preversion": "yarn lint",
     "test": "jest --runInBand --verbose"
   },
   "dependencies": {
-    "@fwl/tracing": "0.10.7",
+    "@fwl/tracing": "file:../tracing",
     "@types/node": "17.0.39",
     "@types/pg": "8.6.5",
     "@types/uuid": "8.3.4",
     "pg": "8.7.3",
     "uuid": "8.3.2"
-  },
-  "devDependencies": {
-    "@fewlines/eslint-config": "3.1.2",
-    "@types/jest": "28.1.1",
-    "@typescript-eslint/eslint-plugin": "5.27.0",
-    "@typescript-eslint/parser": "5.27.0",
-    "eslint": "8.17.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-prettier": "4.0.0",
-    "jest": "28.1.0",
-    "prettier": "2.6.2",
-    "ts-jest": "28.0.4",
-    "ts-node": "10.8.1",
-    "typescript": "4.7.3"
   },
   "eslintConfig": {
     "extends": [

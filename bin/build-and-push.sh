@@ -14,7 +14,6 @@ _appEnvironment() {
   fi
 }
 
-
 cwd=$(dirname $(realpath $0))
 
 imageName=${1:?"app name is required as first argument"}
@@ -22,7 +21,7 @@ gitRepo=${2:?"git repository URL is required as second argument"};
 gitCommit=${4:?"git commit SHA is required as fourth argument"};
 gitBranch=${3:?"git branch is required as third argument"};
 
-gitShortCommit=$(echo $CIRCLE_SHA1 | cut -c -7)
+gitShortCommit=$(echo $gitCommit | cut -c -7)
 releaseName=$(echo ${gitBranch} | sed 's/^\(CU-[[:alnum:]]*\).*/\1/' | sed 's/\//-/g')
 
 environment=$(_appEnvironment $gitBranch)
@@ -35,9 +34,8 @@ docker build \
 		--build-arg GIT_SHA=${gitCommit} \
 		--tag ${dockerImage} \
 		--tag ${dockerImageLatest} \
+    -f "$imageName.Dockerfile" \
 		.
 
 docker push $dockerImage
 docker push $dockerImageLatest
-
-# _updateManifest manifest.txt connect-demo-signup $environment $dockerTag
