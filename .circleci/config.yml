@@ -36,6 +36,9 @@ jobs:
           keys:
             - yarn-packages-v5-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
+          name: bootstrap
+          command: yarn lerna bootstrap --scope @fwl/database
+      - run:
           name: database-tests
           command: yarn lerna run --scope @fwl/database test
 
