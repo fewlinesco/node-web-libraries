@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2022-06-08
+
+- Added `yargs` as a dependency
+- Removed development dependencies from the package to be leveraged by Lerna
+
 ## [0.2.2] - 2022-05-24
 
 - Bump node types & eslint.

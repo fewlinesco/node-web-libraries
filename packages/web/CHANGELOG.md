@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.14.3 - 2022-06-08
+
+- Removed development dependencies from the package to be leveraged by Lerna
+
 ## 0.14.2 - 2022-05-02
 
 - Bump all dependencies

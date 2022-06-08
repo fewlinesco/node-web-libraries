@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.2.4] - 2022-06-08
+
+- Removed development dependencies from the package to be leveraged by Lerna
+
 ## [0.2.3] - 2022-05-24
 
 - Bump node types & eslint.
