@@ -42,9 +42,6 @@
     "prelint": "prettier --trailing-comma all --write './**/*.md'",
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn lint",
-    "preversion": "yarn lint",
     "test": "jest"
   },
   "types": "dist/index.d.ts",

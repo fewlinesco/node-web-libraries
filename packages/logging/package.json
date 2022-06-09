@@ -2,7 +2,7 @@
   "author": "Fewlines",
   "description": "Logging part of Fewlines Web Libraries",
   "types": "dist/index.d.ts",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "license": "MIT",
   "main": "dist/index.js",
   "name": "@fwl/logging",
@@ -20,8 +20,7 @@
     "prelint": "prettier --trailing-comma all --write './**/*.md'",
     "lint": "eslint --ext ts --ignore-pattern dist .",
     "prebuild": "yarn clean",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn test && yarn lint",
+    "prepublishOnly": "yarn test && yarn lint && yarn build",
     "preversion": "yarn lint",
     "test": "jest"
   },
