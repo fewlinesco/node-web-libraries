@@ -25,7 +25,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@types/jsonwebtoken": "8.5.8",
+    "@types/jsonwebtoken": "8.5.9",
     "@types/node": "18.7.13",
     "@types/node-fetch": "2.6.1",
     "@types/node-jose": "1.1.10",
