@@ -35,7 +35,7 @@
     "@opentelemetry/node": "0.24.0",
     "@opentelemetry/plugin-http": "0.18.2",
     "@opentelemetry/plugin-https": "0.18.2",
-    "@opentelemetry/resources": "1.2.0",
+    "@opentelemetry/resources": "1.6.0",
     "@opentelemetry/semantic-conventions": "1.2.0",
     "@opentelemetry/tracing": "0.24.0",
     "@types/node": "18.7.17"
