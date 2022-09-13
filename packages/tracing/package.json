@@ -31,7 +31,7 @@
     "@opentelemetry/context-async-hooks": "1.2.0",
     "@opentelemetry/core": "1.2.0",
     "@opentelemetry/exporter-collector": "0.25.0",
-    "@opentelemetry/exporter-zipkin": "1.2.0",
+    "@opentelemetry/exporter-zipkin": "1.6.0",
     "@opentelemetry/node": "0.24.0",
     "@opentelemetry/plugin-http": "0.18.2",
     "@opentelemetry/plugin-https": "0.18.2",
